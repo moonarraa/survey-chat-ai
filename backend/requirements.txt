@@ -5,3 +5,7 @@ sqlalchemy
 python-dotenv
 openai
 python-jose
+pydantic
+asyncpg
+passlib[bcrypt]
+python-multipart

@@ -6,12 +6,12 @@ from typing import Dict
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.tasks.crud import UserDAO
-from backend.src.tasks.exceptions import (InvalidCredentialsException,
+from src.tasks.crud import UserDAO
+from src.auth.exceptions import (InvalidCredentialsException,
                              UserAlreadyExistsException)
-from backend.src.tasks.models import UserCredentials
-from backend.src.tasks.schema import User as DBUser
-from auth.utils import create_access_token, get_password_hash, verify_password
+from src.tasks.models import UserCredentials
+from src.tasks.schema import User as DBUser
+from src.auth.utils import create_access_token, get_password_hash, verify_password
 
 
 class AuthService:

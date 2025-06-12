@@ -4,9 +4,9 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from backend.src.tasks.exceptions import (DatabaseException, UserAlreadyExistsException,
+from src.auth.exceptions import (DatabaseException, UserAlreadyExistsException,
                                  UserNotFoundException)
-from backend.src.tasks.schema import User
+from src.tasks.schema import User
 
 
 class UserDAO:

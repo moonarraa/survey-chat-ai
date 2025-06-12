@@ -2,8 +2,8 @@ from datetime import datetime, timedelta
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from backend.src.tasks.exceptions import InvalidTokenException, TokenExpiredException
-from config import settings
+from src.auth.exceptions import InvalidTokenException, TokenExpiredException
+from src.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
