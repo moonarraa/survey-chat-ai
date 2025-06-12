@@ -1,7 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { Send, RotateCcw, Download, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart3 } from 'lucide-react';
+
 
 const QUESTION_COUNT = 3;
 const QUESTION_TEMPLATES = [
