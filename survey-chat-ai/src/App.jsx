@@ -1,14 +1,23 @@
-import LandingPage from './LandingPage';
-import Chat from './Chat';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/LandingPage';
+import ChatPage from './pages/ChatPage';
+import Header from './components/Header';
+import Footer from './components/Footer';
 
 function App() {
   return (
-    <>
-      <LandingPage />
-      <div id="chat-demo" style={{ paddingTop: 40 }}>
-        <Chat />
+    <Router>
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/chat" element={<ChatPage />} />
+          </Routes>
+        </main>
+        <Footer />
       </div>
-    </>
+    </Router>
   );
 }
 
