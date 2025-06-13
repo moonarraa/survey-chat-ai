@@ -9,6 +9,7 @@ function Header() {
   const navigation = [
     { name: 'Главная', href: '/' },
     { name: 'Чат', href: '/chat' },
+    { name: 'Дашборд', href: '/dashboard' },
   ];
 
   return (
