@@ -15,6 +15,7 @@ from src.auth.exceptions import (InvalidCredentialsException,
 from src.tasks.models import Token, User, UserCredentials
 from src.tasks.service import AuthService
 from src.database import get_async_db
+from src.tasks.crud import UserDAO
 
 router = APIRouter(prefix="/auth")
 
@@ -35,6 +36,10 @@ class AnswerRequest(BaseModel):
 class AnswerResponse(BaseModel):
     question: str = None
     summary: str = None
+
+class UserProfileUpdate(BaseModel):
+    company: str
+    role: str
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
@@ -97,3 +102,16 @@ async def answer_survey(req: AnswerRequest):
     )
     session["current_question"] = next_question
     return {"question": next_question}
+
+@router.put("/me", response_model=User)
+async def update_profile(
+    profile: UserProfileUpdate = Body(...),
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db)
+):
+    db_user = await UserDAO.get_user_by_email(current_user.email, db)
+    db_user.company = profile.company
+    db_user.role = profile.role
+    await db.commit()
+    await db.refresh(db_user)
+    return db_user

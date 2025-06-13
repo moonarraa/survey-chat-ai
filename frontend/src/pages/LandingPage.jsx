@@ -68,14 +68,14 @@ function LandingPage() {
                 Революционная платформа для создания интерактивных опросов с помощью ИИ. 
                 Получайте более качественные данные через естественное общение.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col items-center gap-4 justify-center">
                 <Link to="/chat" className="btn-primary inline-flex items-center">
                   Попробовать бесплатно
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
-                <button className="btn-secondary">
-                  Посмотреть демо
-                </button>
+                <Link to="/register" className="btn-secondary inline-flex items-center">
+                  Получить ранний доступ
+                </Link>
               </div>
             </motion.div>
           </div>

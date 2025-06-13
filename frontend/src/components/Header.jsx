@@ -9,6 +9,7 @@ function Header() {
   const navigation = [
     { name: 'Главная', href: '/' },
     { name: 'Чат', href: '/chat' },
+    { name: 'Дашборд', href: '/dashboard' },
   ];
 
   return (
@@ -40,8 +41,11 @@ function Header() {
             ))}
           </nav>
 
-          {/* CTA Button */}
-          <div className="hidden md:flex">
+          {/* Desktop CTA Buttons */}
+          <div className="hidden md:flex space-x-4">
+            <Link to="/register" className="btn-secondary">
+              Регистрация
+            </Link>
             <Link to="/chat" className="btn-primary">
               Начать опрос
             </Link>
@@ -76,6 +80,13 @@ function Header() {
                   {item.name}
                 </Link>
               ))}
+              <Link
+                to="/register"
+                className="btn-secondary inline-block text-center"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Регистрация
+              </Link>
               <Link
                 to="/chat"
                 className="btn-primary inline-block text-center"

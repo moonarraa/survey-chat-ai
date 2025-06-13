@@ -54,7 +54,10 @@ class AuthService:
         hashed_password = get_password_hash(credentials.password)
         new_user = DBUser(
             email=credentials.email,
-            hashed_password=hashed_password
+            hashed_password=hashed_password,
+            name=credentials.name,
+            company=credentials.company,
+            role=credentials.role
         )
 
         created_user = await UserDAO.create_user(new_user, db)
@@ -66,7 +69,8 @@ class AuthService:
 
         return {
             "access_token": access_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
+            "refresh_token": ""  # or generate if you use refresh tokens
         }
 
     @staticmethod

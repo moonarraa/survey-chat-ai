@@ -27,3 +27,6 @@ class TokenData(BaseModel):
 class UserCredentials(BaseModel):
     email: EmailStr
     password: str
+    name: str
+    company: str
+    role: str
