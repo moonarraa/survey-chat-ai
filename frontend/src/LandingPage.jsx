@@ -1,4 +1,5 @@
 import React from 'react';
+import './index.css';
 
 const features = [
   {
@@ -25,10 +26,10 @@ function LandingPage() {
       {/* Hero Section */}
       <section style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 400, padding: '4rem 1rem 2rem 1rem', maxWidth: 1400, margin: '0 auto' }}>
         <h1 style={{ fontSize: '2.2rem', fontWeight: 500, textAlign: 'center', marginBottom: 6, color: '#222' }}>
-            Замените скучные опросы
+            <div class="reveal-words">Замените скучные опросы</div>
         </h1>
         <h2 style={{ fontSize: '2.5rem', fontWeight: 800, textAlign: 'center', marginBottom: 16, color: '#222' }}>
-            На живой диалог
+            <div class="reveal-words">На живой диалог</div>
         </h2>
         <p style={{ fontSize: '1.25rem', textAlign: 'center', maxWidth: 900, marginBottom: 32, color: '#444' }}>
           Просто напишите тему — AI сам подготовит вопросы и проведёт опрос в формате живого диалога. Быстро, удобно, эффективно.

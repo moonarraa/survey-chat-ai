@@ -58,3 +58,20 @@
   0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
   40% { transform: scale(1); opacity: 1; }
 }
+
+.reveal-words {
+  font-size: 2.5rem;
+  font-weight: bold;
+  line-height: 1.4;
+}
+
+.reveal-words .word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: revealWord 0.8s ease-out forwards;
+}
+
+.reveal-words .word:nth-child(1) { animation-delay: 0.2s; }
+.reveal-words .word:nth-child(2) { animation-delay: 0.4s; }
+.reveal-words .word:nth-child(3) { animation-delay: 0.6s; }

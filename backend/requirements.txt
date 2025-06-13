@@ -8,4 +8,8 @@ python-jose
 pydantic
 asyncpg
 passlib[bcrypt]
+python-dotenv
+pydantic-settings
+alembic
+pydantic[email]
 python-multipart
