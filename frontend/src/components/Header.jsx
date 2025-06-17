@@ -1,16 +1,22 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, MessageCircle } from 'lucide-react';
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navigation = [
     { name: 'Главная', href: '/' },
-    { name: 'Чат', href: '/chat' },
     { name: 'Дашборд', href: '/dashboard' },
   ];
+
+  const isLoggedIn = Boolean(localStorage.getItem('token'));
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   return (
     <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-50">
@@ -43,12 +49,25 @@ function Header() {
 
           {/* Desktop CTA Buttons */}
           <div className="hidden md:flex space-x-4">
-            <Link to="/register" className="btn-secondary">
-              Регистрация
-            </Link>
-            <Link to="/chat" className="btn-primary">
-              Начать опрос
-            </Link>
+            {!isLoggedIn && (
+              <Link to="/register" className="btn-secondary">
+                Регистрация
+              </Link>
+            )}
+            {!isLoggedIn && (
+              <Link to="/chat" className="btn-primary">
+                Начать опрос
+              </Link>
+            )}
+            {isLoggedIn && (
+              <button
+                onClick={handleLogout}
+                className="btn-secondary"
+                style={{ minWidth: 120 }}
+              >
+                Выйти
+              </button>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -80,20 +99,33 @@ function Header() {
                   {item.name}
                 </Link>
               ))}
-              <Link
-                to="/register"
-                className="btn-secondary inline-block text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Регистрация
-              </Link>
-              <Link
-                to="/chat"
-                className="btn-primary inline-block text-center"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Начать опрос
-              </Link>
+              {!isLoggedIn && (
+                <Link
+                  to="/register"
+                  className="btn-secondary inline-block text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Регистрация
+                </Link>
+              )}
+              {!isLoggedIn && (
+                <Link
+                  to="/chat"
+                  className="btn-primary inline-block text-center"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Начать опрос
+                </Link>
+              )}
+              {isLoggedIn && (
+                <button
+                  onClick={() => { setIsMenuOpen(false); handleLogout(); }}
+                  className="btn-secondary inline-block text-center"
+                  style={{ minWidth: 120 }}
+                >
+                  Выйти
+                </button>
+              )}
             </div>
           </div>
         )}

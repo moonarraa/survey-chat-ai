@@ -69,7 +69,7 @@ function LandingPage() {
                 Получайте более качественные данные через естественное общение.
               </p>
               <div className="flex flex-col items-center gap-4 justify-center">
-                <Link to="/chat" className="btn-primary inline-flex items-center">
+                <Link to="/register" className="btn-primary inline-flex items-center">
                   Попробовать бесплатно
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
@@ -243,7 +243,7 @@ function LandingPage() {
               для получения более качественных данных.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/chat" className="bg-white text-primary-600 hover:bg-gray-50 font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center">
+              <Link to="/register" className="bg-white text-primary-600 hover:bg-gray-50 font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center">
                 Начать бесплатно
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>

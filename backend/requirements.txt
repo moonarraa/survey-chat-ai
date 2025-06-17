@@ -13,3 +13,7 @@ pydantic-settings
 alembic
 pydantic[email]
 python-multipart
+authlib
+httpx
+itsdangerous
+pyjwt

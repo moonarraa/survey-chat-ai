@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Home, 
   FolderOpen, 
@@ -22,6 +22,9 @@ import { motion } from 'framer-motion';
 function DashboardPage() {
   const [activeTab, setActiveTab] = useState('summary');
   const [searchQuery, setSearchQuery] = useState('');
+  const [surveys, setSurveys] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Mock data for company summary
   const companyData = {
@@ -53,36 +56,46 @@ function DashboardPage() {
     ]
   };
 
-  // Mock data for projects
-  const projects = [
-    {
-      id: 1,
-      type: 'NPS',
-      title: 'How likely are you to recommend SurveyChat AI to a friend or colleague?',
-      responses: 1,
-      newResponses: 1,
-      lastResponse: 'Today',
-      tags: [],
-      isActive: true
-    },
-    {
-      id: 2,
-      type: 'Interview',
-      title: '[Sample] Onboarding Interview - How easy was it to get started with our platform?',
-      responses: 30,
-      newResponses: 30,
-      lastResponse: 'Apr 2',
-      tags: [],
-      isActive: true
-    }
+  const sidebarItems = [
+    { id: 'projects', icon: FolderOpen, label: 'Мои опросы', active: activeTab === 'projects' },
+    { id: 'summary', icon: Home, label: 'Сводка', active: activeTab === 'summary' },
+    { id: 'help', icon: HelpCircle, label: 'Справка', active: false },
+    { id: 'settings', icon: Settings, label: 'Настройки', active: false }
   ];
 
-  const sidebarItems = [
-    { id: 'summary', icon: Home, label: 'Company Summary', active: activeTab === 'summary' },
-    { id: 'projects', icon: FolderOpen, label: 'Projects', active: activeTab === 'projects' },
-    { id: 'help', icon: HelpCircle, label: 'Help Docs', active: false },
-    { id: 'settings', icon: Settings, label: 'Settings', active: false }
-  ];
+  useEffect(() => {
+    async function fetchSurveys() {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      const res = await fetch('http://localhost:8000/surveys/', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSurveys(data);
+      }
+      setLoading(false);
+    }
+    fetchSurveys();
+  }, []);
+
+  const handleView = (surveyId) => {
+    navigate(`/survey/${surveyId}`);
+  };
+
+  const handleDelete = async (surveyId) => {
+    if (!window.confirm("Удалить этот опрос?")) return;
+    const token = localStorage.getItem('token');
+    const res = await fetch(`http://localhost:8000/surveys/${surveyId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.ok) {
+      setSurveys(surveys => surveys.filter(s => s.id !== surveyId));
+    } else {
+      alert("Ошибка при удалении опроса");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -226,116 +239,66 @@ function DashboardPage() {
             >
               {/* Header */}
               <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">AI Projects</h1>
-                <button className="btn-primary inline-flex items-center">
+                <h1 className="text-3xl font-bold text-gray-900">Мои опросы</h1>
+                <Link
+                  to="/create-survey"
+                  className="btn-primary inline-flex items-center"
+                >
                   <Plus className="h-4 w-4 mr-2" />
-                  Add project
-                </button>
+                  Создать опрос
+                </Link>
               </div>
 
-              {/* Tabs and Search */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
-                <div className="flex items-center justify-between mb-6">
-                  {/* Tabs */}
-                  <div className="flex space-x-8">
-                    <button className="text-primary-600 font-medium border-b-2 border-primary-600 pb-2">
-                      Current
-                    </button>
-                    <button className="text-gray-500 hover:text-gray-700 pb-2">
-                      Archived
-                    </button>
+              {/* Список опросов */}
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                {loading ? (
+                  <div className="text-gray-500 text-center py-12">Загрузка...</div>
+                ) : surveys.length === 0 ? (
+                  <div className="text-gray-500 text-center py-12">
+                    У вас пока нет опросов.<br />
+                    <Link to="/create-survey" className="text-primary-600 underline">Создать первый опрос</Link>
                   </div>
-
-                  {/* Search and Filter */}
-                  <div className="flex items-center space-x-4">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                      <input
-                        type="text"
-                        placeholder="Search projects..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
-                      />
-                    </div>
-                    <button className="flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                      <Filter className="h-4 w-4 text-gray-500" />
-                      <span className="text-gray-700">All Tags</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Table Header */}
-                <div className="grid grid-cols-12 gap-4 py-3 border-b border-gray-200 text-sm font-medium text-gray-700">
-                  <div className="col-span-5">Project</div>
-                  <div className="col-span-2 text-center">Responses</div>
-                  <div className="col-span-2 text-center">Last Response</div>
-                  <div className="col-span-2 text-center">Tags</div>
-                  <div className="col-span-1"></div>
-                </div>
-
-                {/* Project Rows */}
-                <div className="space-y-4 mt-4">
-                  {projects.map((project) => (
-                    <div key={project.id} className="grid grid-cols-12 gap-4 py-4 items-center hover:bg-gray-50 rounded-lg transition-colors">
-                      {/* Project Info */}
-                      <div className="col-span-5 flex items-center space-x-4">
-                        <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                ) : (
+                  <div className="space-y-4">
+                    {surveys.map((survey) => (
+                      <div
+                        key={survey.id}
+                        className="flex flex-col md:flex-row md:items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-xl p-4 border border-gray-100 transition"
+                      >
                         <div>
-                          <div className="flex items-center space-x-2 mb-1">
-                            <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
-                              {project.type}
-                            </span>
+                          <div className="text-lg font-semibold text-gray-900 mb-1">{survey.topic}</div>
+                          <div className="text-sm text-gray-600 mb-2">
+                            Вопросов: {survey.questions.length}
                           </div>
-                          <p className="text-sm text-gray-900 font-medium">{project.title}</p>
+                          <ul className="list-disc pl-5 text-gray-700 text-sm">
+                            {survey.questions.map((q, idx) => (
+                              <li key={idx}>{q}</li>
+                            ))}
+                          </ul>
                         </div>
-                      </div>
-
-                      {/* Responses */}
-                      <div className="col-span-2 text-center">
-                        <div className="flex items-center justify-center space-x-2">
-                          <span className="text-sm text-gray-900">{project.responses}</span>
-                          <span className="text-xs bg-pink-100 text-pink-700 px-2 py-1 rounded-full">
-                            {project.newResponses} New
+                        <div className="mt-4 md:mt-0 flex-shrink-0 flex flex-col items-end">
+                          <span className="text-xs text-gray-400 mb-2">
+                            Создан: {new Date(survey.created_at).toLocaleString('ru-RU')}
                           </span>
+                          <div className="flex space-x-2">
+                            <button
+                              className="btn-secondary text-xs px-4 py-2"
+                              onClick={() => handleView(survey.id)}
+                            >
+                              Посмотреть
+                            </button>
+                            <button
+                              className="btn-secondary text-xs px-4 py-2 text-red-600 border-red-200 hover:bg-red-50"
+                              onClick={() => handleDelete(survey.id)}
+                            >
+                              Удалить
+                            </button>
+                          </div>
                         </div>
                       </div>
-
-                      {/* Last Response */}
-                      <div className="col-span-2 text-center">
-                        <span className="text-sm text-gray-600">{project.lastResponse}</span>
-                      </div>
-
-                      {/* Tags */}
-                      <div className="col-span-2 text-center">
-                        <button className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
-                          <Tag className="h-4 w-4 inline mr-1" />
-                          Add tag
-                        </button>
-                      </div>
-
-                      {/* Actions */}
-                      <div className="col-span-1 text-right">
-                        <button className="p-1 text-gray-400 hover:text-gray-600 transition-colors">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Pagination */}
-                <div className="flex items-center justify-between mt-6 pt-4 border-t border-gray-200">
-                  <span className="text-sm text-gray-600">1-2 of 2</span>
-                  <div className="flex items-center space-x-2">
-                    <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                      <ChevronLeft className="h-4 w-4" />
-                    </button>
-                    <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                      <ChevronRight className="h-4 w-4" />
-                    </button>
+                    ))}
                   </div>
-                </div>
+                )}
               </div>
             </motion.div>
           )}

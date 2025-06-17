@@ -1,4 +1,5 @@
 from typing import Optional
+import json
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,7 +7,7 @@ from sqlalchemy.future import select
 
 from src.auth.exceptions import (DatabaseException, UserAlreadyExistsException,
                                  UserNotFoundException)
-from src.tasks.schema import User
+from src.tasks.schema import User, Survey
 
 
 class UserDAO:
@@ -103,3 +104,23 @@ class UserDAO:
         if user is None:
             raise UserNotFoundException(str(user_id))
         return user
+
+
+class SurveyDAO:
+    @staticmethod
+    async def create_survey(user_id: int, topic: str, questions: list, db: AsyncSession) -> Survey:
+        survey = Survey(
+            user_id=user_id,
+            topic=topic,
+            questions=json.dumps(questions)
+        )
+        db.add(survey)
+        await db.commit()
+        await db.refresh(survey)
+        return survey
+
+    @staticmethod
+    async def get_surveys_by_user(user_id: int, db: AsyncSession):
+        result = await db.execute(select(Survey).where(Survey.user_id == user_id))
+        surveys = result.scalars().all()
+        return surveys

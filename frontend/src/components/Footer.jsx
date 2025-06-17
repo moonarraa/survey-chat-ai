@@ -33,8 +33,8 @@ function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4">Контакты</h3>
             <ul className="space-y-2">
-              <li className="text-gray-400">support@surveychat.ai</li>
-              <li className="text-gray-400">+7 (999) 123-45-67</li>
+              <li className="text-gray-400">munaratuss@yahoo.com</li>
+              <li className="text-gray-400">+7 (701) 888-58-50</li>
             </ul>
           </div>
         </div>

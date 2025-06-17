@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, Mail, Building, Briefcase, Lock, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
+import OAuthButtons from '../components/OAuthButtons';
+
+// Use the same backend URL as OAuthButtons
+const BACKEND_URL = "http://localhost:8000";
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -68,23 +72,30 @@ function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     const newErrors = validateForm();
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
     setIsSubmitting(true);
-    
-    // Simulate API call
     try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      console.log('Registration data:', formData);
-      // Here you would typically make an API call to register the user
+      const res = await fetch(`${BACKEND_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        // Show backend error (e.g. user exists)
+        setErrors({ api: data.detail || 'Ошибка регистрации' });
+        setIsSubmitting(false);
+        return;
+      }
+      const data = await res.json();
+      localStorage.setItem('token', data.access_token);
       navigate('/dashboard');
-      alert('Регистрация успешна!');
     } catch (error) {
+      setErrors({ api: 'Ошибка сети. Попробуйте позже.' });
       console.error('Registration error:', error);
     } finally {
       setIsSubmitting(false);
@@ -121,6 +132,17 @@ function RegisterPage() {
           className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100"
         >
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* API Error */}
+            {errors.api && (
+              <motion.p
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="text-sm text-red-600 text-center"
+              >
+                {errors.api}
+              </motion.p>
+            )}
+
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
@@ -327,6 +349,9 @@ function RegisterPage() {
               </motion.p>
             )}
 
+            {/* OAuth Login */}
+            <OAuthButtons />
+
             {/* Submit Button */}
             <motion.button
               type="submit"
@@ -353,7 +378,7 @@ function RegisterPage() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Уже есть аккаунт?{' '}
-              <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500 transition-colors">
+               <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500 transition-colors">
                 Войти
               </Link>
             </p>
