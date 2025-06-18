@@ -3,11 +3,11 @@ services:
     image: postgres:15
     restart: always
     environment:
-      POSTGRES_USER: surveyuser
-      POSTGRES_PASSWORD: surveypass
-      POSTGRES_DB: surveydb
+      - POSTGRES_USER=surveyuser
+      - POSTGRES_PASSWORD=surveypass
+      - POSTGRES_DB=surveydb
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata2:/var/lib/postgresql/data
     ports:
       - "5432:5432"
 
@@ -25,4 +25,4 @@ services:
       - db
 
 volumes:
-  pgdata:
+  pgdata2:

@@ -9,7 +9,7 @@ function Header() {
 
   const navigation = [
     { name: 'Главная', href: '/' },
-    { name: 'Дашборд', href: '/dashboard' },
+    { name: 'Опросы', href: '/dashboard' },
   ];
 
   const isLoggedIn = Boolean(localStorage.getItem('token'));

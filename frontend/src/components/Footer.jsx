@@ -24,8 +24,7 @@ function Footer() {
             <h3 className="text-lg font-semibold mb-4">Быстрые ссылки</h3>
             <ul className="space-y-2">
               <li><a href="/" className="text-gray-400 hover:text-white transition-colors">Главная</a></li>
-              <li><a href="/chat" className="text-gray-400 hover:text-white transition-colors">Чат</a></li>
-              <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">Возможности</a></li>
+              <li><a href="/survey" className="text-gray-400 hover:text-white transition-colors">Опросы</a></li>
             </ul>
           </div>
 

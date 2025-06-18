@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import OAuthButtons from "../components/OAuthButtons";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User } from "lucide-react";
 
@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const expired = new URLSearchParams(location.search).get("expired");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -76,6 +78,11 @@ export default function LoginPage() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100 mb-4"
         >
+          {expired && (
+            <div className="mb-4 text-red-600 text-center">
+              Ваша сессия истекла. Пожалуйста, войдите снова.
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <motion.p

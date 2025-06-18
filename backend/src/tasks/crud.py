@@ -104,8 +104,7 @@ class UserDAO:
         if user is None:
             raise UserNotFoundException(str(user_id))
         return user
-
-
+    
 class SurveyDAO:
     @staticmethod
     async def create_survey(user_id: int, topic: str, questions: list, db: AsyncSession) -> Survey:

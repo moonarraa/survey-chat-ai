@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional, List
+from typing import Optional, List, Any
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -34,14 +34,16 @@ class UserCredentials(BaseModel):
 
 class SurveyCreate(BaseModel):
     topic: str
-    questions: List[str]
+    questions: list[Any]
 
 
 class SurveyOut(BaseModel):
     id: int
     topic: str
-    questions: List[str]
+    questions: List[Any]
     created_at: str
+    public_id: str
+    archived: bool
 
     class Config:
         orm_mode = True

@@ -1,7 +1,7 @@
 from datetime import datetime
 import secrets
 
-from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Text
+from sqlalchemy import Column, DateTime, Integer, String, ForeignKey, Text, Boolean
 
 from src.database import Base
 
@@ -29,4 +29,5 @@ class Survey(Base):
     questions = Column(Text, nullable=False)  # Store as JSON string
     created_at = Column(DateTime, default=datetime.now)
     public_id = Column(String, unique=True, index=True, nullable=False, default=lambda: secrets.token_urlsafe(6))
+    archived = Column(Boolean, default=False, nullable=False)
 

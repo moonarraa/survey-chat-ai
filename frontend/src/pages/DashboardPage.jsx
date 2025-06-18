@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation, useParams, useMatch, matchPath } from 'react-router-dom';
 import { 
   Home, 
   FolderOpen, 
@@ -18,13 +18,21 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import Modal from "../components/Modal";
+import CreateSurveyModal from "../components/CreateSurveyModal";
+import SurveyDetailPage from "./SurveyDetailPage";
+import SurveyEditPage from "./SurveyEditPage";
 
 function DashboardPage() {
-  const [activeTab, setActiveTab] = useState('summary');
+  const [activeTab, setActiveTab] = useState('projects');
   const [searchQuery, setSearchQuery] = useState('');
   const [surveys, setSurveys] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [open, setOpen] = useState(false);
+  const [selectedSurveyId, setSelectedSurveyId] = useState(null);
+  const [surveyTab, setSurveyTab] = useState('current'); // 'current' or 'archived'
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Mock data for company summary
   const companyData = {
@@ -67,9 +75,17 @@ function DashboardPage() {
     async function fetchSurveys() {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:8000/surveys/', {
+      let url = 'http://localhost:8000/surveys/';
+      if (surveyTab === 'archived') url += '?archived=true';
+      if (surveyTab === 'current') url += '?archived=false';
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      if (res.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login?expired=1';
+        return;
+      }
       if (res.ok) {
         const data = await res.json();
         setSurveys(data);
@@ -77,10 +93,10 @@ function DashboardPage() {
       setLoading(false);
     }
     fetchSurveys();
-  }, []);
+  }, [surveyTab]);
 
   const handleView = (surveyId) => {
-    navigate(`/survey/${surveyId}`);
+    setSelectedSurveyId(surveyId);
   };
 
   const handleDelete = async (surveyId) => {
@@ -95,6 +111,39 @@ function DashboardPage() {
     } else {
       alert("Ошибка при удалении опроса");
     }
+  };
+
+  const handleArchive = async (surveyId) => {
+    const token = localStorage.getItem('token');
+    await fetch(`http://localhost:8000/surveys/${surveyId}/archive`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    fetchSurveys();
+  };
+
+  const handleRestore = async (surveyId) => {
+    const token = localStorage.getItem('token');
+    await fetch(`http://localhost:8000/surveys/${surveyId}/restore`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    fetchSurveys();
+  };
+
+  // Попробуем найти id в URL
+  let urlSurveyId = null;
+  const matchEdit = matchPath('/dashboard/surveys/:id/edit', location.pathname);
+  const matchView = matchPath('/dashboard/surveys/:id', location.pathname);
+
+  if (matchEdit) urlSurveyId = matchEdit.params.id;
+  else if (matchView) urlSurveyId = matchView.params.id;
+
+  const effectiveSurveyId = urlSurveyId || selectedSurveyId;
+  // onClose должен вести на /dashboard если выбран через URL, иначе сбрасывать selectedSurveyId
+  const handlePanelClose = () => {
+    if (urlSurveyId) navigate('/dashboard');
+    else setSelectedSurveyId(null);
   };
 
   return (
@@ -232,78 +281,101 @@ function DashboardPage() {
           )}
 
           {activeTab === 'projects' && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between mb-8">
-                <h1 className="text-3xl font-bold text-gray-900">Мои опросы</h1>
-                <Link
-                  to="/create-survey"
-                  className="btn-primary inline-flex items-center"
+            <div className="">
+              {/* Если выбран опрос — показываем SurveyEditPage, иначе — список опросов */}
+              {effectiveSurveyId ? (
+                <SurveyEditPage id={effectiveSurveyId} onClose={handlePanelClose} />
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6 }}
                 >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Создать опрос
-                </Link>
-              </div>
-
-              {/* Список опросов */}
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-                {loading ? (
-                  <div className="text-gray-500 text-center py-12">Загрузка...</div>
-                ) : surveys.length === 0 ? (
-                  <div className="text-gray-500 text-center py-12">
-                    У вас пока нет опросов.<br />
-                    <Link to="/create-survey" className="text-primary-600 underline">Создать первый опрос</Link>
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-8">
+                    <h1 className="text-3xl font-bold text-gray-900">Мои опросы</h1>
+                    <button
+                      onClick={() => setOpen(true)}
+                      className="bg-primary-600 text-white px-4 py-2 rounded-xl font-semibold"
+                    >
+                      Создать опрос
+                    </button>
                   </div>
-                ) : (
-                  <div className="space-y-4">
-                    {surveys.map((survey) => (
-                      <div
-                        key={survey.id}
-                        className="flex flex-col md:flex-row md:items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-xl p-4 border border-gray-100 transition"
-                      >
-                        <div>
-                          <div className="text-lg font-semibold text-gray-900 mb-1">{survey.topic}</div>
-                          <div className="text-sm text-gray-600 mb-2">
-                            Вопросов: {survey.questions.length}
-                          </div>
-                          <ul className="list-disc pl-5 text-gray-700 text-sm">
-                            {survey.questions.map((q, idx) => (
-                              <li key={idx}>{q}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div className="mt-4 md:mt-0 flex-shrink-0 flex flex-col items-end">
-                          <span className="text-xs text-gray-400 mb-2">
-                            Создан: {new Date(survey.created_at).toLocaleString('ru-RU')}
-                          </span>
-                          <div className="flex space-x-2">
-                            <button
-                              className="btn-secondary text-xs px-4 py-2"
-                              onClick={() => handleView(survey.id)}
-                            >
-                              Посмотреть
-                            </button>
-                            <button
-                              className="btn-secondary text-xs px-4 py-2 text-red-600 border-red-200 hover:bg-red-50"
-                              onClick={() => handleDelete(survey.id)}
-                            >
-                              Удалить
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  {/* Tabs */}
+                  <div className="flex items-center gap-8 border-b border-gray-200 mb-6 px-2">
+                    <button
+                      className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'current' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-400 hover:text-primary-600'}`}
+                      onClick={() => setSurveyTab('current')}
+                    >
+                      Текущие
+                    </button>
+                    <button
+                      className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'archived' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-400 hover:text-primary-600'}`}
+                      onClick={() => setSurveyTab('archived')}
+                    >
+                      Архив
+                    </button>
                   </div>
-                )}
-              </div>
-            </motion.div>
+                  <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+                    {loading ? (
+                      <div className="text-gray-500 text-center py-12">Загрузка...</div>
+                    ) : surveyTab === 'current' ? (
+                      surveys.length === 0 ? (
+                        <div className="text-gray-500 text-center py-12">
+                          У вас пока нет опросов.<br />
+                          
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {surveys.map((survey) => (
+                            <div
+                              key={survey.id}
+                              className="flex flex-col md:flex-row md:items-center justify-between bg-gray-50 hover:bg-gray-100 rounded-xl p-4 border border-gray-100 transition"
+                            >
+                              <div>
+                                <div className="text-lg font-semibold text-gray-900 mb-1">{survey.topic}</div>
+                                <div className="text-sm text-gray-600 mb-2">
+                                  Вопросов: {survey.questions.length} | Ответов: {survey.answersCount ?? 0}
+                                </div>
+                              </div>
+                              <div className="mt-4 md:mt-0 flex-shrink-0 flex flex-col items-end">
+                                <span className="text-xs text-gray-400 mb-2">
+                                  Создан: {new Date(survey.created_at).toLocaleString('ru-RU')}
+                                </span>
+                                <div className="flex space-x-2">
+                                  <button
+                                    className="btn-secondary text-xs px-4 py-2"
+                                    onClick={() => handleView(survey.id)}
+                                  >
+                                    Посмотреть
+                                  </button>
+                                  <button
+                                    className="btn-secondary text-xs px-4 py-2 text-red-600 border-red-200 hover:bg-red-50"
+                                    onClick={() => handleDelete(survey.id)}
+                                  >
+                                    Удалить
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )
+                    ) : (
+                      <div className="text-gray-500 text-center py-12">В архиве пока нет опросов.</div>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </div>
           )}
         </main>
       </div>
+      {open && (
+        <Modal open={open} onClose={() => setOpen(false)}>
+          <CreateSurveyModal onSuccess={() => setOpen(false)} />
+        </Modal>
+      )}
     </div>
   );
 }
