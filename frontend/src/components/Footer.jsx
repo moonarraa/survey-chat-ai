@@ -40,7 +40,7 @@ function Footer() {
 
         <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400 text-sm">
-            © 2025 SurveyChat AI. Все права защищены.
+            © 2025 Survey AI. Все права защищены.
           </p>
           <div className="flex items-center space-x-1 text-gray-400 text-sm mt-4 md:mt-0">
             <span>Сделано с</span>

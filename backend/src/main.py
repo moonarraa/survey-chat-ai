@@ -15,17 +15,26 @@ from src.tasks.survey_api import router as survey_router
 
 app = FastAPI()
 
+# Список разрешенных origins
+origins = [
+    "http://localhost:3000",  # Для локальной разработки
+    "http://localhost:5173",  # Для Vite dev server
+    "https://survey-chat-ai.vercel.app",  # Ваш домен на Vercel (замените на актуальный)
+    "https://survey-chat-ai*.vercel.app"  # Для preview deployments
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
 )
+
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.secret_key,
-    https_only=False
+    https_only=settings.environment == "production"  # HTTPS только в продакшене
 )
 
 app.include_router(tasks_router, tags=["tasks"])
@@ -34,7 +43,11 @@ app.include_router(survey_router, prefix="/surveys")
 
 @app.get("/")
 def read_root():
-    return {"message": "Hello, World!"}
+    return {
+        "message": "SurveyChat API is running",
+        "version": "1.0.0",
+        "environment": settings.environment
+    }
 
 @app.get("/health")
 async def check_health(db: AsyncSession = Depends(get_async_db)):

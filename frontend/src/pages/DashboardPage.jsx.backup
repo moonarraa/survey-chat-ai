@@ -12,18 +12,8 @@ import {
   Search,
   Filter,
   MoreHorizontal,
-  Eye,
-  Trash2,
-  Archive,
   ChevronLeft,
-  ChevronRight,
-  BarChart3,
-  Users,
-  Clock,
-  ChartBar,
-  PieChart,
-  Activity,
-  MessageCircle
+  ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Modal from "../components/Modal";
@@ -89,32 +79,33 @@ function DashboardPage() {
     { id: 'settings', icon: Settings, label: 'Настройки', active: false }
   ];
 
-  useEffect(() => {
-    async function fetchSurveys() {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      let url = 'http://localhost:8000/surveys/';
-      if (surveyTab === 'archived') url += '?archived=true';
-      if (surveyTab === 'current') url += '?archived=false';
-      
-      try {
-        const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.status === 401) {
-          localStorage.removeItem('token');
-          window.location.href = '/login?expired=1';
-          return;
-        }
-        if (res.ok) {
-          const data = await res.json();
-          setSurveys(data);
-        }
-      } catch (error) {
-        console.error('Error fetching surveys:', error);
+  async function fetchSurveys() {
+    setLoading(true);
+    const token = localStorage.getItem('token');
+    let url = 'http://localhost:8000/surveys/';
+    if (surveyTab === 'archived') url += '?archived=true';
+    if (surveyTab === 'current') url += '?archived=false';
+    
+    try {
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login?expired=1';
+        return;
       }
-      setLoading(false);
+      if (res.ok) {
+        const data = await res.json();
+        setSurveys(data);
+      }
+    } catch (error) {
+      console.error('Error fetching surveys:', error);
     }
+    setLoading(false);
+  }
+
+  useEffect(() => {
     fetchSurveys();
   }, [surveyTab]);
 
@@ -170,23 +161,6 @@ function DashboardPage() {
     setSurveyToDelete(null);
   };
 
-  const handleArchive = async (surveyId) => {
-    const token = localStorage.getItem('token');
-    const res = await fetch(`http://localhost:8000/surveys/${surveyId}/archive`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (res.ok) {
-      setSurveys(surveys => surveys.filter(s => s.id !== surveyId));
-    } else {
-      setErrorModal({
-        open: true,
-        title: 'Ошибка архивации',
-        message: 'Не удалось архивировать опрос. Попробуйте позже.'
-      });
-    }
-  };
-
   const handleRestore = async (surveyId) => {
     const token = localStorage.getItem('token');
     const res = await fetch(`http://localhost:8000/surveys/${surveyId}/restore`, {
@@ -205,6 +179,24 @@ function DashboardPage() {
     }
   };
 
+  const handleArchive = async (surveyId) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`http://localhost:8000/surveys/${surveyId}/archive`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.ok) {
+      setSurveys(surveys => surveys.filter(s => s.id !== surveyId));
+    } else {
+      setErrorModal({
+        open: true,
+        title: 'Ошибка архивации',
+        message: 'Не удалось архивировать опрос. Попробуйте позже.'
+      });
+    }
+  };
+
+  // Find survey ID from URL
   let urlSurveyId = null;
   const matchEdit = matchPath('/dashboard/surveys/:id/edit', location.pathname);
   const matchView = matchPath('/dashboard/surveys/:id', location.pathname);
@@ -222,25 +214,6 @@ function DashboardPage() {
   const filteredSurveys = surveys.filter(survey =>
     survey.topic.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const hasActiveSurvey = surveys.some(survey => !survey.archived);
-  const activeSurveysCount = surveys.filter(s => !s.archived).length;
-  const isArchiveTab = surveyTab === 'archived';
-
-  const handleCreateSurveyClick = (e) => {
-    e.stopPropagation(); // Prevent event bubbling
-    if (hasActiveSurvey || isArchiveTab) {
-      setErrorModal({
-        open: true,
-        title: 'Ограничение',
-        message: isArchiveTab 
-          ? 'Создание новых опросов недоступно в архиве. Перейдите на вкладку "Текущие".'
-          : 'У вас уже есть активный опрос. Пожалуйста, архивируйте или удалите его, прежде чем создавать новый.'
-      });
-      return;
-    }
-    setOpen(true);
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -324,6 +297,7 @@ function DashboardPage() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  {/* Stats cards */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -369,16 +343,7 @@ function DashboardPage() {
                         <MessageCircle className="w-6 h-6 text-blue-600" />
                       </div>
                       <div>
-                        <div className="flex items-baseline gap-2">
-                          <div className="text-3xl font-bold text-gray-900">{summaryStats.totalResponses}</div>
-                          {summaryStats.totalResponses > 0 && (
-                            <div className="text-sm font-medium text-green-600">
-                              {summaryStats.totalSurveys > 0 
-                                ? `${Math.round((summaryStats.totalResponses / summaryStats.totalSurveys) * 100)}%`
-                                : '0%'} 
-                            </div>
-                          )}
-                        </div>
+                        <div className="text-3xl font-bold text-gray-900">{summaryStats.totalResponses}</div>
                         <div className="text-sm text-gray-500">Всего ответов</div>
                       </div>
                     </div>
@@ -395,82 +360,33 @@ function DashboardPage() {
                         <PieChart className="w-6 h-6 text-yellow-600" />
                       </div>
                       <div>
-                        <div className="flex items-baseline gap-2">
-                          <div className="text-3xl font-bold text-gray-900">{summaryStats.averageResponseRate}</div>
-                          <div className="text-sm font-medium text-gray-500">/ опрос</div>
-                        </div>
+                        <div className="text-3xl font-bold text-gray-900">{summaryStats.averageResponseRate}</div>
                         <div className="text-sm text-gray-500">Среднее кол-во ответов</div>
                       </div>
                     </div>
                   </motion.div>
                 </div>
 
-                {/* Response Analysis */}
+                {/* Question Types Distribution */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"
+                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8"
                 >
-                  {/* Question Types Distribution */}
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-900">Распределение типов вопросов</h2>
-                    <div className="space-y-4">
-                      {Object.entries(summaryStats.questionTypes).map(([type, count]) => (
-                        <div key={type} className="flex items-center gap-4">
-                          <div className="w-12 text-lg font-semibold text-gray-900">{count}</div>
-                          <div className="flex-1">
-                            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-primary-600 rounded-full"
-                                style={{ 
-                                  width: `${Math.round((count / Object.values(summaryStats.questionTypes)
-                                    .reduce((a, b) => a + b, 0)) * 100)}%` 
-                                }}
-                              />
-                            </div>
-                          </div>
-                          <div className="w-32 text-sm text-gray-600">
-                            {type === 'multiple_choice' && 'С выбором ответа'}
-                            {type === 'rating' && 'Оценка'}
-                            {type === 'open_ended' && 'Открытые'}
-                            {type === 'long_text' && 'Развёрнутые'}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Response Rate Over Time */}
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-900">Статистика ответов</h2>
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Среднее время заполнения:</div>
-                        <div className="font-medium text-gray-900">~4.5 мин</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Самый популярный день:</div>
-                        <div className="font-medium text-gray-900">Вторник</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Пик активности:</div>
-                        <div className="font-medium text-gray-900">14:00 - 16:00</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Завершаемость:</div>
-                        <div className="font-medium text-green-600">92%</div>
-                      </div>
-                      <div className="pt-4 border-t border-gray-100">
-                        <div className="text-sm font-medium text-gray-900 mb-2">Качество ответов</div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-green-500 rounded-full" style={{ width: '85%' }} />
-                          </div>
-                          <div className="text-sm font-medium text-green-600">85%</div>
+                  <h2 className="text-xl font-semibold mb-4">Распределение типов вопросов</h2>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {Object.entries(summaryStats.questionTypes).map(([type, count], index) => (
+                      <div key={type} className="bg-gray-50 rounded-xl p-4">
+                        <div className="text-2xl font-bold text-gray-900">{count}</div>
+                        <div className="text-sm text-gray-500">
+                          {type === 'multiple_choice' && 'С выбором ответа'}
+                          {type === 'rating' && 'Оценка'}
+                          {type === 'open_ended' && 'Открытые'}
+                          {type === 'long_text' && 'Развёрнутые'}
                         </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
                 </motion.div>
 
@@ -512,25 +428,12 @@ function DashboardPage() {
                   <>
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-                      <div className="flex items-center gap-4">
-                        <h1 className="text-3xl font-bold text-gray-900">Мои опросы</h1>
-                      </div>
+                      <h1 className="text-3xl font-bold text-gray-900">Мои опросы</h1>
                       <motion.button
-                        whileHover={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 1.05 }}
-                        whileTap={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 0.95 }}
-                        onClick={handleCreateSurveyClick}
-                        className={`${
-                          hasActiveSurvey || isArchiveTab
-                            ? 'bg-gray-400' 
-                            : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-xl'
-                        } text-white px-4 py-2 rounded-xl font-semibold shadow-lg transition-all duration-200 flex items-center gap-2`}
-                        title={
-                          isArchiveTab 
-                            ? 'Создание опросов недоступно в архиве' 
-                            : hasActiveSurvey 
-                              ? 'У вас уже есть активный опрос' 
-                              : 'Создать новый опрос'
-                        }
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        onClick={() => setOpen(true)}
+                        className="bg-gradient-to-r from-primary-600 to-primary-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
                       >
                         <Plus className="h-5 w-5" />
                         Создать опрос
@@ -556,15 +459,23 @@ function DashboardPage() {
                     </div>
 
                     {/* Tabs */}
-                    <div className="flex items-center gap-8 border-b border-gray-200 mb-6 px-2">
+                    <div className="flex items-center gap-8 border-b border-gray-200 mb-6">
                       <button
-                        className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'current' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-400 hover:text-primary-600'}`}
+                        className={`pb-3 font-semibold text-lg transition-all duration-200 border-b-2 ${
+                          surveyTab === 'current' 
+                            ? 'border-primary-600 text-primary-700' 
+                            : 'border-transparent text-gray-400 hover:text-primary-600'
+                        }`}
                         onClick={() => setSurveyTab('current')}
                       >
-                        Текущие
+                        Текущие ({filteredSurveys.length})
                       </button>
                       <button
-                        className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'archived' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-400 hover:text-primary-600'}`}
+                        className={`pb-3 font-semibold text-lg transition-all duration-200 border-b-2 ${
+                          surveyTab === 'archived' 
+                            ? 'border-primary-600 text-primary-700' 
+                            : 'border-transparent text-gray-400 hover:text-primary-600'
+                        }`}
                         onClick={() => setSurveyTab('archived')}
                       >
                         Архив
@@ -590,10 +501,10 @@ function DashboardPage() {
                               : 'Здесь будут отображаться архивированные опросы'
                             }
                           </p>
-                          {surveyTab === 'current' && !hasActiveSurvey && !isArchiveTab && (
+                          {surveyTab === 'current' && (
                             <motion.button
                               whileHover={{ scale: 1.05 }}
-                              onClick={handleCreateSurveyClick}
+                              onClick={() => setOpen(true)}
                               className="btn-primary"
                             >
                               Создать первый опрос
