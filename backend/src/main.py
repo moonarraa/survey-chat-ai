@@ -4,6 +4,7 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.middleware.sessions import SessionMiddleware
 import os
+import logging
 from src.config import settings
 
 from fastapi.middleware.cors import CORSMiddleware
@@ -13,15 +14,33 @@ from src.database import get_async_db
 from src.auth.oauth import router as oauth_router
 from src.tasks.survey_api import router as survey_router
 
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 app = FastAPI()
 
 # Список разрешенных origins
 origins = [
     "http://localhost:3000",  # Для локальной разработки
     "http://localhost:5173",  # Для Vite dev server
-    "https://survey-chat-ai.vercel.app",  # Ваш домен на Vercel (замените на актуальный)
+    "https://survey-chat-ai.vercel.app",  # Ваш домен на Vercel
     "https://survey-chat-ai*.vercel.app"  # Для preview deployments
 ]
+
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Starting up application...")
+    logger.info(f"Environment: {getattr(settings, 'environment', 'development')}")
+    logger.info(f"Database URL configured: {'Yes' if settings.async_database_url else 'No'}")
+    try:
+        # Проверка подключения к базе данных при старте
+        db = await anext(get_async_db())
+        await db.execute(text("SELECT 1"))
+        logger.info("Database connection successful")
+    except Exception as e:
+        logger.error(f"Database connection failed: {str(e)}")
+        raise
 
 app.add_middleware(
     CORSMiddleware,
@@ -34,8 +53,20 @@ app.add_middleware(
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.secret_key,
-    https_only=getattr(settings, 'environment', 'development') == "production"  # Более безопасный способ получения атрибута
+    https_only=getattr(settings, 'environment', 'development') == "production"
 )
+
+# Добавляем middleware для логирования запросов
+@app.middleware("http")
+async def log_requests(request, call_next):
+    logger.info(f"Request path: {request.url.path}")
+    try:
+        response = await call_next(request)
+        logger.info(f"Response status code: {response.status_code}")
+        return response
+    except Exception as e:
+        logger.error(f"Request failed: {str(e)}")
+        raise
 
 app.include_router(tasks_router, tags=["tasks"])
 app.include_router(oauth_router, prefix="/auth")
@@ -43,19 +74,33 @@ app.include_router(survey_router, prefix="/surveys")
 
 @app.get("/")
 def read_root():
+    logger.info("Root endpoint called")
     return {
         "message": "SurveyChat API is running",
         "version": "1.0.0",
-        "environment": settings.environment
+        "environment": getattr(settings, 'environment', 'development')
     }
 
 @app.get("/health")
 async def check_health(db: AsyncSession = Depends(get_async_db)):
+    logger.info("Health check endpoint called")
     try:
         await db.execute(text("SELECT 1"))
-    except OperationalError:
+        logger.info("Health check successful")
+        return {
+            "status": "ok",
+            "database": "connected",
+            "environment": getattr(settings, 'environment', 'development')
+        }
+    except OperationalError as e:
+        logger.error(f"Database health check failed: {str(e)}")
         raise HTTPException(
-            status_code=500, detail="Database connection failed"
+            status_code=500,
+            detail=f"Database connection failed: {str(e)}"
         )
-
-    return {"status": "ok", "database": "connected"}
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Health check failed: {str(e)}"
+        )
