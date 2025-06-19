@@ -46,9 +46,12 @@ async def startup_event():
         
     try:
         logger.info("Attempting database connection...")
-        async with get_async_db() as session:
+        session = AsyncSessionLocal()
+        try:
             await session.execute(text("SELECT 1"))
             logger.info("Database connection successful")
+        finally:
+            await session.close()
     except Exception as e:
         logger.error(f"Database connection failed: {str(e)}")
         # Не вызываем raise здесь, чтобы приложение могло запуститься

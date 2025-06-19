@@ -8,8 +8,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Копируем проект
 COPY . .
 
+# Делаем скрипт миграции исполняемым
+RUN chmod +x migrate.sh
+
 # Открываем порт
 EXPOSE 8000
 
-# Запуск сервера
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# Запуск миграций и сервера
+CMD ./migrate.sh && uvicorn src.main:app --host 0.0.0.0 --port $PORT

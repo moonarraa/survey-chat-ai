@@ -12,16 +12,24 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.database import Base
 from src.tasks import schema
 
-load_dotenv()
+# Загружаем .env только в development
+if os.getenv('ENVIRONMENT') != 'production':
+    load_dotenv()
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-# Override sqlalchemy.url with env var if present
-database_url = os.environ.get("sync_database_url")
-if database_url:
-    config.set_main_option("sqlalchemy.url", database_url)
+# Override sqlalchemy.url with env var
+database_url = os.getenv("SYNC_DATABASE_URL") or os.getenv("DATABASE_URL")
+if not database_url:
+    raise Exception("Database URL is not set in environment variables")
+
+# Преобразуем URL если он начинается с postgres:// (для совместимости с SQLAlchemy)
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+config.set_main_option("sqlalchemy.url", database_url)
 
 # Interpret the config file for Python logging.
 # This line Fs up loggers basically.
@@ -70,15 +78,22 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    # Используем NullPool для избежания проблем с подключениями
+    configuration = config.get_section(config.config_ini_section)
+    configuration["sqlalchemy.pool_size"] = "1"
+    configuration["sqlalchemy.max_overflow"] = "0"
+    
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
+        configuration,
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            compare_type=True  # Добавляем проверку типов колонок
         )
 
         with context.begin_transaction():
