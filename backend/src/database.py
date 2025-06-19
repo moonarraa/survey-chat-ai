@@ -9,26 +9,22 @@ from src.config import settings
 
 logger = logging.getLogger(__name__)
 
-# Создаем движки с отключенным pool_pre_ping для избежания ошибок при старте
+# Create async engine without pool settings for now
 async_engine = create_async_engine(
     settings.async_database_url,
-    pool_pre_ping=False,
-    pool_size=5,
-    max_overflow=10,
     echo=False
 )
 
+# Create async session factory
 AsyncSessionLocal = sessionmaker(
-    bind=async_engine,
+    async_engine,
     class_=AsyncSession,
     expire_on_commit=False
 )
 
+# Create sync engine for migrations and utilities
 sync_engine = create_engine(
     settings.sync_database_url,
-    pool_pre_ping=False,
-    pool_size=5,
-    max_overflow=10,
     echo=False
 )
 
@@ -41,15 +37,13 @@ SyncSessionLocal = sessionmaker(
 Base = declarative_base()
 
 async def get_async_db():
-    session = AsyncSessionLocal()
-    try:
-        yield session
-    except SQLAlchemyError as e:
-        logger.error(f"Database error occurred: {str(e)}")
-        await session.rollback()
-        raise
-    finally:
-        await session.close()
+    async with AsyncSessionLocal() as session:
+        try:
+            yield session
+        except SQLAlchemyError as e:
+            logger.error(f"Database error occurred: {str(e)}")
+            await session.rollback()
+            raise
 
 def get_sync_db():
     db = SyncSessionLocal()

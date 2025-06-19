@@ -6,6 +6,7 @@ from starlette.middleware.sessions import SessionMiddleware
 import os
 import logging
 from src.config import settings
+from src.database import get_async_db, AsyncSessionLocal
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -46,16 +47,12 @@ async def startup_event():
         
     try:
         logger.info("Attempting database connection...")
-        session = AsyncSessionLocal()
-        try:
+        async with AsyncSessionLocal() as session:
             await session.execute(text("SELECT 1"))
             logger.info("Database connection successful")
-        finally:
-            await session.close()
     except Exception as e:
         logger.error(f"Database connection failed: {str(e)}")
-        # Не вызываем raise здесь, чтобы приложение могло запуститься
-        # даже при проблемах с БД
+        # Don't raise here to allow the application to start even with DB issues
 
 app.add_middleware(
     CORSMiddleware,

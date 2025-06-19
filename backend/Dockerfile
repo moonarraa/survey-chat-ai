@@ -1,18 +1,30 @@
 FROM python:3.11-slim
 
-# Установка зависимостей
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
 WORKDIR /app
+
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем проект
+# Copy project files
 COPY . .
 
-# Делаем скрипт миграции исполняемым
+# Make scripts executable
 RUN chmod +x migrate.sh
+RUN chmod +x entrypoint.sh
 
-# Открываем порт
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PORT=8000
+
+# Expose port
 EXPOSE 8000
 
-# Запуск миграций и сервера
-CMD ./migrate.sh && uvicorn src.main:app --host 0.0.0.0 --port $PORT
+# Use entrypoint script
+ENTRYPOINT ["./entrypoint.sh"]
