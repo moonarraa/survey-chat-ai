@@ -1,0 +1,16 @@
+language: python
+python:
+  version: 3.11
+services:
+  - type: web
+    name: survey-chat-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: ./migrate.sh && gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+    envVars:
+      - key: WEBSITES_PORT
+        value: 8000
+      - key: PYTHON_VERSION
+        value: 3.11
+      - key: SCM_DO_BUILD_DURING_DEPLOYMENT
+        value: true 

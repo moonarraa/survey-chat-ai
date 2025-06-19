@@ -15,13 +15,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy project files
 COPY . .
 
-# Make scripts executable
+# Make migration script executable
 RUN chmod +x migrate.sh
 
 # Set environment variables
 ENV PYTHONPATH=/app
 ENV PORT=8000
+ENV WEBSITE_HOST=0.0.0.0
+ENV WEBSITE_PORT=8000
 
 # Expose port
 EXPOSE 8000
+
+# Start command
+CMD ./migrate.sh && gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 

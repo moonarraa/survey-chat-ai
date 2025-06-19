@@ -17,3 +17,6 @@ authlib
 httpx
 itsdangerous
 pyjwt
+gunicorn
+azure-storage-blob
+applicationinsights
