@@ -133,14 +133,13 @@ def ai_generate_advanced_questions_for_context(context, n=6):
         f"сгенерируй {n} разнообразных вопросов для анкеты на русском языке, обязательно используя разные типы: "
         "multiple_choice (множественный выбор, всегда с 4-6 вариантами), "
         "rating (шкала 1-5, звёзды или сердечки), "
-        "ranking (ранжирование, 4-8 элементов, пользователь должен перетянуть в нужном порядке), "
         "open_ended (открытый вопрос) или long_text (развёрнутый ответ). "
-        "Для каждого вопроса обязательно укажи: type (multiple_choice, rating, ranking, open_ended, long_text), text (текст вопроса), "
-        "и если нужно — options (варианты для multiple_choice), scale (для rating, всегда 5), items (для ranking), required (true/false). "
+        "Сделай большинство вопросов типа multiple_choice и rating, вопросы с ручным вводом (open_ended, long_text) — не более 1-2 на весь опрос. "
+        "Для каждого вопроса обязательно укажи: type (multiple_choice, rating, open_ended, long_text), text (текст вопроса), "
+        "и если нужно — options (варианты для multiple_choice), scale (для rating, всегда 5), required (true/false). "
         "Пример:\n"
         "[{\"type\": \"multiple_choice\", \"text\": \"Ваш любимый цвет?\", \"options\": [\"Красный\", \"Синий\", \"Зелёный\", \"Жёлтый\"]},"
         "{\"type\": \"rating\", \"text\": \"Оцените качество сервиса\", \"scale\": 5},"
-        "{\"type\": \"ranking\", \"text\": \"Ранжируйте эти аспекты\", \"items\": [\"Цена\", \"Качество\", \"Скорость\"]}]"
         "Верни только JSON-массив, без пояснений и текста вокруг. Вопросы должны быть максимально разнообразными по типу."
     )
     response = client.chat.completions.create(

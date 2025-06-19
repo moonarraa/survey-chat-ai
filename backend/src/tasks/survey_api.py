@@ -4,16 +4,14 @@ from src.auth.dependencies import get_current_user
 from src.database import get_async_db
 from src.tasks.models import SurveyCreate, SurveyOut, User
 from src.tasks.crud import SurveyDAO
-from src.tasks.schema import Survey
+from src.tasks.schema import Survey, SurveyAnswer
 from src.assistant.openai_assistant import ai_generate_followup_question, ai_generate_questions_for_topic, ai_is_meaningful_answer, ai_generate_advanced_questions_for_context
 import json
 from pydantic import BaseModel
 from typing import Any
+from sqlalchemy import select
 
 router = APIRouter(tags=["surveys"])
-
-# In-memory storage for MVP (replace with DB later)
-RESPONSES = {}
 
 class PublicSurveyOut(BaseModel):
     topic: str
@@ -43,26 +41,20 @@ class GenerateQuestionsAdvancedOut(BaseModel):
 
 @router.post("/", response_model=SurveyOut)
 async def create_survey(
-    survey: SurveyCreate = Body(...),
+    survey: SurveyCreate,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db)
 ):
-    # Ignore user-supplied questions, generate 5 AI questions for the topic
-    questions = ai_generate_advanced_questions_for_context(survey.topic, n=5)
-    db_survey = await SurveyDAO.create_survey(
-        user_id=current_user.id,
-        topic=survey.topic,
-        questions=questions,
-        db=db
-    )
-    return SurveyOut(
-        id=db_survey.id,
-        topic=db_survey.topic,
-        questions=json.loads(db_survey.questions),
-        created_at=str(db_survey.created_at),
-        public_id=db_survey.public_id,
-        archived=db_survey.archived,
-    )
+    # Check if user already has an active survey
+    existing_surveys = await SurveyDAO.get_surveys_by_user(current_user.id, db)
+    active_surveys = [s for s in existing_surveys if not s.archived]
+    if active_surveys:
+        raise HTTPException(
+            status_code=400,
+            detail="У вас уже есть активный опрос. Пожалуйста, архивируйте его перед созданием нового."
+        )
+    
+    return await SurveyDAO.create_survey(current_user.id, survey.topic, survey.questions, db)
 
 @router.get("/", response_model=list[SurveyOut])
 async def list_surveys(
@@ -141,24 +133,30 @@ async def submit_public_survey_answer(
     request: Request = None,
     db: AsyncSession = Depends(get_async_db)
 ):
-    # Получаем вопросы опроса
+    # Получаем опрос
     result = await db.execute(Survey.__table__.select().where(Survey.public_id == public_id))
     survey = result.first()
     if not survey:
         raise HTTPException(status_code=404, detail="Survey not found")
     survey = survey._mapping
-    questions = json.loads(survey["questions"])
-
-    # Validate each answer using AI только если вопрос не open_ended/long_text
-   
-
-    # For MVP: just store in memory by public_id
-    RESPONSES.setdefault(public_id, []).append({
-        "answers": data.answers,
-        "respondent_id": data.respondent_id,
-        "ip": request.client.host if request else None
-    })
-    print(f"[SURVEY RESPONSE] public_id={public_id} data={data}")
+    
+    # Проверяем, не архивирован ли опрос
+    if survey["archived"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Этот опрос находится в архиве и больше не принимает ответы."
+        )
+    
+    # Save answer to DB
+    db_answer = SurveyAnswer(
+        survey_id=survey["id"],
+        public_id=public_id,
+        answers=json.dumps(data.answers),
+        respondent_id=data.respondent_id,
+        ip=request.client.host if request else None
+    )
+    db.add(db_answer)
+    await db.commit()
     return PublicSurveyAnswerOut(ok=True, message="Ответ успешно сохранён!")
 
 @router.post("/s/{public_id}/next-question")
@@ -243,13 +241,30 @@ async def restore_survey(
     survey = await db.get(Survey, survey_id)
     if not survey or survey.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Survey not found")
+    
+    # Check if user already has an active survey
+    existing_surveys = await SurveyDAO.get_surveys_by_user(current_user.id, db)
+    active_surveys = [s for s in existing_surveys if not s.archived and s.id != survey_id]
+    if active_surveys:
+        raise HTTPException(
+            status_code=400,
+            detail="У вас уже есть активный опрос. Архивируйте его перед восстановлением другого."
+        )
+    
     survey.archived = False
     await db.commit()
     return {"ok": True}
 
 @router.get("/s/{public_id}/answers")
-async def get_public_survey_answers(public_id: str):
-    """
-    Получить все ответы на публичный опрос (MVP, in-memory).
-    """
-    return RESPONSES.get(public_id, [])
+async def get_public_survey_answers(public_id: str, db: AsyncSession = Depends(get_async_db)):
+    result = await db.execute(select(SurveyAnswer).where(SurveyAnswer.public_id == public_id))
+    answers = result.scalars().all()
+    return [
+        {
+            "answers": json.loads(a.answers),
+            "respondent_id": a.respondent_id,
+            "ip": a.ip,
+            "created_at": a.created_at.isoformat() if a.created_at else None
+        }
+        for a in answers
+    ]

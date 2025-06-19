@@ -349,9 +349,6 @@ function RegisterPage() {
               </motion.p>
             )}
 
-            {/* OAuth Login */}
-            <OAuthButtons />
-
             {/* Submit Button */}
             <motion.button
               type="submit"

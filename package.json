@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react-beautiful-dnd": "^13.1.1",

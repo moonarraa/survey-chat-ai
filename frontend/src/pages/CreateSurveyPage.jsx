@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ErrorModal from '../components/ErrorModal';
 
 const BACKEND_URL = "http://localhost:8000";
 
@@ -31,7 +32,7 @@ function getDefaultQuestion(type = "multiple_choice") {
 export default function CreateSurveyPage() {
   const [context, setContext] = useState("");
   const [questions, setQuestions] = useState([]);
-  const [error, setError] = useState("");
+  const [errorModal, setErrorModal] = useState({ open: false, title: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
@@ -108,9 +109,9 @@ export default function CreateSurveyPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setErrorModal({ open: false, title: '', message: '' });
     if (!context.trim()) {
-      setError("Заполните цель/контекст опроса.");
+      setErrorModal({ open: true, title: 'Не заполнено', message: 'Заполните цель/контекст опроса.' });
       return;
     }
     setIsSubmitting(true);
@@ -122,14 +123,14 @@ export default function CreateSurveyPage() {
         body: JSON.stringify({ context, n: 5 })
       });
       if (!resGen.ok) {
-        setError("Ошибка генерации вопросов. Попробуйте позже.");
+        setErrorModal({ open: true, title: 'Ошибка генерации', message: 'Не удалось сгенерировать вопросы. Попробуйте позже.' });
         setIsSubmitting(false);
         return;
       }
       const dataGen = await resGen.json();
       const questions = dataGen.questions;
       if (!questions || questions.length === 0) {
-        setError("AI не смог сгенерировать вопросы. Попробуйте другую формулировку.");
+        setErrorModal({ open: true, title: 'Ошибка AI', message: 'AI не смог сгенерировать вопросы. Попробуйте другую формулировку.' });
         setIsSubmitting(false);
         return;
       }
@@ -150,13 +151,13 @@ export default function CreateSurveyPage() {
       }
       if (!res.ok) {
         const data = await res.json();
-        setError(data.detail || "Ошибка создания опроса");
+        setErrorModal({ open: true, title: 'Ошибка создания', message: data.detail || 'Ошибка создания опроса' });
         setIsSubmitting(false);
         return;
       }
       navigate("/dashboard");
     } catch (err) {
-      setError("Ошибка сети. Попробуйте позже.");
+      setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение к интернету и попробуйте ещё раз.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -186,7 +187,6 @@ export default function CreateSurveyPage() {
               disabled={isSubmitting}
             />
           </div>
-          {error && <div className="text-red-600">{error}</div>}
           <button
             type="submit"
             disabled={isSubmitting}
@@ -196,6 +196,7 @@ export default function CreateSurveyPage() {
           </button>
         </form>
       </div>
+      <ErrorModal open={errorModal.open} title={errorModal.title} message={errorModal.message} onClose={() => setErrorModal({ open: false, title: '', message: '' })} />
     </div>
   );
 }

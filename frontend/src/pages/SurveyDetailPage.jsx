@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import QRCode from "react-qr-code";
+import ErrorModal from '../components/ErrorModal';
 
 const BACKEND_URL = "http://localhost:8000";
 
@@ -36,24 +37,31 @@ export default function SurveyDetailPage({ id, onClose }) {
   const [showShare, setShowShare] = useState(false);
   const [copySuccess, setCopySuccess] = useState("");
   const navigate = useNavigate();
+  const [errorModal, setErrorModal] = useState({ open: false, title: '', message: '' });
 
   useEffect(() => {
     async function fetchSurvey() {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await fetch(`${BACKEND_URL}/surveys/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.status === 401) {
-        localStorage.removeItem('token');
-        window.location.href = '/login?expired=1';
-        return;
-      }
-      if (res.ok) {
-        const data = await res.json();
-        setSurvey(data);
-      } else {
-        navigate("/dashboard");
+      try {
+        const res = await fetch(`${BACKEND_URL}/surveys/${id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.status === 401) {
+          localStorage.removeItem('token');
+          window.location.href = '/login?expired=1';
+          return;
+        }
+        if (res.ok) {
+          const data = await res.json();
+          setSurvey(data);
+        } else if (res.status === 404) {
+          setErrorModal({ open: true, title: 'Опрос не найден', message: 'Возможно, ссылка устарела или опрос был удалён.' });
+        } else {
+          setErrorModal({ open: true, title: 'Ошибка сервера', message: 'Не удалось загрузить опрос. Попробуйте позже.' });
+        }
+      } catch {
+        setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение к интернету и попробуйте ещё раз.' });
       }
       setLoading(false);
     }
@@ -170,6 +178,7 @@ export default function SurveyDetailPage({ id, onClose }) {
           </div>
         </div>
       )}
+      <ErrorModal open={errorModal.open} title={errorModal.title} message={errorModal.message} onClose={() => setErrorModal({ open: false, title: '', message: '' })} />
     </div>
   );
 }

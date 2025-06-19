@@ -65,8 +65,8 @@ function LandingPage() {
                 <span className="block text-primary-600">на живой диалог</span>
               </h1>
               <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-                Революционная платформа для создания интерактивных опросов с помощью ИИ. 
-                Получайте более качественные данные через естественное общение.
+              Гугл Формы — это прошлый век. Наша платформа помогает создавать интерактивные опросы с помощью ИИ, которые действительно
+              слушают и понимают участников. Получайте качественные ответы быстро и легко.
               </p>
               <div className="flex flex-col items-center gap-4 justify-center">
                 <Link to="/register" className="btn-primary inline-flex items-center">
