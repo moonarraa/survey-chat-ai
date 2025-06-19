@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     google_client_id: str
     google_client_secret: str
     google_redirect_url: str
+    environment: str = "development"  # По умолчанию development, в Railway переопределим на production
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8"

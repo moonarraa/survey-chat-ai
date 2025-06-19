@@ -34,7 +34,7 @@ app.add_middleware(
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.secret_key,
-    https_only=settings.environment == "production"  # HTTPS только в продакшене
+    https_only=getattr(settings, 'environment', 'development') == "production"  # Более безопасный способ получения атрибута
 )
 
 app.include_router(tasks_router, tags=["tasks"])
