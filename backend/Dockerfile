@@ -17,7 +17,6 @@ COPY . .
 
 # Make scripts executable
 RUN chmod +x migrate.sh
-RUN chmod +x entrypoint.sh
 
 # Set environment variables
 ENV PYTHONPATH=/app
@@ -26,5 +25,3 @@ ENV PORT=8000
 # Expose port
 EXPOSE 8000
 
-# Use entrypoint script
-ENTRYPOINT ["./entrypoint.sh"]
