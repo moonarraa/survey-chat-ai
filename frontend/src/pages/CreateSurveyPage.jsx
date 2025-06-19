@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ErrorModal from '../components/ErrorModal';
-
-const BACKEND_URL = "http://localhost:8000";
+import { BACKEND_URL } from '../config';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple choice" },

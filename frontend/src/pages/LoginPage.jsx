@@ -3,8 +3,7 @@ import OAuthButtons from "../components/OAuthButtons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Eye, EyeOff, Mail, Lock } from "lucide-react";
-
-const BACKEND_URL = "http://localhost:8000";
+import { BACKEND_URL } from '../config';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });

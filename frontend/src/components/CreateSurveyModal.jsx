@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, Loader2 } from "lucide-react";
-
-const BACKEND_URL = "http://localhost:8000";
+import { BACKEND_URL } from '../config';
 
 export default function CreateSurveyModal({ onSuccess }) {
   const [context, setContext] = useState("");

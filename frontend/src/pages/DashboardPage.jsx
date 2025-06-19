@@ -29,6 +29,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Modal from "../components/Modal";
 import CreateSurveyModal from "../components/CreateSurveyModal";
 import SurveyEditPage from "./SurveyEditPage";
+import { BACKEND_URL } from '../config';
 
 function DashboardPage() {
   const [activeTab, setActiveTab] = useState('projects');
@@ -93,7 +94,7 @@ function DashboardPage() {
     async function fetchSurveys() {
       setLoading(true);
       const token = localStorage.getItem('token');
-      let url = 'http://localhost:8000/surveys/';
+      let url = `${BACKEND_URL}/surveys/`;
       if (surveyTab === 'archived') url += '?archived=true';
       if (surveyTab === 'current') url += '?archived=false';
       
@@ -154,7 +155,7 @@ function DashboardPage() {
   const confirmDelete = async () => {
     if (!surveyToDelete) return;
     const token = localStorage.getItem('token');
-    const res = await fetch(`http://localhost:8000/surveys/${surveyToDelete}`, {
+    const res = await fetch(`${BACKEND_URL}/surveys/${surveyToDelete}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -172,7 +173,7 @@ function DashboardPage() {
 
   const handleArchive = async (surveyId) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`http://localhost:8000/surveys/${surveyId}/archive`, {
+    const res = await fetch(`${BACKEND_URL}/surveys/${surveyId}/archive`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -189,7 +190,7 @@ function DashboardPage() {
 
   const handleRestore = async (surveyId) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(`http://localhost:8000/surveys/${surveyId}/restore`, {
+    const res = await fetch(`${BACKEND_URL}/surveys/${surveyId}/restore`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` }
     });

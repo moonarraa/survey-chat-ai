@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
-
-const BACKEND_URL = "http://localhost:8000";
+import { BACKEND_URL } from '../config';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },

@@ -3,8 +3,7 @@ import { useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, Send, CheckCircle, Star, Heart } from "lucide-react";
 import ErrorModal from '../components/ErrorModal';
-
-const BACKEND_URL = "http://localhost:8000";
+import { BACKEND_URL } from '../config';
 
 export default function SurveyPublicPage() {
   const { public_id } = useParams();

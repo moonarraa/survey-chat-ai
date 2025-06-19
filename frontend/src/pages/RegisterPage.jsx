@@ -3,9 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, Mail, Building, Briefcase, Lock, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import OAuthButtons from '../components/OAuthButtons';
-
-// Use the same backend URL as OAuthButtons
-const BACKEND_URL = "http://localhost:8000";
+import { BACKEND_URL } from '../config';
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
