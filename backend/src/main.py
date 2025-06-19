@@ -32,15 +32,27 @@ origins = [
 async def startup_event():
     logger.info("Starting up application...")
     logger.info(f"Environment: {getattr(settings, 'environment', 'development')}")
-    logger.info(f"Database URL configured: {'Yes' if settings.async_database_url else 'No'}")
+    
+    # Логируем URL базы данных (без чувствительных данных)
+    db_url = settings.async_database_url
+    if db_url:
+        parsed_url = db_url.split('@')
+        if len(parsed_url) > 1:
+            logger.info(f"Database host: {parsed_url[1].split('/')[0]}")
+        else:
+            logger.info("Database URL is not in expected format")
+    else:
+        logger.error("Database URL is not configured")
+        
     try:
-        # Проверка подключения к базе данных при старте
-        db = await anext(get_async_db())
-        await db.execute(text("SELECT 1"))
-        logger.info("Database connection successful")
+        logger.info("Attempting database connection...")
+        async with get_async_db() as session:
+            await session.execute(text("SELECT 1"))
+            logger.info("Database connection successful")
     except Exception as e:
         logger.error(f"Database connection failed: {str(e)}")
-        raise
+        # Не вызываем raise здесь, чтобы приложение могло запуститься
+        # даже при проблемах с БД
 
 app.add_middleware(
     CORSMiddleware,
