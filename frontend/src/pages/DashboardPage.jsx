@@ -12,16 +12,8 @@ import {
   Search,
   Filter,
   MoreHorizontal,
-  Eye,
-  Trash2,
-  Archive,
-  BarChart3,
-  Users,
-  Clock,
-  ChartBar,
-  PieChart,
-  Activity,
-  MessageCircle
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Modal from "../components/Modal";
@@ -87,38 +79,38 @@ function DashboardPage() {
     { id: 'settings', icon: Settings, label: 'Настройки', active: false }
   ];
 
-  useEffect(() => {
-    async function fetchSurveys() {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      let url = 'http://localhost:8000/surveys/';
-      if (surveyTab === 'archived') url += '?archived=true';
-      if (surveyTab === 'current') url += '?archived=false';
-      
-      try {
-        const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.status === 401) {
-          localStorage.removeItem('token');
-          window.location.href = '/login?expired=1';
-          return;
-        }
-        if (res.ok) {
-          const data = await res.json();
-          setSurveys(data);
-        }
-      } catch (error) {
-        console.error('Error fetching surveys:', error);
+  async function fetchSurveys() {
+    setLoading(true);
+    const token = localStorage.getItem('token');
+    let url = 'http://localhost:8000/surveys/';
+    if (surveyTab === 'archived') url += '?archived=true';
+    if (surveyTab === 'current') url += '?archived=false';
+    
+    try {
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login?expired=1';
+        return;
       }
-      setLoading(false);
+      if (res.ok) {
+        const data = await res.json();
+        setSurveys(data);
+      }
+    } catch (error) {
+      console.error('Error fetching surveys:', error);
     }
+    setLoading(false);
+  }
+
+  useEffect(() => {
     fetchSurveys();
   }, [surveyTab]);
 
   useEffect(() => {
     if (activeTab === 'summary') {
-      // Calculate summary statistics from surveys
       const stats = {
         totalSurveys: surveys.length,
         activeSurveys: surveys.filter(s => !s.archived).length,
@@ -129,7 +121,6 @@ function DashboardPage() {
         recentResponses: []
       };
 
-      // Calculate question type distribution
       surveys.forEach(survey => {
         if (survey.questions) {
           survey.questions.forEach(q => {
@@ -160,8 +151,6 @@ function DashboardPage() {
     });
     if (res.ok) {
       setSurveys(surveys => surveys.filter(s => s.id !== surveyToDelete));
-    } else {
-      // Можно добавить всплывающее уведомление об ошибке
     }
     setShowDeleteModal(false);
     setSurveyToDelete(null);
@@ -207,7 +196,7 @@ function DashboardPage() {
     }
   };
 
-  // Check for URL-based survey selection
+  // Find survey ID from URL
   let urlSurveyId = null;
   const matchEdit = matchPath('/dashboard/surveys/:id/edit', location.pathname);
   const matchView = matchPath('/dashboard/surveys/:id', location.pathname);
@@ -291,6 +280,7 @@ function DashboardPage() {
             ← На главную
           </button>
         </div>
+
         <main className="flex-1 p-8">
           <AnimatePresence mode="wait">
             {activeTab === 'summary' && (
@@ -307,6 +297,7 @@ function DashboardPage() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                  {/* Stats cards */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -627,7 +618,7 @@ function DashboardPage() {
         </main>
       </div>
 
-      {/* Create Survey Modal */}
+      {/* Modals */}
       <AnimatePresence>
         {open && (
           <Modal open={open} onClose={() => setOpen(false)}>

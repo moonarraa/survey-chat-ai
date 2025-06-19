@@ -183,9 +183,6 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* <div className="mt-6">
-              <OAuthButtons />
-            </div> */}
           </div>
 
           <div className="mt-6 text-center">
