@@ -10,8 +10,6 @@ class User(BaseModel):
     id: int
     email: EmailStr
 
-    class Config:
-        orm_mode = True
 
 
 class Token(BaseModel):
@@ -45,5 +43,4 @@ class SurveyOut(BaseModel):
     public_id: str
     archived: bool
 
-    class Config:
-        orm_mode = True
+ 
