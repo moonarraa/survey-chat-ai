@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, Mail, Building, Briefcase, Lock, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import OAuthButtons from '../components/OAuthButtons';
-import { BACKEND_URL } from '../config';
+import { BACKEND_URL, getApiUrl } from '../config';
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -77,7 +77,7 @@ function RegisterPage() {
     }
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${BACKEND_URL}/auth/register`, {
+      const res = await fetch(getApiUrl('auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

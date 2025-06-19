@@ -1,9 +1,9 @@
 import React from "react";
-import { BACKEND_URL } from '../config';
+import { BACKEND_URL, getApiUrl } from '../config';
 
 export default function OAuthButtons() {
   const handleGoogleLogin = () => {
-    window.location.href = `${BACKEND_URL}/auth/login/google`;
+    window.location.href = getApiUrl('auth/login/google');
   };
 
   return (

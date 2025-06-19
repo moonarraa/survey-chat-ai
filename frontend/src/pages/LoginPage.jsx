@@ -3,7 +3,7 @@ import OAuthButtons from "../components/OAuthButtons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Eye, EyeOff, Mail, Lock } from "lucide-react";
-import { BACKEND_URL } from '../config';
+import { BACKEND_URL, getApiUrl } from '../config';
 
 export default function LoginPage() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -28,7 +28,7 @@ export default function LoginPage() {
       const body = new URLSearchParams();
       body.append("username", formData.email);
       body.append("password", formData.password);
-      const res = await fetch(`${BACKEND_URL}/auth/token`, {
+      const res = await fetch(getApiUrl('auth/token'), {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body,

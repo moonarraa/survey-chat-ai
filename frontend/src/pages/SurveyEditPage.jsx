@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
-import { BACKEND_URL } from '../config';
+import { BACKEND_URL, getApiUrl } from '../config';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },
@@ -53,30 +53,34 @@ export default function SurveyEditPage({ id: propId, onClose }) {
     async function fetchSurvey() {
       setLoading(true);
       const token = localStorage.getItem("token");
-      const res = await fetch(`${BACKEND_URL}/surveys/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (res.status === 401) {
-        localStorage.removeItem('token');
-        window.location.href = '/login?expired=1';
-        return;
-      }
-      if (res.ok) {
-        const data = await res.json();
-        setSurvey(data);
-        setQuestions(data.questions);
-        // Загружаем ответы, если есть public_id
-        if (data.public_id) {
-          const res2 = await fetch(`${BACKEND_URL}/surveys/s/${data.public_id}/answers`);
-          if (res2.ok) {
-            const answers = await res2.json();
-            setResponses(answers);
-          } else {
-            setResponses([]);
-          }
+      try {
+        const res = await fetch(getApiUrl(`surveys/${id}`), {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.status === 401) {
+          localStorage.removeItem('token');
+          window.location.href = '/login?expired=1';
+          return;
         }
-      } else {
-        navigate("/dashboard");
+        if (res.ok) {
+          const data = await res.json();
+          setSurvey(data);
+          setQuestions(data.questions);
+          // Загружаем ответы, если есть public_id
+          if (data.public_id) {
+            const res2 = await fetch(getApiUrl(`surveys/s/${data.public_id}/answers`));
+            if (res2.ok) {
+              const answers = await res2.json();
+              setResponses(answers);
+            } else {
+              setResponses([]);
+            }
+          }
+        } else {
+          navigate("/dashboard");
+        }
+      } catch {
+        setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение к интернету и попробуйте ещё раз.' });
       }
       setLoading(false);
     }
@@ -157,7 +161,7 @@ export default function SurveyEditPage({ id: propId, onClose }) {
     setSuccess("");
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(`${BACKEND_URL}/surveys/${id}`, {
+      const res = await fetch(getApiUrl(`surveys/${id}`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
