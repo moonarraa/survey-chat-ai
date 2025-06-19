@@ -78,10 +78,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    # Используем NullPool для избежания проблем с подключениями
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.pool_size"] = "1"
-    configuration["sqlalchemy.max_overflow"] = "0"
     
     connectable = engine_from_config(
         configuration,
