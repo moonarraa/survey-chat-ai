@@ -255,6 +255,32 @@ async def restore_survey(
     await db.commit()
     return {"ok": True}
 
+@router.post("/archive-all-active", tags=["temporary"])
+async def archive_all_active_surveys(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db)
+):
+    """
+    Temporary endpoint to find and archive all active surveys for the current user.
+    """
+    try:
+        query = select(Survey).where(Survey.user_id == current_user.id).where(Survey.archived == False)
+        result = await db.execute(query)
+        surveys_to_archive = result.scalars().all()
+
+        if not surveys_to_archive:
+            return {"message": "No active surveys found to archive."}
+
+        for survey in surveys_to_archive:
+            survey.archived = True
+        
+        await db.commit()
+
+        return {"message": f"Successfully archived {len(surveys_to_archive)} active survey(s)."}
+    except Exception as e:
+        await db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
 @router.get("/s/{public_id}/answers")
 async def get_public_survey_answers(public_id: str, db: AsyncSession = Depends(get_async_db)):
     result = await db.execute(select(SurveyAnswer).where(SurveyAnswer.public_id == public_id))
