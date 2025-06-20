@@ -6,15 +6,15 @@ const normalizeUrl = (url) => {
   return baseUrl;
 };
 
-const rawUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
-let finalUrl = normalizeUrl(rawUrl);
+const rawUrl = import.meta.env.VITE_BACKEND_URL || '//localhost:8000'; // ← protocol-relative fallback
 
-// Force HTTPS for production builds to prevent mixed content errors
-if (import.meta.env.PROD && finalUrl.startsWith('http://')) {
-  finalUrl = finalUrl.replace('http://', 'https://');
-}
+// 2. OPTIONAL: auto-upgrade if someone still passes http:// in prod
+const safeUrl =
+  window.location.protocol === 'https:' && rawUrl.startsWith('http://')
+    ? rawUrl.replace('http://', 'https://')
+    : rawUrl;
 
-export const BACKEND_URL = finalUrl;
+export const BACKEND_URL = normalizeUrl(safeUrl);
 
 // Helper function to construct API URLs
 export const getApiUrl = (path) => {
