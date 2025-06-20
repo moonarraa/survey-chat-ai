@@ -5,7 +5,15 @@ const normalizeUrl = (url) => {
   return baseUrl;
 };
 
-export const BACKEND_URL = normalizeUrl(import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000');
+const rawUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+let finalUrl = normalizeUrl(rawUrl);
+
+// Force HTTPS for production builds to prevent mixed content errors
+if (import.meta.env.PROD && finalUrl.startsWith('http://')) {
+  finalUrl = finalUrl.replace('http://', 'https://');
+}
+
+export const BACKEND_URL = finalUrl;
 
 // Helper function to construct API URLs
 export const getApiUrl = (path) => {
