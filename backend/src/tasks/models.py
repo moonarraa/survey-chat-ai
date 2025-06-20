@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional, List, Any
+from datetime import datetime
 
 class UserCreate(BaseModel):
     email: EmailStr
@@ -39,8 +40,11 @@ class SurveyOut(BaseModel):
     id: int
     topic: str
     questions: List[Any]
-    created_at: str
+    created_at: datetime
     public_id: str
     archived: bool
+
+    class Config:
+        from_attributes = True
 
  

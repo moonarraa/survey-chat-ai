@@ -72,7 +72,7 @@ async def list_surveys(
             id=s.id,
             topic=s.topic,
             questions=json.loads(s.questions),
-            created_at=str(s.created_at),
+            created_at=s.created_at,
             public_id=s.public_id,
             archived=s.archived,
         ) for s in [row._mapping for row in surveys]
@@ -104,7 +104,7 @@ async def get_survey(
         id=survey.id,
         topic=survey.topic,
         questions=json.loads(survey.questions),
-        created_at=str(survey.created_at),
+        created_at=survey.created_at,
         public_id=survey.public_id,
         archived=survey.archived,
     )
@@ -214,7 +214,7 @@ async def update_survey(
         id=survey.id,
         topic=survey.topic,
         questions=json.loads(survey.questions),
-        created_at=str(survey.created_at),
+        created_at=survey.created_at,
         public_id=survey.public_id,
         archived=survey.archived,
     )
