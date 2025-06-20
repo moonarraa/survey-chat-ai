@@ -8,6 +8,7 @@ from sqlalchemy.future import select
 from src.auth.exceptions import (DatabaseException, UserAlreadyExistsException,
                                  UserNotFoundException)
 from src.tasks.schema import User, Survey
+from src.tasks.models import SurveyOut
 
 
 class UserDAO:
@@ -107,7 +108,7 @@ class UserDAO:
     
 class SurveyDAO:
     @staticmethod
-    async def create_survey(user_id: int, topic: str, questions: list, db: AsyncSession) -> Survey:
+    async def create_survey(user_id: int, topic: str, questions: list, db: AsyncSession) -> SurveyOut:
         survey = Survey(
             user_id=user_id,
             topic=topic,
@@ -116,7 +117,16 @@ class SurveyDAO:
         db.add(survey)
         await db.commit()
         await db.refresh(survey)
-        return survey
+        
+        # Manually construct the SurveyOut model before returning
+        return SurveyOut(
+            id=survey.id,
+            topic=survey.topic,
+            questions=questions,  # Use the original list, not the json string
+            created_at=survey.created_at,
+            public_id=survey.public_id,
+            archived=survey.archived,
+        )
 
     @staticmethod
     async def get_surveys_by_user(user_id: int, db: AsyncSession):
