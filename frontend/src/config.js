@@ -24,4 +24,4 @@ export const getApiUrl = (path) => {
 };
 
 // Other configuration variables can be added here
-export const APP_VERSION = '1.0.0'; 
+export const APP_VERSION = '1.0.0';
