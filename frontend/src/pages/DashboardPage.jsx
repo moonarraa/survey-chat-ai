@@ -230,16 +230,6 @@ function DashboardPage() {
 
   const handleCreateSurveyClick = (e) => {
     e.stopPropagation(); // Prevent event bubbling
-    if (hasActiveSurvey || isArchiveTab) {
-      setErrorModal({
-        open: true,
-        title: 'Ограничение',
-        message: isArchiveTab 
-          ? 'Создание новых опросов недоступно в архиве. Перейдите на вкладку "Текущие".'
-          : 'У вас уже есть активный опрос. Пожалуйста, архивируйте или удалите его, прежде чем создавать новый.'
-      });
-      return;
-    }
     setOpen(true);
   };
 
