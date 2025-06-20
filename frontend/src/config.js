@@ -1,3 +1,4 @@
+// Forcing a clean rebuild on Railway by adding a comment
 // Normalize the backend URL to ensure no double slashes
 const normalizeUrl = (url) => {
   // Remove trailing slash if present
