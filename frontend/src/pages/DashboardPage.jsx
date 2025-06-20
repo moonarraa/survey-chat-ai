@@ -90,32 +90,43 @@ function DashboardPage() {
     { id: 'settings', icon: Settings, label: 'Настройки', active: false }
   ];
 
-  useEffect(() => {
-    async function fetchSurveys() {
-      setLoading(true);
-      const token = localStorage.getItem('token');
-      let url = getApiUrl('surveys');
-      if (surveyTab === 'archived') url += '?archived=true';
-      if (surveyTab === 'current') url += '?archived=false';
-      
-      try {
-        const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.status === 401) {
-          localStorage.removeItem('token');
-          window.location.href = '/login?expired=1';
-          return;
-        }
-        if (res.ok) {
-          const data = await res.json();
-          setSurveys(data);
-        }
-      } catch (error) {
-        console.error('Error fetching surveys:', error);
+  const fetchSurveys = async () => {
+    setLoading(true);
+    const token = localStorage.getItem('token');
+    
+    const params = new URLSearchParams();
+    if (surveyTab === 'current') {
+      params.append('archived', 'false');
+    } else if (surveyTab === 'archived') {
+      params.append('archived', 'true');
+    }
+    
+    let url = getApiUrl(`surveys?${params.toString()}`);
+
+    try {
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.status === 401) {
+        localStorage.removeItem('token');
+        window.location.href = '/login?expired=1';
+        return;
       }
+      if (res.ok) {
+        const data = await res.json();
+        setSurveys(data);
+      } else {
+        setSurveys([]); // Clear surveys on error
+      }
+    } catch (error) {
+      console.error('Error fetching surveys:', error);
+      setSurveys([]); // Clear surveys on network error
+    } finally {
       setLoading(false);
     }
+  };
+
+  useEffect(() => {
     fetchSurveys();
   }, [surveyTab]);
 
@@ -160,7 +171,7 @@ function DashboardPage() {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (res.ok) {
-      setSurveys(surveys => surveys.filter(s => s.id !== surveyToDelete));
+      fetchSurveys(); // Refetch surveys instead of filtering
     }
     setShowDeleteModal(false);
     setSurveyToDelete(null);
@@ -178,7 +189,7 @@ function DashboardPage() {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (res.ok) {
-      setSurveys(surveys => surveys.filter(s => s.id !== surveyId));
+      fetchSurveys(); // Refetch surveys
     } else {
       setErrorModal({
         open: true,
@@ -195,7 +206,7 @@ function DashboardPage() {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (res.ok) {
-      setSurveys(surveys => surveys.filter(s => s.id !== surveyId));
+      fetchSurveys(); // Refetch surveys
     } else {
       const data = await res.json();
       setErrorModal({
