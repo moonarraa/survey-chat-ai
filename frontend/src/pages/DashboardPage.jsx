@@ -713,7 +713,12 @@ function DashboardPage() {
       <AnimatePresence>
         {open && (
           <Modal open={open} onClose={() => setOpen(false)}>
-            <CreateSurveyModal onSuccess={() => setOpen(false)} />
+            <CreateSurveyModal
+              onSuccess={() => {
+                fetchSurveys(); // Refetch surveys after successful creation
+                setOpen(false);
+              }}
+            />
           </Modal>
         )}
         {showDeleteModal && (

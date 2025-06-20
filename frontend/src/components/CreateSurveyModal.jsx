@@ -56,7 +56,9 @@ export default function CreateSurveyModal({ onSuccess }) {
         return;
       }
       const created = await res.json();
-      onSuccess?.();
+      if (onSuccess) {
+        onSuccess();
+      }
       navigate(`/dashboard/surveys/${created.id}/edit`);
     } catch {
       setError("Ошибка сети. Попробуйте позже.");
