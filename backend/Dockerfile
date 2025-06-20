@@ -27,6 +27,6 @@ ENV WEBSITE_PORT=8000
 # Expose port
 EXPOSE 8000
 
-# Start command
-CMD ./migrate.sh && gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
+# Start command uses the PORT environment variable provided by Railway
+CMD ./migrate.sh && gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
 
