@@ -1,3 +1,4 @@
+# Forcing a clean rebuild on Railway by adding a comment
 FROM python:3.11-slim
 
 # Install system dependencies
