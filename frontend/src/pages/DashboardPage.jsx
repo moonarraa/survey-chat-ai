@@ -681,50 +681,50 @@ function DashboardPage() {
                               initial={{ opacity: 0, y: 20 }}
                               animate={{ opacity: 1, y: 0 }}
                               transition={{ delay: index * 0.1 }}
-                              className="p-6 hover:bg-gray-50 transition-colors duration-200 group cursor-pointer relative"
+                              className="p-4 sm:p-6 hover:bg-gray-50 transition-colors duration-200 group cursor-pointer relative"
                               onClick={() => handleView(survey.id)}
                               tabIndex={0}
                               role="button"
                               onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') handleView(survey.id); }}
                             >
-                              <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-3 mb-2">
-                                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start gap-3 mb-2">
+                                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors break-words">
                                       {survey.topic}
                                     </h3>
                                     {surveyTab === 'archived' ? (
-                                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
+                                      <span className="flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
                                         Архивирован
                                       </span>
                                     ) : (
-                                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                      <span className="flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                         Активный
                                       </span>
                                     )}
                                   </div>
-                                  <div className="flex items-center gap-6 text-sm text-gray-600">
-                                    <div className="flex items-center gap-1">
+                                  <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
+                                    <div className="flex items-center gap-1.5">
                                       <BarChart3 className="h-4 w-4" />
-                                      {survey.questions?.length || 0} вопросов
+                                      <span>{survey.questions?.length || 0} вопросов</span>
                                     </div>
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-1.5">
                                       <Users className="h-4 w-4" />
-                                      {survey.answersCount || 0} ответов
+                                      <span>{survey.answersCount || 0} ответов</span>
                                     </div>
-                                    <div className="flex items-center gap-1">
+                                    <div className="flex items-center gap-1.5">
                                       <Clock className="h-4 w-4" />
-                                      {new Date(survey.created_at).toLocaleDateString('ru-RU')}
+                                      <span>{new Date(survey.created_at).toLocaleDateString('ru-RU')}</span>
                                     </div>
                                   </div>
                                 </div>
-                                <div onClick={e => e.stopPropagation()}>
-                                  <div className="flex items-center gap-2">
+                                <div onClick={e => e.stopPropagation()} className="self-start sm:self-center flex-shrink-0">
+                                  <div className="flex items-center gap-1 sm:gap-2">
                                     {surveyTab === 'archived' ? (
                                       <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         onClick={() => handleRestore(survey.id)}
-                                        className="p-2 text-primary-600 hover:text-white hover:bg-primary-600 rounded-lg transition-all duration-200 border border-primary-200"
+                                        className="p-2 text-primary-600 hover:text-white hover:bg-primary-600 rounded-lg transition-all duration-200 border border-primary-200 text-sm font-semibold px-3"
                                         title="Вернуть из архива"
                                       >
                                         Вернуть
@@ -757,7 +757,7 @@ function DashboardPage() {
                                         </motion.button>
                                         <motion.button
                                           whileHover={{ scale: 1.05 }}
-                                          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                                          className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 hidden sm:block"
                                           title="Дополнительно"
                                         >
                                           <MoreHorizontal className="h-5 w-5" />
