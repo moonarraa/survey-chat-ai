@@ -23,7 +23,8 @@ import {
   ChartBar,
   PieChart,
   Activity,
-  MessageCircle
+  MessageCircle,
+  Menu
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Modal from "../components/Modal";
@@ -42,6 +43,7 @@ function DashboardPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [surveyToDelete, setSurveyToDelete] = useState(null);
   const [errorModal, setErrorModal] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [summaryStats, setSummaryStats] = useState({
     totalSurveys: 0,
     activeSurveys: 0,
@@ -246,12 +248,8 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
-      <motion.div
-        initial={{ x: -300 }}
-        animate={{ x: 0 }}
-        className="w-64 bg-gray-900 text-white flex flex-col shadow-xl"
-      >
+      {/* Sidebar for Desktop */}
+      <div className="w-64 bg-gray-900 text-white flex-col shadow-xl hidden md:flex">
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">
           <div className="flex items-center space-x-3">
@@ -296,12 +294,85 @@ function DashboardPage() {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
+
+      {/* Mobile Sidebar (Overlay) */}
+      <AnimatePresence>
+        {isSidebarOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsSidebarOpen(false)}
+              className="fixed inset-0 bg-black/60 z-40 md:hidden"
+            />
+            <motion.div
+              initial={{ x: -300 }}
+              animate={{ x: 0 }}
+              exit={{ x: -300 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              className="fixed inset-y-0 left-0 w-64 bg-gray-900 text-white flex flex-col shadow-xl z-50 md:hidden"
+            >
+              {/* Logo */}
+              <div className="p-6 border-b border-gray-800">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-2.5 rounded-xl">
+                    <span className="text-white font-bold text-sm">SC</span>
+                  </div>
+                  <span className="text-xl font-bold">SurveyChat</span>
+                </div>
+              </div>
+
+              {/* Navigation */}
+              <nav className="flex-1 py-6">
+                <ul className="space-y-2 px-4">
+                  {sidebarItems.map((item) => (
+                    <li key={item.id}>
+                      <button
+                        onClick={() => {
+                          setActiveTab(item.id);
+                          setIsSidebarOpen(false);
+                        }}
+                        className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                          item.active 
+                            ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg' 
+                            : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                        }`}
+                      >
+                        <item.icon className="h-5 w-5" />
+                        <span className="font-medium">{item.label}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              {/* User Profile */}
+              <div className="p-4 border-t border-gray-800">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-semibold">MT</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-white truncate">Munara Tussubek...</p>
+                    <p className="text-xs text-gray-400 truncate">munaratus@yahoo.com</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Top bar with 'На главную' button */}
-        <div className="flex items-center justify-between mb-4">
+        {/* Top bar */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+          <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 md:hidden">
+            <Menu className="h-6 w-6" />
+          </button>
+          <div className="flex-1" /> {/* Spacer */}
           <button
             className="btn-secondary text-sm px-4 py-2"
             onClick={() => navigate("/")}
@@ -310,7 +381,7 @@ function DashboardPage() {
           </button>
         </div>
 
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
           <AnimatePresence mode="wait">
             {activeTab === 'summary' && (
               <motion.div

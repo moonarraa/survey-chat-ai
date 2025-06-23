@@ -191,6 +191,7 @@ async def generate_questions(data: GenerateQuestionsIn = Body(...)):
 
 @router.post("/generate-questions-advanced", response_model=GenerateQuestionsAdvancedOut)
 async def generate_questions_advanced(data: GenerateQuestionsAdvancedIn = Body(...)):
+
     questions = ai_generate_advanced_questions_for_context(data.context, n=min(max(data.n, 3), 8))
     return GenerateQuestionsAdvancedOut(questions=questions)
 
