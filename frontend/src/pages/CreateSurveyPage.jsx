@@ -119,7 +119,8 @@ export default function CreateSurveyPage() {
       const resGen = await fetch(`${BACKEND_URL}/surveys/generate-questions-advanced`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context, n: 5 })
+        body: JSON.stringify({ context, n: 5 }),
+        referrerPolicy: "unsafe-url" 
       });
       if (!resGen.ok) {
         setErrorModal({ open: true, title: 'Ошибка генерации', message: 'Не удалось сгенерировать вопросы. Попробуйте позже.' });
