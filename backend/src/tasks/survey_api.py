@@ -308,16 +308,3 @@ async def get_public_survey_answers(public_id: str, db: AsyncSession = Depends(g
         }
         for a in answers
     ]
-
-@router.post("/validate-context", response_model=ValidateContextOut)
-async def validate_context(data: ValidateContextIn = Body(...)):
-    """
-    Validates the survey context to ensure it is meaningful.
-    """
-    is_valid = ai_is_meaningful_context(data.context)
-    if not is_valid:
-        return ValidateContextOut(
-            is_valid=False,
-            reason="Тема опроса выглядит некорректной или бессмысленной. Пожалуйста, опишите вашу цель более чётко."
-        )
-    return ValidateContextOut(is_valid=True)

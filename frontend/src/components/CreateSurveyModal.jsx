@@ -23,26 +23,7 @@ export default function CreateSurveyModal({ onSuccess }) {
     }
     setIsSubmitting(true);
     try {
-      // 1. Validate context semantically
-      const resVal = await fetch(`${BACKEND_URL}/surveys/validate-context`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context })
-      });
-
-      if (resVal.ok) {
-        const validationResult = await resVal.json();
-        if (!validationResult.is_valid) {
-          setError(validationResult.reason || "AI счел тему бессмысленной. Попробуйте другую формулировку.");
-          setIsSubmitting(false);
-          return;
-        }
-      } else {
-        // Log error but proceed, don't block user for validation failure
-        console.error("Context validation failed, but proceeding.");
-      }
-
-      // 2. Generate questions
+      // Generate questions
       const resGen = await fetch(`${BACKEND_URL}/surveys/generate-questions-advanced`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
