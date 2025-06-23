@@ -27,7 +27,9 @@ origins = [
     "http://localhost:5173",  # Для Vite dev server
     "https://survey-chat-ai.vercel.app",  # Ваш домен на Vercel
     "https://survey-chat-ai*.vercel.app",  # Для preview deployments
-    "https://grateful-adventure-production-91c0.up.railway.app" # Your new frontend on Railway
+    "https://grateful-adventure-production-91c0.up.railway.app",  # Your new frontend on Railway
+    "https://survey-chat-frontend-production.up.railway.app",
+    "https://survey-ai.up.railway.app",
 ]
 
 @app.on_event("startup")
