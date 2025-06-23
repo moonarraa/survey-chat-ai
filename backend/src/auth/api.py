@@ -7,13 +7,13 @@ from authlib.integrations.starlette_client import OAuth # type: ignore
 import jwt
 from datetime import datetime, timedelta
 
-from auth.dependencies import get_current_user
-from auth.exceptions import (InvalidCredentialsException,
+from src.auth.dependencies import get_current_user
+from src.auth.exceptions import (InvalidCredentialsException,
                              UserAlreadyExistsException, raise_http_exception)
-from backend.src.tasks.models import Token, User, UserCredentials
-from backend.src.tasks.service import AuthService
-from database import get_async_db
-from config import settings
+from src.tasks.models import Token, User, UserCredentials
+from src.tasks.service import AuthService
+from src.database import get_async_db
+from src.config import settings
 
 router = APIRouter(prefix="/auth")
 
