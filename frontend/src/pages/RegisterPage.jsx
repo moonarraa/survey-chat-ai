@@ -80,8 +80,7 @@ function RegisterPage() {
       const res = await fetch(getApiUrl('auth/register'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-        referrerPolicy: "unsafe-url"
+        body: JSON.stringify(formData)
       });
       if (!res.ok) {
         const data = await res.json();
