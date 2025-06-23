@@ -5,7 +5,13 @@ from src.database import get_async_db
 from src.tasks.models import SurveyCreate, SurveyOut, User
 from src.tasks.crud import SurveyDAO
 from src.tasks.schema import Survey, SurveyAnswer
-from src.assistant.openai_assistant import ai_generate_followup_question, ai_generate_questions_for_topic, ai_is_meaningful_answer, ai_generate_advanced_questions_for_context
+from src.assistant.openai_assistant import (
+    ai_generate_followup_question, 
+    ai_generate_questions_for_topic, 
+    ai_is_meaningful_answer, 
+    ai_generate_advanced_questions_for_context,
+    ai_is_meaningful_context
+)
 import json
 from pydantic import BaseModel
 from typing import Any
@@ -38,6 +44,13 @@ class GenerateQuestionsAdvancedIn(BaseModel):
 
 class GenerateQuestionsAdvancedOut(BaseModel):
     questions: list[dict]
+
+class ValidateContextIn(BaseModel):
+    context: str
+
+class ValidateContextOut(BaseModel):
+    is_valid: bool
+    reason: str | None = None
 
 @router.post("/", response_model=SurveyOut)
 async def create_survey(
@@ -295,3 +308,16 @@ async def get_public_survey_answers(public_id: str, db: AsyncSession = Depends(g
         }
         for a in answers
     ]
+
+@router.post("/validate-context", response_model=ValidateContextOut)
+async def validate_context(data: ValidateContextIn = Body(...)):
+    """
+    Validates the survey context to ensure it is meaningful.
+    """
+    is_valid = ai_is_meaningful_context(data.context)
+    if not is_valid:
+        return ValidateContextOut(
+            is_valid=False,
+            reason="Тема опроса выглядит некорректной или бессмысленной. Пожалуйста, опишите вашу цель более чётко."
+        )
+    return ValidateContextOut(is_valid=True)

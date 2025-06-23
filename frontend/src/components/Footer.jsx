@@ -11,7 +11,7 @@ function Footer() {
               <div className="bg-primary-600 p-2 rounded-xl">
                 <MessageCircle className="h-6 w-6 text-white" />
               </div>
-              <span className="text-xl font-bold">SurveyChat AI</span>
+              <span className="text-xl font-bold">Survey AI</span>
             </div>
             <p className="text-gray-400 max-w-md">
               Революционная платформа для проведения опросов в формате живого диалога. 

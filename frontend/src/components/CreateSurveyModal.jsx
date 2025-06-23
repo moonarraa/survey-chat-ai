@@ -17,8 +17,32 @@ export default function CreateSurveyModal({ onSuccess }) {
       setError("Заполните цель/контекст опроса.");
       return;
     }
+    if (context.trim().split(/\s+/).length < 3) {
+      setError("Пожалуйста, опишите цель опроса более подробно. Нужно как минимум 3 слова, чтобы AI понял задачу.");
+      return;
+    }
     setIsSubmitting(true);
     try {
+      // 1. Validate context semantically
+      const resVal = await fetch(`${BACKEND_URL}/surveys/validate-context`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ context })
+      });
+
+      if (resVal.ok) {
+        const validationResult = await resVal.json();
+        if (!validationResult.is_valid) {
+          setError(validationResult.reason || "AI счел тему бессмысленной. Попробуйте другую формулировку.");
+          setIsSubmitting(false);
+          return;
+        }
+      } else {
+        // Log error but proceed, don't block user for validation failure
+        console.error("Context validation failed, but proceeding.");
+      }
+
+      // 2. Generate questions
       const resGen = await fetch(`${BACKEND_URL}/surveys/generate-questions-advanced`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

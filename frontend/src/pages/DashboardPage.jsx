@@ -57,9 +57,9 @@ function DashboardPage() {
 
   // Mock data for company summary
   const companyData = {
-    name: 'SurveyChat AI',
+    name: 'Survey AI',
     category: 'B2B SaaS',
-    summary: 'SurveyChat AI - это революционная платформа для проведения опросов в формате живого диалога. Используя силу искусственного интеллекта, мы помогаем компаниям получать более качественные и детальные ответы от участников опросов.',
+    summary: 'Survey AI - это революционная платформа для проведения опросов в формате живого диалога. Используя силу искусственного интеллекта, мы помогаем компаниям получать более качественные и детальные ответы от участников опросов.',
     products: [
       'AI-генерация вопросов',
       'Диалоговые опросы',
@@ -256,7 +256,7 @@ function DashboardPage() {
             <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-2.5 rounded-xl">
               <span className="text-white font-bold text-sm">SC</span>
             </div>
-            <span className="text-xl font-bold">SurveyChat</span>
+            <span className="text-xl font-bold">Survey AI</span>
           </div>
         </div>
 
@@ -320,7 +320,7 @@ function DashboardPage() {
                   <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-2.5 rounded-xl">
                     <span className="text-white font-bold text-sm">SC</span>
                   </div>
-                  <span className="text-xl font-bold">SurveyChat</span>
+                  <span className="text-xl font-bold">Survey AI</span>
                 </div>
               </div>
 
@@ -749,7 +749,10 @@ function DashboardPage() {
                                         </motion.button>
                                         <motion.button
                                           whileHover={{ scale: 1.05 }}
-                                          onClick={() => handleDelete(survey.id)}
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDelete(survey.id);
+                                          }}
                                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
                                           title="Удалить"
                                         >

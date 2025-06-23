@@ -89,7 +89,7 @@ app.include_router(survey_router, prefix="/surveys")
 def read_root():
     logger.info("Root endpoint called")
     return {
-        "message": "SurveyChat API is running",
+        "message": "Survey AI API is running",
         "version": "1.0.0",
         "environment": getattr(settings, 'environment', 'development')
     }

@@ -161,3 +161,36 @@ def ai_generate_advanced_questions_for_context(context, n=6):
         return questions[:n]
     except Exception:
         return []
+
+def ai_is_meaningful_context(context: str) -> bool:
+    """
+    Checks if the given context for a survey is meaningful and not just random characters or nonsense.
+    """
+    if not context or not isinstance(context, str):
+        return False
+
+    prompt = (
+        f"Оцени, является ли следующая тема для опроса осмысленной, конкретной и подходящей для создания анкеты: '{context}'.\n"
+        "Тема должна быть не просто набором случайных слов или букв. Она должна представлять собой понятную идею, которую можно исследовать с помощью вопросов.\n"
+        "Примеры хороших тем: 'Удовлетворенность сотрудников условиями труда в IT-компании', 'Исследование предпочтений потребителей кофе в Алматы', 'Мнение студентов о качестве онлайн-образования'.\n"
+        "Примеры плохих тем: 'абырвалг', 'тест тест', 'jaskdjfh askdjfh', '12345'.\n"
+        "Если тема осмысленная и подходит для опроса, ответь 'YES'. В противном случае, ответь 'NO'.\n"
+        "Ответь только 'YES' или 'NO'."
+    )
+    
+    try:
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "Ты — AI-ассистент, который помогает в создании качественных опросов."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=5,
+            temperature=0.0,
+        )
+        result = response.choices[0].message.content.strip().upper()
+        return result == "YES"
+    except Exception:
+        # In case of any API error, default to allowing the context
+        # to avoid blocking the user due to external issues.
+        return True
