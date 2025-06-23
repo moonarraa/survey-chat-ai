@@ -121,6 +121,7 @@ export default function CreateSurveyPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ context, n: 5 }),
         referrerPolicy: "unsafe-url" 
+        //TODO: remove this
       });
       if (!resGen.ok) {
         setErrorModal({ open: true, title: 'Ошибка генерации', message: 'Не удалось сгенерировать вопросы. Попробуйте позже.' });
@@ -142,7 +143,9 @@ export default function CreateSurveyPage() {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ topic: context, questions })
+        body: JSON.stringify({ topic: context, questions }),
+        referrerPolicy: "unsafe-url" 
+        //TODO: remove this
       });
       if (res.status === 401) {
         localStorage.removeItem('token');
