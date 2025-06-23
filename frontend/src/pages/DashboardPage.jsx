@@ -275,6 +275,25 @@ function DashboardPage() {
 
   const handleCreateSurveyClick = (e) => {
     e.stopPropagation(); // Prevent event bubbling
+    
+    if (isArchiveTab) {
+      setErrorModal({
+        open: true,
+        title: 'Действие недоступно',
+        message: 'Вы не можете создавать опросы, находясь на вкладке "Архив".'
+      });
+      return;
+    }
+    
+    if (hasActiveSurvey) {
+      setErrorModal({
+        open: true,
+        title: 'У вас уже есть активный опрос',
+        message: 'Чтобы создать новый опрос, пожалуйста, сначала архивируйте текущий активный.'
+      });
+      return;
+    }
+
     setOpen(true);
   };
 
@@ -284,12 +303,12 @@ function DashboardPage() {
       <div className="w-64 bg-gray-900 text-white flex-col shadow-xl hidden md:flex">
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">
-          <div className="flex items-center space-x-3">
+          <Link to="/" className="flex items-center space-x-3">
             <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-2.5 rounded-xl">
               <span className="text-white font-bold text-sm">SC</span>
             </div>
             <span className="text-xl font-bold">Survey AI</span>
-          </div>
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -348,12 +367,12 @@ function DashboardPage() {
             >
               {/* Logo */}
               <div className="p-6 border-b border-gray-800">
-                <div className="flex items-center space-x-3">
+                <Link to="/" className="flex items-center space-x-3">
                   <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-2.5 rounded-xl">
                     <span className="text-white font-bold text-sm">SC</span>
                   </div>
                   <span className="text-xl font-bold">Survey AI</span>
-                </div>
+                </Link>
               </div>
 
               {/* Navigation */}
@@ -401,16 +420,17 @@ function DashboardPage() {
       <div className="flex-1 flex flex-col">
         {/* Top bar */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
-          <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 md:hidden">
-            <Menu className="h-6 w-6" />
-          </button>
-          <div className="flex-1" /> {/* Spacer */}
-          <button
-            className="btn-secondary text-sm px-4 py-2"
-            onClick={() => navigate("/")}
-          >
-            ← На главную
-          </button>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 md:hidden">
+              <Menu className="h-6 w-6" />
+            </button>
+            <button
+              className="btn-primary flex items-center gap-1 text-sm px-4 py-2"
+              onClick={() => navigate("/")}
+            >
+              <ChevronLeft className="h-4 w-4" /> На главную
+            </button>
+          </div>
         </div>
 
         <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
@@ -626,7 +646,7 @@ function DashboardPage() {
                         onClick={handleCreateSurveyClick}
                         className={`${
                           hasActiveSurvey || isArchiveTab
-                            ? 'bg-gray-400' 
+                            ? 'bg-gray-400 cursor-not-allowed' 
                             : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-xl'
                         } text-white px-4 py-2 rounded-xl font-semibold shadow-lg transition-all duration-200 flex items-center gap-2`}
                         title={
