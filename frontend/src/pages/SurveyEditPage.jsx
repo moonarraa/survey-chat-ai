@@ -425,15 +425,15 @@ export default function SurveyEditPage({ id: propId, onClose }) {
       {activeTab === 'responses' && (
         <div>
           <h3 className="text-lg font-semibold mb-4">Все ответы</h3>
-          <div className="mb-4 flex flex-col sm:flex-row flex-wrap gap-2 items-center">
+          <div className="mb-4 flex flex-col sm:flex-row flex-wrap gap-4 items-center">
             <input
-              className="border rounded px-3 py-2 w-full sm:w-64"
+              className="border rounded-xl px-3 py-2 w-full sm:w-auto sm:flex-1"
               placeholder="Поиск по ответам..."
               value={responseSearch}
               onChange={e => setResponseSearch(e.target.value)}
             />
             <select
-              className="border rounded px-2 py-2 w-full sm:w-auto"
+              className="border rounded-xl px-2 py-2 w-full sm:w-auto"
               value={responseFilter}
               onChange={e => setResponseFilter(e.target.value)}
             >
@@ -442,55 +442,81 @@ export default function SurveyEditPage({ id: propId, onClose }) {
                 <option key={id} value={id}>{id}</option>
               ))}
             </select>
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-              <label className="text-sm text-gray-500">Дата с:</label>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <label className="text-sm text-gray-500 whitespace-nowrap">Дата с:</label>
               <input
                 type="date"
-                className="border rounded px-2 py-2"
+                className="border rounded-xl px-2 py-2 w-full"
                 value={responseDateFrom}
                 onChange={e => setResponseDateFrom(e.target.value)}
               />
             </div>
-            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <label className="text-sm text-gray-500">по:</label>
               <input
                 type="date"
-                className="border rounded px-2 py-2"
+                className="border rounded-xl px-2 py-2 w-full"
                 value={responseDateTo}
                 onChange={e => setResponseDateTo(e.target.value)}
               />
             </div>
           </div>
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <div className="bg-gray-50 rounded-xl p-2 sm:p-4 border border-gray-100">
             {(filteredResponses.length === 0) ? (
               <div className="text-gray-500 text-center py-8">Пока нет ни одного ответа на этот опрос.</div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="min-w-full border text-sm">
-                  <thead>
-                    <tr>
-                      <th className="border px-2 py-1 bg-gray-100">#</th>
-                      {questions.map((q, idx) => (
-                        <th key={idx} className="border px-2 py-1 bg-gray-100">{typeof q === 'string' ? q : q.text || `Вопрос ${idx+1}`}</th>
-                      ))}
-                      <th className="border px-2 py-1 bg-gray-100">Респондент</th>
-                      <th className="border px-2 py-1 bg-gray-100">Дата</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredResponses.map((resp, rIdx) => (
-                      <tr key={rIdx}>
-                        <td className="border px-2 py-1 text-gray-400">{rIdx + 1}</td>
-                        {(resp.answers || []).map((ans, aIdx) => (
-                          <td key={aIdx} className="border px-2 py-1">{ans}</td>
+              <>
+                {/* Desktop Table */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="min-w-full border text-sm">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border px-2 py-2">#</th>
+                        {questions.map((q, idx) => (
+                          <th key={idx} className="border px-3 py-2 text-left font-medium text-gray-600">{typeof q === 'string' ? q : q.text || `Вопрос ${idx+1}`}</th>
                         ))}
-                        <td className="border px-2 py-1 text-gray-500">{resp.respondent_id || '-'}</td>
-                        <td className="border px-2 py-1 text-gray-500">{resp.created_at ? new Date(resp.created_at).toLocaleString('ru-RU') : '-'}</td>
+                        <th className="border px-3 py-2 text-left font-medium text-gray-600">Респондент</th>
+                        <th className="border px-3 py-2 text-left font-medium text-gray-600">Дата</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="bg-white">
+                      {filteredResponses.map((resp, rIdx) => (
+                        <tr key={rIdx} className="hover:bg-gray-50 transition-colors">
+                          <td className="border px-2 py-2 text-gray-400 text-center">{rIdx + 1}</td>
+                          {(resp.answers || []).map((ans, aIdx) => (
+                            <td key={aIdx} className="border px-3 py-2">{String(ans)}</td>
+                          ))}
+                          <td className="border px-3 py-2 text-gray-500">{resp.respondent_id || '-'}</td>
+                          <td className="border px-3 py-2 text-gray-500">{resp.created_at ? new Date(resp.created_at).toLocaleString('ru-RU') : '-'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* Mobile Cards */}
+                <div className="md:hidden space-y-4">
+                  {filteredResponses.map((resp, rIdx) => (
+                    <div key={rIdx} className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                      <div className="flex justify-between items-start mb-3 pb-3 border-b border-gray-100">
+                        <div>
+                          <span className="font-semibold text-gray-800">Ответ #{rIdx + 1}</span>
+                          {resp.respondent_id && <span className="block text-xs text-gray-500 mt-1">(ID: {resp.respondent_id})</span>}
+                        </div>
+                        <div className="text-xs text-gray-500 whitespace-nowrap">{resp.created_at ? new Date(resp.created_at).toLocaleDateString('ru-RU') : '-'}</div>
+                      </div>
+                      <div className="space-y-3 text-sm">
+                        {questions.map((q, qIdx) => (
+                          <div key={qIdx}>
+                            <div className="font-medium text-gray-600 mb-1">{q.text || `Вопрос ${qIdx + 1}`}</div>
+                            <div className="text-gray-800 pl-2 border-l-2 border-primary-200 bg-primary-50/50 py-1">{String(resp.answers[qIdx]) || '-'}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>

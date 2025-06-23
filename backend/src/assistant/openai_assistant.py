@@ -143,7 +143,7 @@ def ai_generate_advanced_questions_for_context(context, n=6):
         "Верни только JSON-массив, без пояснений и текста вокруг. Вопросы должны быть максимально разнообразными по типу."
     )
     response = client.chat.completions.create(
-        model="gpt-4.1",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": "Ты — AI-бот для опросов."},
             {"role": "user", "content": prompt}
