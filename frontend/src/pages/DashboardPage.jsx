@@ -44,6 +44,7 @@ function DashboardPage() {
   const [surveyToDelete, setSurveyToDelete] = useState(null);
   const [errorModal, setErrorModal] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const [summaryStats, setSummaryStats] = useState({
     totalSurveys: 0,
     activeSurveys: 0,
@@ -54,6 +55,28 @@ function DashboardPage() {
   });
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const token = localStorage.getItem('token');
+      try {
+        const res = await fetch(getApiUrl('auth/me'), {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          setCurrentUser(await res.json());
+        } else {
+           // Handle error, e.g. redirect to login if 401
+           if (res.status === 401) {
+             navigate('/login?expired=1');
+           }
+        }
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+    fetchCurrentUser();
+  }, [navigate]);
 
   // Mock data for company summary
   const companyData = {
@@ -91,6 +114,15 @@ function DashboardPage() {
     { id: 'help', icon: HelpCircle, label: 'Справка', active: false },
     { id: 'settings', icon: Settings, label: 'Настройки', active: false }
   ];
+
+  const getInitials = (name) => {
+    if (!name) return '';
+    const parts = name.split(' ');
+    if (parts.length > 1 && parts[0] && parts[1]) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
 
   const fetchSurveys = async () => {
     setLoading(true);
@@ -286,11 +318,11 @@ function DashboardPage() {
         <div className="p-4 border-t border-gray-800">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
-              <span className="text-white text-sm font-semibold">MT</span>
+              <span className="text-white text-sm font-semibold">{currentUser ? getInitials(currentUser.name) : ''}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">Munara Tussubek...</p>
-              <p className="text-xs text-gray-400 truncate">munaratus@yahoo.com</p>
+              <p className="text-sm font-medium text-white truncate">{currentUser ? currentUser.name : 'Загрузка...'}</p>
+              <p className="text-xs text-gray-400 truncate">{currentUser ? currentUser.email : ''}</p>
             </div>
           </div>
         </div>
@@ -352,11 +384,11 @@ function DashboardPage() {
               <div className="p-4 border-t border-gray-800">
                 <div className="flex items-center space-x-3">
                   <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
-                    <span className="text-white text-sm font-semibold">MT</span>
+                    <span className="text-white text-sm font-semibold">{currentUser ? getInitials(currentUser.name) : ''}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">Munara Tussubek...</p>
-                    <p className="text-xs text-gray-400 truncate">munaratus@yahoo.com</p>
+                    <p className="text-sm font-medium text-white truncate">{currentUser ? currentUser.name : 'Загрузка...'}</p>
+                    <p className="text-xs text-gray-400 truncate">{currentUser ? currentUser.email : ''}</p>
                   </div>
                 </div>
               </div>
