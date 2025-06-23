@@ -193,7 +193,7 @@ export default function SurveyEditPage({ id: propId, onClose }) {
   if (loading) return <div className="p-8 text-center">Загрузка...</div>;
   if (!survey) return null;
 
-  const publicUrl = `${window.location.origin}/s/${survey.public_id}`;
+  const publicUrl = `${window.location.origin}/s/${survey.slug || survey.public_id}`;
 
   // Get unique respondent IDs for filter dropdown
   const respondentIds = Array.from(new Set(responses.map(r => r.respondent_id).filter(Boolean)));
@@ -221,19 +221,21 @@ export default function SurveyEditPage({ id: propId, onClose }) {
   });
 
   return (
-    <div className="relative max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+    <div className="relative max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-8">
       {onClose && (
         <button
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-2 rounded-full"
           onClick={onClose}
           title="Закрыть"
-        >×</button>
+        >
+          <span className="text-2xl font-bold">×</span>
+        </button>
       )}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <h2 className="text-2xl font-bold text-gray-900">{survey?.topic}</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+          <h2 className="text-2xl font-bold text-gray-900 break-words">{survey?.topic}</h2>
           {survey?.archived && (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 flex-shrink-0">
               Архивирован
             </span>
           )}
@@ -311,19 +313,19 @@ export default function SurveyEditPage({ id: propId, onClose }) {
                           >
                             ☰
                           </span>
-                          <div className="border rounded-2xl p-6 bg-white mb-2 shadow-md transition-all duration-200 hover:shadow-lg">
-                            <div className="flex items-center gap-2 mb-2">
+                          <div className="border rounded-2xl p-4 sm:p-6 bg-white mb-2 shadow-md transition-all duration-200 hover:shadow-lg">
+                            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-2">
                               <select
                                 value={q.type}
                                 onChange={e => handleQuestionChange(idx, "type", e.target.value)}
-                                className="border rounded px-2 py-1 text-sm"
+                                className="border rounded px-2 py-1 text-sm w-full sm:w-auto"
                               >
                                 {QUESTION_TYPES.map(t => (
                                   <option key={t.value} value={t.value}>{t.label}</option>
                                 ))}
                               </select>
                               <textarea
-                                className="border rounded-xl px-4 py-3 flex-1 min-h-[48px] max-h-40 resize-y bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary-200 transition-all text-base shadow-sm"
+                                className="border rounded-xl px-4 py-3 w-full flex-1 min-h-[48px] max-h-40 resize-y bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary-200 transition-all text-base shadow-sm"
                                 value={q.text || ""}
                                 onChange={e => handleQuestionChange(idx, "text", e.target.value)}
                                 onBlur={e => handleQuestionChange(idx, "text", e.target.value)}
@@ -343,7 +345,7 @@ export default function SurveyEditPage({ id: propId, onClose }) {
                                     />
                                     <button
                                       type="button"
-                                      className="ml-2 text-red-500"
+                                      className="ml-2 text-red-500 p-1"
                                       onClick={() => handleRemoveOption(idx, oIdx)}
                                       disabled={(q.options ?? []).length <= 2}
                                     >
@@ -387,7 +389,7 @@ export default function SurveyEditPage({ id: propId, onClose }) {
                                     />
                                     <button
                                       type="button"
-                                      className="ml-2 text-red-500"
+                                      className="ml-2 text-red-500 p-1"
                                       onClick={() => handleRemoveRankingItem(idx, iIdx)}
                                       disabled={(q.items ?? []).length <= 2}
                                     >
@@ -414,24 +416,24 @@ export default function SurveyEditPage({ id: propId, onClose }) {
               )}
             </Droppable>
           </DragDropContext>
-          <div className="flex gap-2 mt-2">
-            <button className="btn-primary" onClick={handleSave}>Сохранить</button>
-            <button className="btn-secondary" onClick={() => navigate(`/dashboard/surveys/${id}`)}>Отмена</button>
+          <div className="flex flex-col sm:flex-row gap-2 mt-2">
+            <button className="btn-primary w-full sm:w-auto" onClick={handleSave}>Сохранить</button>
+            <button className="btn-secondary w-full sm:w-auto" onClick={() => navigate(`/dashboard/surveys/${id}`)}>Отмена</button>
           </div>
         </>
       )}
       {activeTab === 'responses' && (
         <div>
           <h3 className="text-lg font-semibold mb-4">Все ответы</h3>
-          <div className="mb-4 flex flex-wrap gap-2 items-center">
+          <div className="mb-4 flex flex-col sm:flex-row flex-wrap gap-2 items-center">
             <input
-              className="border rounded px-3 py-2 w-64"
+              className="border rounded px-3 py-2 w-full sm:w-64"
               placeholder="Поиск по ответам..."
               value={responseSearch}
               onChange={e => setResponseSearch(e.target.value)}
             />
             <select
-              className="border rounded px-2 py-2"
+              className="border rounded px-2 py-2 w-full sm:w-auto"
               value={responseFilter}
               onChange={e => setResponseFilter(e.target.value)}
             >
@@ -440,20 +442,24 @@ export default function SurveyEditPage({ id: propId, onClose }) {
                 <option key={id} value={id}>{id}</option>
               ))}
             </select>
-            <label className="text-sm text-gray-500 ml-2">Дата с:</label>
-            <input
-              type="date"
-              className="border rounded px-2 py-2"
-              value={responseDateFrom}
-              onChange={e => setResponseDateFrom(e.target.value)}
-            />
-            <label className="text-sm text-gray-500 ml-2">по:</label>
-            <input
-              type="date"
-              className="border rounded px-2 py-2"
-              value={responseDateTo}
-              onChange={e => setResponseDateTo(e.target.value)}
-            />
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <label className="text-sm text-gray-500">Дата с:</label>
+              <input
+                type="date"
+                className="border rounded px-2 py-2"
+                value={responseDateFrom}
+                onChange={e => setResponseDateFrom(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+              <label className="text-sm text-gray-500">по:</label>
+              <input
+                type="date"
+                className="border rounded px-2 py-2"
+                value={responseDateTo}
+                onChange={e => setResponseDateTo(e.target.value)}
+              />
+            </div>
           </div>
           <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
             {(filteredResponses.length === 0) ? (
@@ -491,20 +497,20 @@ export default function SurveyEditPage({ id: propId, onClose }) {
       )}
       {activeTab === 'share' && !survey?.archived && (
         <div className="flex flex-col items-center gap-6 py-8">
-          <div className="text-lg font-semibold">Публичная ссылка на опрос:</div>
-          <div className="flex items-center gap-2">
+          <div className="text-lg font-semibold text-center">Публичная ссылка на опрос:</div>
+          <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <input
-              className="border rounded px-3 py-2 w-96 text-gray-700"
+              className="border rounded px-3 py-2 w-full sm:flex-1 text-gray-700 bg-gray-50"
               value={publicUrl}
               readOnly
             />
             <button
-              className="bg-primary-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-primary-700 transition"
+              className="bg-primary-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-primary-700 transition flex-shrink-0"
               onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess('Скопировано!'); setTimeout(()=>setCopySuccess(''), 1500);}}
             >
               Копировать
             </button>
-            {copySuccess && <span className="text-green-600 ml-2">{copySuccess}</span>}
+            {copySuccess && <span className="text-green-600 ml-2 text-center w-full sm:w-auto mt-2 sm:mt-0">{copySuccess}</span>}
           </div>
           <div className="mt-4 flex flex-col items-center">
             <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>

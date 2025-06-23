@@ -37,7 +37,7 @@ const testimonials = [
   {
     name: 'Анна Петрова',
     role: 'HR-директор, TechCorp',
-    content: 'SurveyChat AI полностью изменил наш подход к опросам сотрудников. Теперь мы получаем гораздо более честные и развернутые ответы.',
+    content: 'Survey AI полностью изменил наш подход к опросам сотрудников. Теперь мы получаем гораздо более честные и развернутые ответы.',
     rating: 5
   },
   {
@@ -75,9 +75,6 @@ function LandingPage() {
                   Попробовать бесплатно
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
-                <Link to="/register" className="btn-secondary inline-flex items-center">
-                  Получить ранний доступ
-                </Link>
               </div>
             </motion.div>
           </div>
@@ -96,7 +93,7 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Почему выбирают SurveyChat AI?
+              Почему выбирают Survey AI?
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Современные технологии для создания опросов нового поколения
@@ -191,7 +188,7 @@ function LandingPage() {
               Что говорят наши клиенты
             </h2>
             <p className="text-xl text-gray-600">
-              Реальные отзывы от компаний, которые уже используют SurveyChat AI
+              Реальные отзывы от компаний, которые уже используют Survey AI
             </p>
           </div>
           
@@ -241,7 +238,7 @@ function LandingPage() {
               Готовы революционизировать ваши опросы?
             </h2>
             <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-              Присоединяйтесь к тысячам компаний, которые уже используют SurveyChat AI 
+              Присоединяйтесь к тысячам компаний, которые уже используют Survey AI 
               для получения более качественных данных.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -70,13 +70,13 @@ export default function SurveyDetailPage({ id, onClose }) {
   if (loading) return <div className="p-8 text-center">Загрузка...</div>;
   if (!survey) return null;
 
-  const publicUrl = `${window.location.origin}/s/${survey.public_id}`;
+  const publicUrl = `${window.location.origin}/s/${survey.slug || survey.public_id}`;
 
   return (
-    <div className="relative max-w-2xl mx-auto mt-10 bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+    <div className="relative max-w-2xl mx-auto my-4 sm:my-10 bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-8">
       {onClose && (
         <button
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-2 rounded-full"
           onClick={onClose}
           title="Закрыть"
         >×</button>
@@ -132,45 +132,45 @@ export default function SurveyDetailPage({ id, onClose }) {
           </li>
         ))}
       </ul>
-      <div className="flex flex-wrap gap-4 mt-2 items-center">
-        <Link to={`/dashboard/surveys/${survey.id}/edit`} className="btn-primary flex items-center gap-2 text-base px-6 py-3 rounded-xl shadow hover:shadow-md transition">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-4 mt-2">
+        <Link to={`/dashboard/surveys/${survey.id}/edit`} className="btn-primary w-full sm:w-auto flex items-center justify-center gap-2 text-base px-6 py-3 rounded-xl shadow hover:shadow-md transition">
           <span role="img" aria-label="edit">✏️</span> Редактировать
         </Link>
         <button
-          className="btn-secondary flex items-center gap-2 text-base px-6 py-3 rounded-xl shadow hover:shadow-md transition"
+          className="btn-secondary w-full sm:w-auto flex items-center justify-center gap-2 text-base px-6 py-3 rounded-xl shadow hover:shadow-md transition"
           onClick={() => navigate("/dashboard")}
         >
           <span role="img" aria-label="back">←</span> Назад к списку опросов
         </button>
         <button
-          className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold shadow hover:bg-primary-700 hover:shadow-lg transition flex items-center gap-2"
+          className="bg-primary-600 text-white w-full sm:w-auto px-6 py-3 rounded-xl font-semibold shadow hover:bg-primary-700 hover:shadow-lg transition flex items-center justify-center gap-2"
           onClick={() => setShowShare(true)}
         >
           <span role="img" aria-label="share">🔗</span> Поделиться
         </button>
       </div>
       {showShare && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-2xl p-8 shadow-lg relative w-full max-w-lg flex flex-col items-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4">
+          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg relative w-full max-w-lg flex flex-col items-center">
             <button
               onClick={() => setShowShare(false)}
               className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
               aria-label="Закрыть"
             >×</button>
-            <div className="text-lg font-semibold mb-4">Публичная ссылка на опрос:</div>
-            <div className="flex items-center gap-2 mb-6">
+            <div className="text-lg font-semibold mb-4 text-center">Публичная ссылка на опрос:</div>
+            <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-6">
               <input
-                className="border rounded px-3 py-2 w-96 text-gray-700"
+                className="border rounded px-3 py-2 w-full sm:flex-1 text-gray-700 bg-gray-50"
                 value={publicUrl}
                 readOnly
               />
               <button
-                className="bg-primary-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-primary-700 transition"
+                className="bg-primary-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-primary-700 transition flex-shrink-0"
                 onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess('Скопировано!'); setTimeout(()=>setCopySuccess(''), 1500);}}
               >
                 Копировать
               </button>
-              {copySuccess && <span className="text-green-600 ml-2">{copySuccess}</span>}
+              {copySuccess && <span className="text-green-600 text-center w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2">{copySuccess}</span>}
             </div>
             <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
             <QRCode value={publicUrl} size={160} />

@@ -1,6 +1,6 @@
-# SurveyChat Backend
+# Survey AI Backend
 
-Backend for SurveyChat: FastAPI + PostgreSQL + OpenAI
+Backend for Survey AI: FastAPI + PostgreSQL + OpenAI
 
 ## Features
 - User authentication (JWT)

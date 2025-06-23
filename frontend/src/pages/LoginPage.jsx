@@ -67,7 +67,7 @@ export default function LoginPage() {
             <User className="h-8 w-8 text-white" />
           </motion.div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Добро пожаловать!</h1>
-          <p className="text-gray-600">Войдите в свой аккаунт SurveyChat AI</p>
+          <p className="text-gray-600">Войдите в свой аккаунт Survey AI</p>
         </motion.div>
 
         <motion.div
