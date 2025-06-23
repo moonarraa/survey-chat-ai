@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
-import { BACKEND_URL } from '../config';
+import { getApiUrl } from '../config';
+import { Plus, Trash2 } from 'lucide-react';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },
@@ -32,7 +33,9 @@ function getDefaultQuestion(type = "multiple_choice") {
 
 export default function SurveyDetailPage({ id, onClose }) {
   const [survey, setSurvey] = useState(null);
+  const [originalSurvey, setOriginalSurvey] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [showShare, setShowShare] = useState(false);
   const [copySuccess, setCopySuccess] = useState("");
   const navigate = useNavigate();
@@ -43,7 +46,7 @@ export default function SurveyDetailPage({ id, onClose }) {
       setLoading(true);
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch(`${BACKEND_URL}/surveys/${id}`, {
+        const res = await fetch(getApiUrl(`surveys/${id}`), {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.status === 401) {
@@ -54,6 +57,7 @@ export default function SurveyDetailPage({ id, onClose }) {
         if (res.ok) {
           const data = await res.json();
           setSurvey(data);
+          setOriginalSurvey(JSON.parse(JSON.stringify(data)));
         } else if (res.status === 404) {
           setErrorModal({ open: true, title: 'Опрос не найден', message: 'Возможно, ссылка устарела или опрос был удалён.' });
         } else {
@@ -67,24 +71,155 @@ export default function SurveyDetailPage({ id, onClose }) {
     fetchSurvey();
   }, [id, navigate]);
 
+  const handleSave = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(getApiUrl(`surveys/${id}`), {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          topic: survey.topic,
+          questions: survey.questions
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSurvey(data);
+        setOriginalSurvey(JSON.parse(JSON.stringify(data)));
+        setIsEditing(false);
+      } else {
+        const errorData = await res.json().catch(() => ({ detail: 'Не удалось сохранить изменения.' }));
+        setErrorModal({ open: true, title: 'Ошибка сохранения', message: errorData.detail });
+      }
+    } catch {
+      setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение и попробуйте снова.' });
+    }
+  };
+
+  const handleCancel = () => {
+    setSurvey(originalSurvey);
+    setIsEditing(false);
+  };
+
+  const handleQuestionChange = (qIndex, field, value) => {
+    const newSurvey = { ...survey };
+    if (field === 'type') {
+      const oldQuestionText = newSurvey.questions[qIndex].text;
+      newSurvey.questions[qIndex] = getDefaultQuestion(value);
+      newSurvey.questions[qIndex].text = oldQuestionText;
+    } else {
+      newSurvey.questions[qIndex][field] = value;
+    }
+    setSurvey(newSurvey);
+  };
+
+  const handleOptionChange = (qIndex, oIndex, value) => {
+    const newSurvey = { ...survey };
+    newSurvey.questions[qIndex].options[oIndex] = value;
+    setSurvey(newSurvey);
+  };
+  
+  const handleAddOption = (qIndex) => {
+    const newSurvey = { ...survey };
+    newSurvey.questions[qIndex].options.push("");
+    setSurvey(newSurvey);
+  };
+
+  const handleRemoveOption = (qIndex, oIndex) => {
+    const newSurvey = { ...survey };
+    newSurvey.questions[qIndex].options.splice(oIndex, 1);
+    setSurvey(newSurvey);
+  };
+  
+  const handleAddQuestion = () => {
+    const newSurvey = { ...survey };
+    newSurvey.questions.push(getDefaultQuestion());
+    setSurvey(newSurvey);
+  };
+  
+  const handleRemoveQuestion = (qIndex) => {
+    const newSurvey = { ...survey };
+    newSurvey.questions.splice(qIndex, 1);
+    setSurvey(newSurvey);
+  };
+
   if (loading) return <div className="p-8 text-center">Загрузка...</div>;
   if (!survey) return null;
 
   const publicUrl = `${window.location.origin}/s/${survey.slug || survey.public_id}`;
 
-  return (
-    <div className="relative max-w-2xl mx-auto my-4 sm:my-10 bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-8">
-      {onClose && (
-        <button
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-2 rounded-full"
-          onClick={onClose}
-          title="Закрыть"
-        >×</button>
-      )}
-      <h2 className="text-2xl font-bold text-gray-900 mb-4">{survey.topic}</h2>
-      <div className="mb-4 text-gray-500 text-sm">
-        Создан: {new Date(survey.created_at).toLocaleString('ru-RU')}
-      </div>
+  const renderEditView = () => (
+    <div>
+      {survey.questions.map((q, qIndex) => (
+        <div key={qIndex} className="border rounded-xl p-4 mb-4 bg-gray-50 relative">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Текст вопроса</label>
+          <input
+            type="text"
+            value={q.text}
+            onChange={(e) => handleQuestionChange(qIndex, 'text', e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md mb-2"
+          />
+
+          <label className="block text-sm font-medium text-gray-700 mb-1">Тип вопроса</label>
+          <select
+            value={q.type}
+            onChange={(e) => handleQuestionChange(qIndex, 'type', e.target.value)}
+            className="w-full p-2 border border-gray-300 rounded-md mb-4"
+          >
+            {QUESTION_TYPES.map(qt => <option key={qt.value} value={qt.value}>{qt.label}</option>)}
+          </select>
+
+          {q.type === 'multiple_choice' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Варианты ответа</label>
+              {q.options.map((opt, oIndex) => (
+                <div key={oIndex} className="flex items-center gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={opt}
+                    onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+                    className="flex-grow p-2 border border-gray-300 rounded-md"
+                  />
+                  <button onClick={() => handleRemoveOption(qIndex, oIndex)} className="p-2 text-red-500 hover:text-red-700">
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              ))}
+              <button onClick={() => handleAddOption(qIndex)} className="btn-secondary text-sm">Добавить вариант</button>
+            </div>
+          )}
+
+          {q.type === 'rating' && (
+             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Шкала (1-10)</label>
+               <input
+                type="number"
+                min="2"
+                max="10"
+                value={q.scale || 5}
+                onChange={(e) => handleQuestionChange(qIndex, 'scale', parseInt(e.target.value))}
+                className="w-full p-2 border border-gray-300 rounded-md"
+              />
+            </div>
+          )}
+
+          <button onClick={() => handleRemoveQuestion(qIndex)} className="absolute top-2 right-2 p-2 text-gray-400 hover:text-red-600">
+            <Trash2 size={20}/>
+          </button>
+        </div>
+      ))}
+      <button onClick={handleAddQuestion} className="btn-primary w-full flex items-center justify-center gap-2">
+        <Plus/> Добавить вопрос
+      </button>
+    </div>
+  );
+
+  const renderDisplayView = () => (
+    <>
       <h3 className="text-lg font-semibold mb-2">Вопросы:</h3>
       <ul className="list-decimal pl-6 text-gray-800 mb-6">
         {survey.questions && survey.questions.map((q, idx) => (
@@ -133,9 +268,6 @@ export default function SurveyDetailPage({ id, onClose }) {
         ))}
       </ul>
       <div className="flex flex-col sm:flex-row flex-wrap gap-4 mt-2">
-        <Link to={`/dashboard/surveys/${survey.id}/edit`} className="btn-primary w-full sm:w-auto flex items-center justify-center gap-2 text-base px-6 py-3 rounded-xl shadow hover:shadow-md transition">
-          <span role="img" aria-label="edit">✏️</span> Редактировать
-        </Link>
         <button
           className="btn-secondary w-full sm:w-auto flex items-center justify-center gap-2 text-base px-6 py-3 rounded-xl shadow hover:shadow-md transition"
           onClick={() => navigate("/dashboard")}
@@ -149,6 +281,41 @@ export default function SurveyDetailPage({ id, onClose }) {
           <span role="img" aria-label="share">🔗</span> Поделиться
         </button>
       </div>
+    </>
+  );
+
+  return (
+    <div className="relative max-w-2xl mx-auto my-4 sm:my-10 bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-8">
+      {onClose && !isEditing && (
+        <button
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-2 rounded-full"
+          onClick={onClose}
+          title="Закрыть"
+        >×</button>
+      )}
+      <div className="flex justify-between items-start mb-4">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">{isEditing ? "Редактирование опроса" : survey.topic}</h2>
+          {!isEditing && <div className="text-gray-500 text-sm mt-1">
+            Создан: {new Date(survey.created_at).toLocaleString('ru-RU')}
+          </div>}
+        </div>
+        <div className="flex gap-2 flex-shrink-0">
+          {isEditing ? (
+            <>
+              <button onClick={handleSave} className="btn-primary">Сохранить</button>
+              <button onClick={handleCancel} className="btn-secondary">Отмена</button>
+            </>
+          ) : (
+            <button onClick={() => setIsEditing(true)} className="btn-primary flex items-center justify-center gap-2">
+              <span role="img" aria-label="edit">✏️</span> Редактировать
+            </button>
+          )}
+        </div>
+      </div>
+      
+      {isEditing ? renderEditView() : renderDisplayView()}
+
       {showShare && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4">
           <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg relative w-full max-w-lg flex flex-col items-center">
