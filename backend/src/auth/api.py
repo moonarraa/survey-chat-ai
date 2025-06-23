@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from auth.dependencies import get_current_user
-from auth.execptions import (InvalidCredentialsException,
+from auth.exceptions import (InvalidCredentialsException,
                              UserAlreadyExistsException, raise_http_exception)
 from backend.src.tasks.models import Token, User, UserCredentials
 from backend.src.tasks.service import AuthService

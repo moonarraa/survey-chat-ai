@@ -32,6 +32,7 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body,
+        referrerPolicy: "unsafe-url"
       });
       if (!res.ok) {
         const data = await res.json();

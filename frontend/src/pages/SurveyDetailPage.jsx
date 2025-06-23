@@ -44,7 +44,8 @@ export default function SurveyDetailPage({ id, onClose }) {
       const token = localStorage.getItem("token");
       try {
         const res = await fetch(`${BACKEND_URL}/surveys/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
+          referrerPolicy: "unsafe-url"
         });
         if (res.status === 401) {
           localStorage.removeItem('token');

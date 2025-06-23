@@ -55,7 +55,8 @@ export default function SurveyEditPage({ id: propId, onClose }) {
       const token = localStorage.getItem("token");
       try {
         const res = await fetch(getApiUrl(`surveys/${id}`), {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
+          referrerPolicy: "unsafe-url"
         });
         if (res.status === 401) {
           localStorage.removeItem('token');
@@ -68,7 +69,9 @@ export default function SurveyEditPage({ id: propId, onClose }) {
           setQuestions(data.questions);
           // Загружаем ответы, если есть public_id
           if (data.public_id) {
-            const res2 = await fetch(getApiUrl(`surveys/s/${data.public_id}/answers`));
+            const res2 = await fetch(getApiUrl(`surveys/s/${data.public_id}/answers`), {
+              referrerPolicy: "unsafe-url"
+            });
             if (res2.ok) {
               const answers = await res2.json();
               setResponses(answers);
@@ -167,7 +170,8 @@ export default function SurveyEditPage({ id: propId, onClose }) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ questions })
+        body: JSON.stringify({ questions }),
+        referrerPolicy: "unsafe-url"
       });
       if (res.ok) {
         setSuccess("Изменения сохранены!");

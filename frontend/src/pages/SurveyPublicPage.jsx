@@ -24,7 +24,9 @@ export default function SurveyPublicPage() {
     async function fetchSurvey() {
       setLoading(true);
       try {
-        const res = await fetch(`${BACKEND_URL}/surveys/s/${public_id}`);
+        const res = await fetch(`${BACKEND_URL}/surveys/s/${public_id}`, {
+          referrerPolicy: "unsafe-url" 
+        });
         if (res.ok) {
           const data = await res.json();
           setTopic(data.topic);
@@ -88,7 +90,8 @@ export default function SurveyPublicPage() {
       const res = await fetch(`${BACKEND_URL}/surveys/s/${public_id}/answer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: finalChat.map(c => c.answer) })
+        body: JSON.stringify({ answers: finalChat.map(c => c.answer) }),
+        referrerPolicy: "unsafe-url" 
       });
       if (res.ok) {
         setSubmitted(true);

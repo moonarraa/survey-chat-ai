@@ -22,7 +22,8 @@ export default function CreateSurveyModal({ onSuccess }) {
       const resGen = await fetch(`${BACKEND_URL}/surveys/generate-questions-advanced`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context, n: 6 })
+        body: JSON.stringify({ context, n: 6 }),
+        referrerPolicy: "unsafe-url"
       });
       if (!resGen.ok) {
         setError("Ошибка генерации вопросов. Попробуйте позже.");
@@ -43,7 +44,8 @@ export default function CreateSurveyModal({ onSuccess }) {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ topic: context, questions })
+        body: JSON.stringify({ topic: context, questions }),
+        referrerPolicy: "unsafe-url"
       });
       if (!res.ok) {
         const data = await res.json();

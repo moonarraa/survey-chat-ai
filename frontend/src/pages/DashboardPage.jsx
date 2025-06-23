@@ -105,7 +105,8 @@ function DashboardPage() {
 
     try {
       const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        referrerPolicy: "unsafe-url"
       });
       if (res.status === 401) {
         localStorage.removeItem('token');
@@ -168,7 +169,8 @@ function DashboardPage() {
     const token = localStorage.getItem('token');
     const res = await fetch(getApiUrl(`surveys/${surveyToDelete}`), {
       method: "DELETE",
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
+      referrerPolicy: "unsafe-url"
     });
     if (res.ok) {
       fetchSurveys(); // Refetch surveys instead of filtering
@@ -186,7 +188,8 @@ function DashboardPage() {
     const token = localStorage.getItem('token');
     const res = await fetch(getApiUrl(`surveys/${surveyId}/archive`), {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
+      referrerPolicy: "unsafe-url"
     });
     if (res.ok) {
       fetchSurveys(); // Refetch surveys
@@ -203,7 +206,8 @@ function DashboardPage() {
     const token = localStorage.getItem('token');
     const res = await fetch(getApiUrl(`surveys/${surveyId}/restore`), {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` }
+      headers: { Authorization: `Bearer ${token}` },
+      referrerPolicy: "unsafe-url"
     });
     if (res.ok) {
       fetchSurveys(); // Refetch surveys
