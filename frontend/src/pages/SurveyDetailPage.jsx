@@ -339,23 +339,34 @@ export default function SurveyDetailPage({ id, onClose }) {
               className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
               aria-label="Закрыть"
             >×</button>
-            <div className="text-lg font-semibold mb-4 text-center">Публичная ссылка на опрос:</div>
-            <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-6">
-              <input
-                className="border rounded px-3 py-2 w-full sm:flex-1 text-gray-700 bg-gray-50"
-                value={publicUrl}
-                readOnly
-              />
-              <button
-                className="bg-primary-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-primary-700 transition flex-shrink-0"
-                onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess('Скопировано!'); setTimeout(()=>setCopySuccess(''), 1500);}}
-              >
-                Копировать
-              </button>
-              {copySuccess && <span className="text-green-600 text-center w-full sm:w-auto mt-2 sm:mt-0 sm:ml-2">{copySuccess}</span>}
-            </div>
+            <div className="text-lg font-semibold mb-6 text-center">Публичная ссылка на опрос</div>
+            <button
+              className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition mb-8 text-lg"
+              style={{ minWidth: 220 }}
+              onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess('Скопировано!'); setTimeout(()=>setCopySuccess(''), 1500);}}
+            >
+              Копировать ссылку
+            </button>
+            {copySuccess && <span className="text-green-600 text-center w-full mb-4">{copySuccess}</span>}
             <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
-            <QRCode value={publicUrl} size={160} />
+            <div className="flex flex-col items-center gap-2">
+              <QRCode id="qr-download" value={publicUrl} size={160} />
+              <button
+                className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl font-medium transition"
+                onClick={() => {
+                  const canvas = document.querySelector('#qr-download canvas');
+                  if (canvas) {
+                    const url = canvas.toDataURL('image/png');
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'survey-qr.png';
+                    a.click();
+                  }
+                }}
+              >
+                Скачать QR
+              </button>
+            </div>
           </div>
         </div>
       )}
