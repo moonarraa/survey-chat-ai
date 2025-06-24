@@ -4,7 +4,6 @@ import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
 import { getApiUrl } from '../config';
 import { Plus, Trash2, BarChart2, Edit, Settings } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },
