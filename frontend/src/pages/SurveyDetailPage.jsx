@@ -3,7 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
 import { getApiUrl } from '../config';
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Trash2, BarChart2, Edit, Settings } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },
@@ -40,6 +41,7 @@ export default function SurveyDetailPage({ id, onClose }) {
   const [copySuccess, setCopySuccess] = useState("");
   const navigate = useNavigate();
   const [errorModal, setErrorModal] = useState({ open: false, title: '', message: '' });
+  const [activeTab, setActiveTab] = useState('questions'); // 'questions', 'analytics', 'settings'
 
   useEffect(() => {
     async function fetchSurvey() {
@@ -285,36 +287,50 @@ export default function SurveyDetailPage({ id, onClose }) {
   );
 
   return (
-    <div className="relative max-w-2xl mx-auto my-4 sm:my-10 bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-8">
-      {onClose && !isEditing && (
-        <button
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-2 rounded-full"
-          onClick={onClose}
-          title="Закрыть"
-        >×</button>
-      )}
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">{isEditing ? "Редактирование опроса" : survey.topic}</h2>
-          {!isEditing && <div className="text-gray-500 text-sm mt-1">
-            Создан: {new Date(survey.created_at).toLocaleString('ru-RU')}
-          </div>}
-        </div>
-        <div className="flex gap-2 flex-shrink-0">
-          {isEditing ? (
-            <>
-              <button onClick={handleSave} className="btn-primary">Сохранить</button>
-              <button onClick={handleCancel} className="btn-secondary">Отмена</button>
-            </>
-          ) : (
-            <button onClick={() => setIsEditing(true)} className="btn-primary flex items-center justify-center gap-2">
-              <span role="img" aria-label="edit">✏️</span> Редактировать
-            </button>
-          )}
-        </div>
+    <div className="p-4 sm:p-6 bg-white rounded-2xl shadow-lg border border-gray-200 w-full">
+       <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-gray-800 truncate" title={survey.topic}>{survey.topic}</h2>
+        {/* Actions can go here */}
       </div>
-      
-      {isEditing ? renderEditView() : renderDisplayView()}
+
+       <div className="flex border-b mb-6">
+        <button
+          onClick={() => setActiveTab('questions')}
+          className={`px-4 py-2 flex items-center gap-2 border-b-2 border-blue-500 text-blue-600`}
+        >
+          <Edit size={16} /> Вопросы
+        </button>
+         <button
+          onClick={() => setActiveTab('settings')}
+          className={`px-4 py-2 flex items-center gap-2 ${activeTab === 'settings' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+        >
+          <Settings size={16} /> Настройки
+        </button>
+      </div>
+
+      {activeTab === 'questions' && (
+        <>
+          {isEditing ? renderEditView() : renderDisplayView()}
+          <div className="mt-6 flex gap-4">
+            {isEditing ? (
+              <>
+                <button onClick={handleSave} className="btn-primary">Сохранить</button>
+                <button onClick={handleCancel} className="btn-secondary">Отмена</button>
+              </>
+            ) : (
+              <button onClick={() => setIsEditing(true)} className="btn-primary">Редактировать</button>
+            )}
+          </div>
+        </>
+      )}
+
+      {activeTab === 'settings' && (
+        <div>
+          <h2 className="text-xl font-bold">Настройки опроса</h2>
+          {/* Settings content goes here */}
+          <p>Раздел настроек в разработке.</p>
+        </div>
+      )}
 
       {showShare && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4">
@@ -344,7 +360,12 @@ export default function SurveyDetailPage({ id, onClose }) {
           </div>
         </div>
       )}
-      <ErrorModal open={errorModal.open} title={errorModal.title} message={errorModal.message} onClose={() => setErrorModal({ open: false, title: '', message: '' })} />
+      <ErrorModal
+        isOpen={errorModal.open}
+        onClose={() => setErrorModal({ open: false, title: '', message: '' })}
+        title={errorModal.title}
+        message={errorModal.message}
+      />
     </div>
   );
 }

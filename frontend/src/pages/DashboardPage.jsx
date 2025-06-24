@@ -31,6 +31,7 @@ import Modal from "../components/Modal";
 import CreateSurveyModal from "../components/CreateSurveyModal";
 import SurveyEditPage from "./SurveyEditPage";
 import { BACKEND_URL, getApiUrl } from '../config';
+import { BarChart as RBarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart as RPieChart, Pie, Cell } from 'recharts';
 
 function DashboardPage() {
   const [activeTab, setActiveTab] = useState('projects');
@@ -53,6 +54,9 @@ function DashboardPage() {
     questionTypes: {},
     recentResponses: []
   });
+  const [selectedAnalyticsSurveyId, setSelectedAnalyticsSurveyId] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -187,6 +191,31 @@ function DashboardPage() {
       setSummaryStats(stats);
     }
   }, [activeTab, surveys]);
+
+  useEffect(() => {
+    if (activeTab === 'summary' && selectedAnalyticsSurveyId) {
+      fetchAnalytics(selectedAnalyticsSurveyId);
+    }
+  }, [activeTab, selectedAnalyticsSurveyId]);
+
+  const fetchAnalytics = async (surveyId) => {
+    setLoadingAnalytics(true);
+    setAnalytics(null);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await fetch(getApiUrl(`surveys/${surveyId}/analytics`), {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setAnalytics(await res.json());
+      } else {
+        setAnalytics(null);
+      }
+    } catch {
+      setAnalytics(null);
+    }
+    setLoadingAnalytics(false);
+  };
 
   const handleView = (surveyId) => {
     setSelectedSurveyId(surveyId);
@@ -620,6 +649,77 @@ function DashboardPage() {
                     </div>
                   </div>
                 </motion.div>
+
+                {/* Аналитика по выбранному опросу */}
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
+                  <h2 className="text-xl font-semibold mb-4 text-gray-900">Аналитика по опросу</h2>
+                  <div className="mb-4">
+                    <label className="block mb-1 text-sm font-medium text-gray-700">Выберите опрос:</label>
+                    <select
+                      className="w-full max-w-md border border-gray-300 rounded-xl px-4 py-2"
+                      value={selectedAnalyticsSurveyId || (surveys[0] && surveys[0].id) || ''}
+                      onChange={e => setSelectedAnalyticsSurveyId(e.target.value)}
+                    >
+                      {surveys.map(s => (
+                        <option key={s.id} value={s.id}>{s.topic}</option>
+                      ))}
+                    </select>
+                  </div>
+                  {loadingAnalytics && <div className="p-4 text-center">Загрузка аналитики...</div>}
+                  {!loadingAnalytics && analytics && (
+                    <div className="space-y-8">
+                      <div className="bg-gray-100 p-4 rounded-lg">
+                        <p className="text-lg">Всего ответов: <span className="font-bold">{analytics.total_responses}</span></p>
+                      </div>
+                      {Object.entries(analytics.question_analytics).map(([question, data]) => {
+                        const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF19AF'];
+                        return (
+                          <div key={question} className="border rounded-xl p-4">
+                            <h3 className="text-lg font-semibold mb-3">{question}</h3>
+                            {data.type === 'rating' && (
+                              <div>
+                                <p>Средняя оценка: {data.average}</p>
+                              </div>
+                            )}
+                            {data.type === 'multiple_choice' && (
+                              <ResponsiveContainer width="100%" height={300}>
+                                <RBarChart data={Object.entries(data.answers).map(([name, value]) => ({ name, value }))}>
+                                  <XAxis dataKey="name" />
+                                  <YAxis />
+                                  <Tooltip />
+                                  <Legend />
+                                  <Bar dataKey="value" fill="#8884d8" />
+                                </RBarChart>
+                              </ResponsiveContainer>
+                            )}
+                            {data.type === 'text' && data.sentiment && (
+                              <ResponsiveContainer width="100%" height={300}>
+                                <RPieChart>
+                                  <Pie
+                                    data={Object.entries(data.sentiment).map(([name, value]) => ({ name, value: value * 100 }))}
+                                    cx="50%"
+                                    cy="50%"
+                                    labelLine={false}
+                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                    outerRadius={80}
+                                    fill="#8884d8"
+                                    dataKey="value"
+                                  >
+                                    {Object.entries(data.sentiment).map((entry, index) => (
+                                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                    ))}
+                                  </Pie>
+                                  <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+                                  <Legend />
+                                </RPieChart>
+                              </ResponsiveContainer>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               </motion.div>
             )}
 

@@ -43,6 +43,7 @@ class SurveyOut(BaseModel):
     created_at: datetime
     public_id: str
     archived: bool
+    answers_count: int | None = None
 
     class Config:
         from_attributes = True

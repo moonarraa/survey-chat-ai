@@ -4,6 +4,7 @@
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react-beautiful-dnd": "^13.1.1",
-    "react-qr-code": "^2.0.16"
+    "react-qr-code": "^2.0.16",
+    "recharts": "^3.0.0"
   }
 }

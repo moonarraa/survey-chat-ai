@@ -15,7 +15,7 @@ from src.assistant.openai_assistant import (
 import json
 from pydantic import BaseModel
 from typing import Any
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 router = APIRouter(tags=["surveys"])
 
@@ -52,6 +52,10 @@ class ValidateContextOut(BaseModel):
     is_valid: bool
     reason: str | None = None
 
+class SurveyAnalytics(BaseModel):
+    total_responses: int
+    question_analytics: dict[str, Any]
+
 @router.post("/", response_model=SurveyOut)
 async def create_survey(
     survey: SurveyCreate,
@@ -75,11 +79,32 @@ async def list_surveys(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db)
 ):
-    query = Survey.__table__.select().where(Survey.user_id == current_user.id)
+    # Subquery to count answers for each survey
+    answers_count_subquery = (
+        select(
+            SurveyAnswer.survey_id,
+            func.count(SurveyAnswer.id).label("answers_count")
+        )
+        .group_by(SurveyAnswer.survey_id)
+        .subquery()
+    )
+
+    # Main query to select surveys and join with the answer count
+    query = (
+        select(
+            Survey.__table__,
+            answers_count_subquery.c.answers_count
+        )
+        .outerjoin(answers_count_subquery, Survey.id == answers_count_subquery.c.survey_id)
+        .where(Survey.user_id == current_user.id)
+    )
+    
     if archived is not None:
         query = query.where(Survey.archived == archived)
+        
     result = await db.execute(query)
     surveys = result.fetchall()
+    
     return [
         SurveyOut(
             id=s.id,
@@ -88,7 +113,8 @@ async def list_surveys(
             created_at=s.created_at,
             public_id=s.public_id,
             archived=s.archived,
-        ) for s in [row._mapping for row in surveys]
+            answers_count=s.answers_count or 0,
+        ) for s in surveys
     ]
 
 @router.delete("/{survey_id}")
@@ -308,3 +334,61 @@ async def get_public_survey_answers(public_id: str, db: AsyncSession = Depends(g
         }
         for a in answers
     ]
+
+@router.get("/{survey_id}/analytics", response_model=SurveyAnalytics)
+async def get_survey_analytics(
+    survey_id: int,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db)
+):
+    # Fetch survey to ensure it belongs to the user
+    survey = await db.get(Survey, survey_id)
+    if not survey or survey.user_id != current_user.id:
+        raise HTTPException(status_code=404, detail="Survey not found")
+
+    # Fetch all answers for the survey
+    answers_result = await db.execute(
+        select(SurveyAnswer).where(SurveyAnswer.survey_id == survey_id)
+    )
+    answers = answers_result.scalars().all()
+
+    total_responses = len(answers)
+    question_analytics = {}
+    
+    # Placeholder for real analytics
+    # In a real app, you would process answers here
+    # For now, let's return some dummy data based on question types
+
+    questions = json.loads(survey.questions)
+    for i, q in enumerate(questions):
+        q_text = q.get('text', f'Question {i+1}')
+        q_type = q.get('type', 'unknown')
+        
+        if q_type == 'rating':
+            # Dummy data for rating
+            question_analytics[q_text] = {
+                "type": "rating",
+                "average": 4.2,
+                "distribution": {"1": 5, "2": 10, "3": 20, "4": 50, "5": 15}
+            }
+        elif q_type == 'multiple_choice':
+            # Dummy data for multiple choice
+            question_analytics[q_text] = {
+                "type": "multiple_choice",
+                "answers": {
+                    opt: (i+1)*10 for i, opt in enumerate(q.get('options', []))
+                }
+            }
+        else: # open_ended, long_text
+            # Dummy data for open text
+            question_analytics[q_text] = {
+                "type": "text",
+                "wordcloud": {"AI": 15, "удобно": 12, "быстро": 10, "интерфейс": 8},
+                "sentiment": {"positive": 0.7, "neutral": 0.2, "negative": 0.1}
+            }
+
+
+    return SurveyAnalytics(
+        total_responses=total_responses,
+        question_analytics=question_analytics
+    )
