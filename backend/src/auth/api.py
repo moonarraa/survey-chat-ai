@@ -17,7 +17,7 @@ from src.database import get_async_db
 from src.config import settings
 from src.tasks.crud import UserDAO
 
-router = APIRouter(prefix="/auth")
+router = APIRouter()
 
 oauth = OAuth()
 oauth.register(
