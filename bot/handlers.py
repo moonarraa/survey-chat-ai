@@ -3,6 +3,8 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from . import api
+import httpx
+from .config import BACKEND_URL, BOT_API_TOKEN
 
 router = Router()
 
@@ -37,4 +39,26 @@ async def process_context(message: types.Message, state: FSMContext):
         import traceback
         traceback.print_exc()
         await message.answer(f"Ошибка: {e}")
-    await state.clear() 
+    await state.clear()
+
+@router.message(Command("link"))
+async def cmd_link(message: types.Message):
+    import traceback
+    try:
+        parts = message.text.strip().split()
+        if len(parts) != 2:
+            await message.answer("Пожалуйста, отправьте команду в формате: /link <код>")
+            return
+        code = parts[1]
+        await message.answer("Пробую привязать Telegram...")  # Для отладки
+        async with httpx.AsyncClient() as client:
+            res = await client.post(
+                f"{BACKEND_URL}/auth/users/link-telegram",
+                json={"tg_link_code": code, "tg_user_id": str(message.from_user.id)},
+                headers={"Authorization": f"Bearer {BOT_API_TOKEN}"}
+            )
+            res.raise_for_status()
+        await message.answer("Ваш Telegram успешно привязан к аккаунту!")
+    except Exception as e:
+        traceback.print_exc()
+        await message.answer(f"Ошибка при привязке: {e}") 

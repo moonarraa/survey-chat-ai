@@ -143,13 +143,12 @@ async def link_telegram(
     tg_user_id: str = Body(...),
     db: AsyncSession = Depends(get_async_db)
 ):
-    user = await db.execute(
-        User.__table__.select().where(User.tg_link_code == tg_link_code)
+    result = await db.execute(
+        select(User).where(User.tg_link_code == tg_link_code)
     )
-    user = user.first()
+    user = result.scalar_one_or_none()
     if not user:
         raise HTTPException(status_code=404, detail="Invalid code")
-    user = await UserDAO.get_user_by_id(user._mapping["id"], db)
     user.tg_user_id = tg_user_id
     user.tg_link_code = None
     await db.commit()
