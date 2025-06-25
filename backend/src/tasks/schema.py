@@ -18,6 +18,8 @@ class User(Base):
     role = Column(String)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
+    tg_user_id = Column(String, unique=True, index=True, nullable=True)
+    tg_link_code = Column(String, unique=True, index=True, nullable=True)
 
 
 class Survey(Base):

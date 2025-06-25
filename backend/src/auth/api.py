@@ -6,6 +6,7 @@ from sqlalchemy import select, func
 from authlib.integrations.starlette_client import OAuth # type: ignore
 import jwt
 from datetime import datetime, timedelta
+import uuid
 
 from src.auth.dependencies import get_current_user
 from src.auth.exceptions import (InvalidCredentialsException,
@@ -14,6 +15,7 @@ from src.tasks.models import Token, User, UserCredentials
 from src.tasks.service import AuthService
 from src.database import get_async_db
 from src.config import settings
+from src.tasks.crud import UserDAO
 
 router = APIRouter(prefix="/auth")
 
@@ -121,3 +123,35 @@ async def auth_via_google(request: Request):
     jwt_token = jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
     frontend_url = f"http://localhost:5173/auth/callback/google?token={jwt_token}"
     return RedirectResponse(frontend_url)
+
+
+@router.post("/users/generate-tg-link-code")
+async def generate_tg_link_code(
+    current_user=Depends(get_current_user),
+    db: AsyncSession = Depends(get_async_db)
+):
+    user = await UserDAO.get_user_by_id(current_user.id, db)
+    code = uuid.uuid4().hex[:8]
+    user.tg_link_code = code
+    await db.commit()
+    await db.refresh(user)
+    return {"tg_link_code": code}
+
+@router.post("/users/link-telegram")
+async def link_telegram(
+    tg_link_code: str = Body(...),
+    tg_user_id: str = Body(...),
+    db: AsyncSession = Depends(get_async_db)
+):
+    user = await db.execute(
+        User.__table__.select().where(User.tg_link_code == tg_link_code)
+    )
+    user = user.first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Invalid code")
+    user = await UserDAO.get_user_by_id(user._mapping["id"], db)
+    user.tg_user_id = tg_user_id
+    user.tg_link_code = None
+    await db.commit()
+    await db.refresh(user)
+    return {"ok": True}
