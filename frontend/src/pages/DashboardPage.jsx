@@ -115,6 +115,7 @@ function DashboardPage() {
   const sidebarItems = [
     { id: 'projects', icon: FolderOpen, label: 'Мои опросы', active: activeTab === 'projects' },
     { id: 'summary', icon: Home, label: 'Сводка', active: activeTab === 'summary' },
+    { id: 'profile', icon: User, label: 'Личный кабинет', active: activeTab === 'profile' },
     { id: 'help', icon: HelpCircle, label: 'Справка', active: false },
     { id: 'settings', icon: Settings, label: 'Настройки', active: false }
   ];
@@ -931,6 +932,20 @@ function DashboardPage() {
                 )}
               </motion.div>
             )}
+
+            {activeTab === 'profile' && (
+              <motion.div
+                key="profile"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8 border border-gray-200"
+              >
+                <h2 className="text-2xl font-bold mb-4">Личный кабинет</h2>
+                <ProfileSection currentUser={currentUser} surveys={surveys} />
+              </motion.div>
+            )}
           </AnimatePresence>
         </main>
       </div>
@@ -971,6 +986,40 @@ function DashboardPage() {
           </Modal>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function ProfileSection({ currentUser, surveys }) {
+  // Найти активный опрос
+  const activeSurvey = surveys?.find(s => !s.archived);
+  const BOT_USERNAME = "survey_chat_ai_bot";
+
+  return (
+    <div>
+      <div className="mb-4">
+        <div className="font-semibold">Имя:</div>
+        <div className="mb-2">{currentUser?.name || "-"}</div>
+        <div className="font-semibold">Email:</div>
+        <div>{currentUser?.email || "-"}</div>
+      </div>
+      {/* Кнопка для Telegram */}
+      {activeSurvey && (
+        <div className="mt-6 p-4 bg-primary-50 rounded-xl">
+          <div className="font-semibold mb-2">Пройти опрос в Telegram:</div>
+          <a
+            href={`https://t.me/${BOT_USERNAME}?start=${activeSurvey.public_id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary inline-block"
+          >
+            Открыть чат с ботом
+          </a>
+          <div className="text-gray-600 text-sm mt-2">
+            Просто перейдите по ссылке — бот начнёт опрос автоматически.
+          </div>
+        </div>
+      )}
     </div>
   );
 }

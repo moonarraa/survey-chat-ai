@@ -152,6 +152,7 @@ export default function SurveyDetailPage({ id, onClose }) {
   if (!survey) return null;
 
   const publicUrl = `${window.location.origin}/s/${survey.slug || survey.public_id}`;
+  const telegramUrl = `https://t.me/survey_chat_ai_bot?start=${survey.public_id}`;
 
   const renderEditView = () => (
     <div>
@@ -303,7 +304,7 @@ export default function SurveyDetailPage({ id, onClose }) {
           onClick={() => setActiveTab('settings')}
           className={`px-4 py-2 flex items-center gap-2 ${activeTab === 'settings' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
         >
-          <Settings size={16} /> Настройки
+          <User size={16} /> Личный кабинет
         </button>
       </div>
 
@@ -339,14 +340,23 @@ export default function SurveyDetailPage({ id, onClose }) {
               className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
               aria-label="Закрыть"
             >×</button>
-            <div className="text-lg font-semibold mb-6 text-center">Публичная ссылка на опрос</div>
-            <button
-              className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition mb-8 text-lg"
-              style={{ minWidth: 220 }}
-              onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess('Скопировано!'); setTimeout(()=>setCopySuccess(''), 1500);}}
-            >
-              Копировать ссылку
-            </button>
+            <div className="text-lg font-semibold mb-6 text-center">Поделиться опросом</div>
+            <div className="flex flex-col gap-4 w-full mb-8">
+              <button
+                className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition text-lg"
+                style={{ minWidth: 220 }}
+                onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess('Публичная ссылка скопирована!'); setTimeout(()=>setCopySuccess(''), 1500);}}
+              >
+                Скопировать публичную ссылку
+              </button>
+              <button
+                className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition text-lg"
+                style={{ minWidth: 220 }}
+                onClick={() => {navigator.clipboard.writeText(telegramUrl); setCopySuccess('Ссылка на Telegram скопирована!'); setTimeout(()=>setCopySuccess(''), 1500);}}
+              >
+                Скопировать ссылку на Telegram
+              </button>
+            </div>
             {copySuccess && <span className="text-green-600 text-center w-full mb-4">{copySuccess}</span>}
             <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
             <div className="flex flex-col items-center gap-2">
