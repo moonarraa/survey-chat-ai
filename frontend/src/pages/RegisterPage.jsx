@@ -9,12 +9,9 @@ function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: '',
-    company: '',
-    role: ''
+    password: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -51,18 +48,6 @@ function RegisterPage() {
       newErrors.password = 'Пароль обязателен для заполнения';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Пароль должен содержать минимум 8 символов';
-    }
-    
-    if (!formData.company.trim()) {
-      newErrors.company = 'Компания обязательна для заполнения';
-    }
-    
-    if (!formData.role.trim()) {
-      newErrors.role = 'Роль обязательна для заполнения';
-    }
-    
-    if (!agreeTerms) {
-      newErrors.terms = 'Необходимо согласиться с условиями';
     }
     
     return newErrors;
@@ -248,105 +233,6 @@ function RegisterPage() {
               )}
             </div>
 
-            {/* Company Field */}
-            <div>
-              <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
-                Компания
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Building className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="company"
-                  name="company"
-                  type="text"
-                  value={formData.company}
-                  onChange={handleInputChange}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 ${
-                    errors.company ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                  placeholder="Название вашей компании"
-                />
-              </div>
-              {errors.company && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-1 text-sm text-red-600"
-                >
-                  {errors.company}
-                </motion.p>
-              )}
-            </div>
-
-            {/* Role Field */}
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-                Должность
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Briefcase className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="role"
-                  name="role"
-                  type="text"
-                  value={formData.role}
-                  onChange={handleInputChange}
-                  className={`block w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 ${
-                    errors.role ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
-                  }`}
-                  placeholder="Ваша должность"
-                />
-              </div>
-              {errors.role && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-1 text-sm text-red-600"
-                >
-                  {errors.role}
-                </motion.p>
-              )}
-            </div>
-
-            {/* Terms Checkbox */}
-            <div className="flex items-start">
-              <div className="flex items-center h-5">
-                <input
-                  id="terms"
-                  name="terms"
-                  type="checkbox"
-                  checked={agreeTerms}
-                  onChange={(e) => setAgreeTerms(e.target.checked)}
-                  className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-                />
-              </div>
-              <div className="ml-3 text-sm">
-                <label htmlFor="terms" className="text-gray-700">
-                  Я согласен с{' '}
-                  <a href="#" className="text-primary-600 hover:text-primary-500 font-medium">
-                    Условиями использования
-                  </a>{' '}
-                  и{' '}
-                  <a href="#" className="text-primary-600 hover:text-primary-500 font-medium">
-                    Политикой конфиденциальности
-                  </a>
-                </label>
-              </div>
-            </div>
-            {errors.terms && (
-              <motion.p
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="text-sm text-red-600"
-              >
-                {errors.terms}
-              </motion.p>
-            )}
-
             {/* Submit Button */}
             <motion.button
               type="submit"
@@ -368,6 +254,11 @@ function RegisterPage() {
               )}
             </motion.button>
           </form>
+
+          {/* Google OAuth */}
+          <div className="mt-6">
+            <OAuthButtons />
+          </div>
 
           {/* Login Link */}
           <div className="mt-6 text-center">
