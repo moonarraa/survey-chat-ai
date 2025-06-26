@@ -255,11 +255,6 @@ function RegisterPage() {
             </motion.button>
           </form>
 
-          {/* Google OAuth */}
-          <div className="mt-6">
-            <OAuthButtons />
-          </div>
-
           {/* Login Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
