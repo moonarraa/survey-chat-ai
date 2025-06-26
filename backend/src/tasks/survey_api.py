@@ -126,6 +126,10 @@ async def delete_survey(
     survey = await db.get(Survey, survey_id)
     if not survey or survey.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Survey not found")
+    # Удаляем все связанные ответы
+    await db.execute(
+        SurveyAnswer.__table__.delete().where(SurveyAnswer.survey_id == survey_id)
+    )
     await db.delete(survey)
     await db.commit()
     return {"ok": True}
