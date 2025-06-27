@@ -172,26 +172,15 @@ function DashboardPage() {
 
   useEffect(() => {
     if (activeTab === 'analytics') {
-      const stats = {
-        totalSurveys: surveys.length,
-        activeSurveys: surveys.filter(s => !s.archived).length,
-        totalResponses: surveys.reduce((sum, s) => sum + (s.answersCount || 0), 0),
-        averageResponseRate: surveys.length ? 
-          (surveys.reduce((sum, s) => sum + (s.answersCount || 0), 0) / surveys.length).toFixed(1) : 0,
-        questionTypes: {},
-        recentResponses: []
-      };
-
-      surveys.forEach(survey => {
-        if (survey.questions) {
-          survey.questions.forEach(q => {
-            stats.questionTypes[q.type] = (stats.questionTypes[q.type] || 0) + 1;
-          });
-        }
-      });
-
-      setSummaryStats(stats);
+      const activeSurvey = surveys.find(s => !s.archived);
+      if (activeSurvey) {
+        setSelectedAnalyticsSurveyId(activeSurvey.id);
+        fetchAnalytics(activeSurvey.id);
+      } else {
+        setAnalytics(null);
+      }
     }
+    // eslint-disable-next-line
   }, [activeTab, surveys]);
 
   useEffect(() => {
@@ -651,35 +640,31 @@ function DashboardPage() {
                   </div>
 
                   {/* Response Rate Over Time */}
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+                  <div className="bg-gray-100 rounded-2xl p-6 shadow-sm border border-gray-200">
                     <h2 className="text-xl font-semibold mb-4 text-gray-900">Статистика ответов</h2>
-                    <div className="space-y-6">
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Среднее время заполнения:</div>
-                        <div className="font-medium text-gray-900">~4.5 мин</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Самый популярный день:</div>
-                        <div className="font-medium text-gray-900">Вторник</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Пик активности:</div>
-                        <div className="font-medium text-gray-900">14:00 - 16:00</div>
-                      </div>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <div>Завершаемость:</div>
-                        <div className="font-medium text-green-600">92%</div>
-                      </div>
-                      <div className="pt-4 border-t border-gray-100">
-                        <div className="text-sm font-medium text-gray-900 mb-2">Качество ответов</div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                            <div className="h-full bg-green-500 rounded-full" style={{ width: '85%' }} />
-                          </div>
-                          <div className="text-sm font-medium text-green-600">85%</div>
+                    {analytics && analytics.total_responses > 0 ? (
+                      <div className="space-y-6">
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div>Среднее время между ответами:</div>
+                          <div className="font-medium text-gray-900">{analytics.avg_time_between_responses ? analytics.avg_time_between_responses + ' мин' : '-'}</div>
                         </div>
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div>Самый популярный день:</div>
+                          <div className="font-medium text-gray-900">{analytics.popular_day || '-'}</div>
+                        </div>
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div>Пик активности:</div>
+                          <div className="font-medium text-gray-900">{analytics.popular_hour || '-'}</div>
+                        </div>
+                        <div className="flex items-center justify-between text-sm text-gray-500">
+                          <div>Завершаемость:</div>
+                          <div className="font-medium text-green-600">{analytics.response_rate ? analytics.response_rate + '%' : '-'}</div>
+                        </div>
+                        {/* Качество ответов можно вычислять отдельно, если появится логика */}
                       </div>
-                    </div>
+                    ) : (
+                      <div className="text-gray-500">Нет данных для статистики.</div>
+                    )}
                   </div>
                 </motion.div>
 
@@ -708,24 +693,28 @@ function DashboardPage() {
                 {/* Аналитика по выбранному опросу */}
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
                   <h2 className="text-xl font-semibold mb-4 text-gray-900">Аналитика по опросу</h2>
-                  <div className="mb-4">
-                    <label className="block mb-1 text-sm font-medium text-gray-700">Выберите опрос:</label>
-                    <select
-                      className="w-full max-w-md border border-gray-300 rounded-xl px-4 py-2"
-                      value={selectedAnalyticsSurveyId || (surveys[0] && surveys[0].id) || ''}
-                      onChange={e => setSelectedAnalyticsSurveyId(e.target.value)}
-                    >
-                      {surveys.map(s => (
-                        <option key={s.id} value={s.id}>{s.topic}</option>
-                      ))}
-                    </select>
-                  </div>
                   {loadingAnalytics && <div className="p-4 text-center">Загрузка аналитики...</div>}
                   {!loadingAnalytics && analytics && (
                     <div className="space-y-8">
                       <div className="bg-gray-100 p-4 rounded-lg">
                         <p className="text-lg">Всего ответов: <span className="font-bold">{analytics.total_responses}</span></p>
                       </div>
+                      {/* Статистика ответов */}
+                      <div className="bg-gray-100 p-4 rounded-lg">
+                        <h3 className="text-lg font-semibold mb-2">Статистика ответов</h3>
+                        {/* Пример: дата первого и последнего ответа, если есть */}
+                        {analytics.total_responses > 0 ? (
+                          <>
+                            <p>Первый ответ: {analytics.first_response_date ? new Date(analytics.first_response_date).toLocaleString('ru-RU') : '-'}</p>
+                            <p>Последний ответ: {analytics.last_response_date ? new Date(analytics.last_response_date).toLocaleString('ru-RU') : '-'}</p>
+                            <p>Уникальных респондентов: {analytics.unique_respondents || '-'}</p>
+                            <p>Среднее время между ответами: {analytics.avg_time_between_responses ? analytics.avg_time_between_responses + ' мин' : '-'}</p>
+                          </>
+                        ) : (
+                          <p>Ответов пока нет.</p>
+                        )}
+                      </div>
+                      {/* Остальная аналитика по вопросам */}
                       {Object.entries(analytics.question_analytics).map(([question, data]) => {
                         const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF19AF'];
                         return (

@@ -56,6 +56,14 @@ class ValidateContextOut(BaseModel):
 class SurveyAnalytics(BaseModel):
     total_responses: int
     question_analytics: dict[str, Any]
+    first_response_date: str | None = None
+    last_response_date: str | None = None
+    unique_respondents: int | None = None
+    avg_time_between_responses: float | None = None
+    response_rate: float | None = None
+    response_times: list[str] = []
+    popular_day: str | None = None
+    popular_hour: str | None = None
 
 @router.post("/", response_model=SurveyOut)
 async def create_survey(
@@ -360,6 +368,44 @@ async def get_survey_analytics(
     total_responses = len(answers)
     question_analytics = {}
 
+    # Дополнительные метрики
+    if answers:
+        sorted_answers = sorted(answers, key=lambda a: a.created_at)
+        first_response_date = sorted_answers[0].created_at.isoformat() if sorted_answers[0].created_at else None
+        last_response_date = sorted_answers[-1].created_at.isoformat() if sorted_answers[-1].created_at else None
+        respondent_ids = [a.respondent_id for a in answers if a.respondent_id]
+        unique_respondents = len(set(respondent_ids)) if respondent_ids else None
+        # Среднее время между ответами (в минутах)
+        if len(sorted_answers) > 1:
+            times = [a.created_at for a in sorted_answers if a.created_at]
+            deltas = [(t2 - t1).total_seconds() / 60 for t1, t2 in zip(times, times[1:])]
+            avg_time_between_responses = round(sum(deltas) / len(deltas), 2) if deltas else None
+        else:
+            avg_time_between_responses = None
+        # Завершаемость (response_rate) — если нет незавершённых, считаем 100%
+        response_rate = 100.0
+        # Массив дат ответов
+        response_times = [a.created_at.isoformat() for a in sorted_answers if a.created_at]
+        # Популярный день недели
+        days = [a.created_at.strftime('%A') for a in sorted_answers if a.created_at]
+        popular_day = Counter(days).most_common(1)[0][0] if days else None
+        # Популярный час
+        hours = [a.created_at.hour for a in sorted_answers if a.created_at]
+        if hours:
+            hour = Counter(hours).most_common(1)[0][0]
+            popular_hour = f"{hour:02d}:00 - {hour:02d}:59"
+        else:
+            popular_hour = None
+    else:
+        first_response_date = None
+        last_response_date = None
+        unique_respondents = None
+        avg_time_between_responses = None
+        response_rate = None
+        response_times = []
+        popular_day = None
+        popular_hour = None
+
     questions = json.loads(survey.questions)
     # Собираем ответы по вопросам (answers: list[str] по индексу)
     all_answers = [json.loads(a.answers) for a in answers]
@@ -459,5 +505,13 @@ async def get_survey_analytics(
 
     return SurveyAnalytics(
         total_responses=total_responses,
-        question_analytics=question_analytics
+        question_analytics=question_analytics,
+        first_response_date=first_response_date,
+        last_response_date=last_response_date,
+        unique_respondents=unique_respondents,
+        avg_time_between_responses=avg_time_between_responses,
+        response_rate=response_rate,
+        response_times=response_times,
+        popular_day=popular_day,
+        popular_hour=popular_hour
     )
