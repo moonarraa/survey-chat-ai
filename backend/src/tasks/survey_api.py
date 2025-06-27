@@ -354,7 +354,6 @@ async def get_survey_analytics(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_async_db)
 ):
-    # Fetch survey to ensure it belongs to the user
     survey = await db.get(Survey, survey_id)
     if not survey or survey.user_id != current_user.id:
         raise HTTPException(status_code=404, detail="Survey not found")
