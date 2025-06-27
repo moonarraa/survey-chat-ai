@@ -257,87 +257,98 @@ export default function CreateSurveyModal({ onSuccess }) {
       </form>
 
       {showTemplateModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="bg-white rounded-3xl p-8 sm:p-14 shadow-2xl relative w-full flex flex-col"
-            style={{ minHeight: 600, maxWidth: '1400px' }}
+            className="relative bg-white rounded-3xl shadow-2xl max-w-[98vw] w-full max-h-[80vh] flex flex-col"
+            style={{ overflow: 'hidden' }}
           >
-            <div className="flex items-center mb-10">
+            {/* Back button for templates */}
+            {selectedSegment !== null && (
               <button
-                onClick={() => setShowTemplateModal(false)}
-                className="mr-4 p-3 rounded-full hover:bg-gray-100 transition"
+                onClick={() => setSelectedSegment(null)}
+                className="absolute top-6 left-6 z-10 bg-white/80 backdrop-blur rounded-full p-2 shadow hover:bg-gray-100 transition"
                 aria-label="Назад"
                 type="button"
               >
                 <ArrowLeft className="h-7 w-7 text-gray-500" />
               </button>
-              <h3 className="text-3xl font-bold flex-1 text-gray-900">Выберите сегмент и шаблон</h3>
+            )}
+            {selectedSegment === null && (
               <button
                 onClick={() => setShowTemplateModal(false)}
-                className="ml-auto text-gray-400 hover:text-gray-700 text-3xl font-bold px-2"
-                aria-label="Закрыть"
+                className="absolute top-6 left-6 z-10 bg-white/80 backdrop-blur rounded-full p-2 shadow hover:bg-gray-100 transition"
+                aria-label="Назад"
                 type="button"
-              >×</button>
+              >
+                <ArrowLeft className="h-7 w-7 text-gray-500" />
+              </button>
+            )}
+            {/* Title */}
+            <div className="pt-10 pb-2 px-8 text-center">
+              <h3 className="text-3xl font-bold text-gray-900 mb-1">
+                {selectedSegment === null ? 'Выберите сегмент' : 'Выберите шаблон'}
+              </h3>
+              <p className="text-gray-500 text-lg">
+                {selectedSegment === null
+                  ? 'AI поможет быстро начать с готовых сценариев'
+                  : TEMPLATES[selectedSegment].segment}
+              </p>
             </div>
-            <div className="flex flex-col md:flex-row gap-12 h-full">
-              <div className="md:w-1/3">
-                <div className="font-semibold mb-4 text-gray-700 text-lg">Сегменты:</div>
-                <ul className="space-y-4">
+            {/* Content */}
+            <div className="flex-1 flex flex-col items-center justify-center px-4 pb-8 overflow-y-auto">
+              {selectedSegment === null ? (
+                <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
                   {TEMPLATES.map((seg, idx) => (
-                    <li key={seg.segment}>
+                    <button
+                      key={seg.segment}
+                      className="w-full px-6 py-5 rounded-3xl bg-white text-primary-900 text-base font-semibold shadow-sm border border-gray-200 hover:bg-primary-50 hover:border-primary-200 hover:shadow-lg transition focus:ring-2 focus:ring-primary-100 focus:outline-none"
+                      onClick={() => setSelectedSegment(idx)}
+                      type="button"
+                    >
+                      {seg.segment}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="w-full max-w-2xl flex flex-col gap-4 mt-6">
+                  {TEMPLATES[selectedSegment].templates.map((tpl) => (
+                    <div
+                      key={tpl.name}
+                      className="w-full flex flex-col items-start border rounded-2xl p-4 bg-gray-50 shadow-md transition hover:shadow-xl border-gray-200"
+                    >
+                      <div className="font-semibold text-gray-900 text-base mb-1">{tpl.name}</div>
+                      <div className="text-gray-600 text-sm mb-3">{tpl.context}</div>
                       <button
-                        className={`w-full text-left px-6 py-4 rounded-2xl transition font-semibold border border-transparent shadow-md text-lg
-                          ${selectedSegment === idx ? 'bg-primary-100 text-primary-700 border-primary-300 ring-2 ring-primary-200 scale-105' : 'hover:bg-gray-100 hover:border-gray-200'}
-                        `}
-                        onClick={() => setSelectedSegment(idx)}
+                        className="w-full px-6 py-2 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition shadow-lg text-sm"
+                        onClick={() => {
+                          setContext(tpl.context);
+                          setShowTemplateModal(false);
+                        }}
                         type="button"
                       >
-                        {seg.segment}
+                        Использовать этот шаблон
                       </button>
-                    </li>
+                    </div>
                   ))}
-                </ul>
-              </div>
-              <div className="md:w-2/3">
-                <div className="font-semibold mb-4 text-gray-700 text-lg">Шаблоны:</div>
-                {selectedSegment === null ? (
-                  <div className="text-gray-400 text-center mt-20 text-lg">Сначала выберите сегмент</div>
-                ) : (
-                  <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {TEMPLATES[selectedSegment].templates.map((tpl, tIdx) => (
-                      <li key={tpl.name} className={`border rounded-2xl p-6 flex flex-col gap-3 bg-gray-50 shadow-md transition
-                        hover:shadow-xl ${context === tpl.context ? 'border-primary-400 ring-2 ring-primary-200 scale-105' : 'border-gray-200'}`}
-                      >
-                        <div className="font-semibold text-gray-900 text-xl flex items-center gap-2">
-                          {tpl.name}
-                          {context === tpl.context && (
-                            <span className="ml-2 px-2 py-0.5 text-xs rounded-full bg-primary-100 text-primary-700">Выбрано</span>
-                          )}
-                        </div>
-                        <div className="text-gray-600 text-base mb-2">{tpl.context}</div>
-                        <button
-                          className="self-start px-6 py-2 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition shadow-lg mt-2 text-base"
-                          onClick={() => {
-                            setContext(tpl.context);
-                            setShowTemplateModal(false);
-                          }}
-                          type="button"
-                        >
-                          Использовать этот шаблон
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </motion.div>
         </div>
       )}
+
+      <button
+        type="button"
+        className="px-4 py-2 bg-primary-100 text-primary-700 rounded-xl font-medium hover:bg-primary-200 transition mx-auto flex justify-center"
+        onClick={() => setShowTemplateModal(true)}
+        tabIndex={-1}
+      >
+        Выбрать шаблон
+      </button>
     </motion.div>
   );
 }

@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, MessageSquare, Brain, BarChart3, FileText, CheckCircle, Star } from 'lucide-react';
+import { ArrowRight, MessageSquare, Brain, BarChart3, FileText, CheckCircle, Star, ChevronDown } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Typewriter } from 'react-simple-typewriter';
+import surveyCreateImg from '../assets/survey-create.png';
+import aknurAvatar from '../assets/aknur-photo.png';
+import danaAvatar from '../assets/dana-photo.jpg';
+import { useState } from 'react';
 
 const features = [
   {
@@ -35,144 +40,199 @@ const benefits = [
 
 const testimonials = [
   {
-    name: 'Анна Петрова',
-    role: 'HR-директор, TechCorp',
-    content: 'Survey AI полностью изменил наш подход к опросам сотрудников. Теперь мы получаем гораздо более честные и развернутые ответы.',
-    rating: 5
+    name: 'Акнур Сейдазым',
+    role: 'CEO, ShuShu AI',
+    content: 'Survey AI помог мне собрать данные о том, как люди воспринимают наш продукт. Теперь мы можем улучшать его на основе этих данных.',
+    rating: 5,
+    avatar: aknurAvatar
   },
   {
-    name: 'Михаил Сидоров',
-    role: 'Маркетолог, StartupXYZ',
-    content: 'Невероятно удобно! Раньше на создание опроса уходил целый день, теперь — 5 минут. А качество данных выросло в разы.',
-    rating: 5
+    name: 'Дана Жаксылык',
+    role: 'CEO, LazyJumys',
+    content: 'Невероятно удобно! Раньше я создавала Google формы, а теперь - Survey AI помогает мне создавать опросы за 2 минуты. А качество данных выросло в разы.',
+    rating: 5,
+    avatar: danaAvatar
   }
 ];
 
 function LandingPage() {
+  const [openFaq, setOpenFaq] = useState(null);
+  const faq = [
+    {
+      q: 'Как быстро я получу аналитику по опросу?',
+      a: 'Аналитика формируется мгновенно после получения первых ответов. Вы видите результаты в реальном времени.'
+    },
+    {
+      q: 'Можно ли экспортировать результаты?',
+      a: 'Да, вы можете экспортировать все ответы и аналитику в Excel одним кликом.'
+    },
+    {
+      q: 'Нужно ли устанавливать приложение?',
+      a: 'Нет, Survey AI полностью работает в браузере — ничего скачивать не нужно.'
+    },
+    {
+      q: 'Могу ли я создать опрос бесплатно?',
+      a: 'Да, базовый функционал доступен бесплатно. Для расширенных возможностей выберите подходящий тариф.'
+    }
+  ];
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
-      <section className="relative py-20 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
+      <section className="relative min-h-[70vh] flex flex-col items-center justify-center bg-white">
+        <div className="w-full max-w-2xl flex flex-col items-center justify-center text-center px-4">
+          <div className="mt-[120px]" />
+          <h1 className="text-5xl font-bold text-black mb-4">AI-опросы за 2 минуты</h1>
+          <div className="text-xl text-primary-600 font-semibold h-8 mb-2">
+            <Typewriter
+              words={["Создайте опрос за 2 минуты...", "Получайте честные ответы...", "Всё просто, быстро, AI!"]}
+              loop={0}
+              cursor
+              cursorStyle="|"
+              typeSpeed={60}
+              deleteSpeed={40}
+              delaySpeed={1200}
+            />
+          </div>
+          <p className="text-xl text-gray-600 mb-4">Получайте честные ответы от клиентов и сотрудников.</p>
+          <p className="text-lg text-gray-600 mb-4">Наша платформа помогает создавать интерактивные опросы с помощью ИИ, которые действительно слушают и понимают участников. </p>
+          <div className="flex gap-4 justify-center my-6">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0 }} viewport={{ once: true }}>
+              <MessageSquare className="h-8 w-8 text-primary-500 animate-bounce" />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1 }} viewport={{ once: true }}>
+              <Brain className="h-8 w-8 text-blue-500 animate-pulse" />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }} viewport={{ once: true }}>
+              <BarChart3 className="h-8 w-8 text-black animate-bounce" />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.3 }} viewport={{ once: true }}>
+              <FileText className="h-8 w-8 text-blue-400 animate-pulse" />
+            </motion.div>
+          </div>
+          <a href="/register" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg px-8 py-4 rounded-xl shadow mb-8 transition">Попробовать бесплатно</a>
+          <div className="mb-[80px]" />
+          {/* Screenshot below headline */}
+          <div className="w-full flex justify-center">
+            <img src={surveyCreateImg} alt="Survey Example" className="max-w-md w-full rounded-2xl shadow-xl border border-gray-100" />
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section (замена features) */}
+      <section id="how-it-works" className="py-20 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Как это работает?
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Всего 3 шага до качественной обратной связи
+            </p>
+          </div>
+          <div className="flex flex-col gap-8">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0 }}
+              viewport={{ once: true }}
+              className="card flex items-start gap-6 bg-primary-50 p-6 rounded-2xl shadow group hover:scale-[1.02] transition"
             >
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Замените скучные опросы
-                <span className="block text-primary-600">на живой диалог</span>
-              </h1>
-              <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Гугл Формы — это прошлый век.
-              Наша платформа помогает создавать интерактивные опросы с помощью ИИ, которые действительно
-              слушают и понимают участников. 
-              Получайте качественные ответы быстро и легко.
-              </p>
-              <div className="flex flex-col items-center gap-4 justify-center">
-                <Link to="/register" className="btn-primary inline-flex items-center">
-                  Попробовать бесплатно
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+              <div className="bg-primary-100 w-14 h-14 rounded-2xl flex items-center justify-center">
+                <Brain className="h-7 w-7 text-primary-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">1. Создайте опрос за 2 минуты</h3>
+                <p className="text-gray-600 leading-relaxed text-base">Укажите тему — AI сам предложит вопросы или выберите шаблон. Не нужно тратить время на ручную настройку.</p>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              viewport={{ once: true }}
+              className="card flex items-start gap-6 bg-primary-50 p-6 rounded-2xl shadow group hover:scale-[1.02] transition"
+            >
+              <div className="bg-primary-100 w-14 h-14 rounded-2xl flex items-center justify-center">
+                <MessageSquare className="h-7 w-7 text-primary-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">2. Отправьте ссылку или QR-код</h3>
+                <p className="text-gray-600 leading-relaxed text-base">Поделитесь опросом с клиентами или коллегами — они проходят его в удобном диалоговом формате на любом устройстве.</p>
+              </div>
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="card flex items-start gap-6 bg-primary-50 p-6 rounded-2xl shadow group hover:scale-[1.02] transition"
+            >
+              <div className="bg-primary-100 w-14 h-14 rounded-2xl flex items-center justify-center">
+                <BarChart3 className="h-7 w-7 text-primary-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">3. Получите аналитику</h3>
+                <p className="text-gray-600 leading-relaxed text-base">Видите результаты в реальном времени: графики, ключевые темы, экспорт в Excel. Всё просто и наглядно.</p>
               </div>
             </motion.div>
           </div>
         </div>
-        
-        {/* Background decoration */}
-        <div className="absolute inset-0 -z-10">
-          <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-96 h-96 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-bounce-subtle"></div>
-          <div className="absolute top-0 right-1/4 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-bounce-subtle" style={{ animationDelay: '1s' }}></div>
-          <div className="absolute top-0 left-1/4 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-bounce-subtle" style={{ animationDelay: '2s' }}></div>
-        </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Почему выбирают Survey AI?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Современные технологии для создания опросов нового поколения
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                className="card text-center group hover:scale-105"
-              >
-                <div className="bg-primary-100 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 group-hover:bg-primary-200 transition-colors">
-                  <feature.icon className="h-8 w-8 text-primary-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
+      {/* Analytics Showcase Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-                Результаты, которые говорят сами за себя
+                Ваша аналитика — наглядно
               </h2>
               <p className="text-xl text-gray-600 mb-8">
-                Наши клиенты получают значительно лучшие результаты благодаря инновационному подходу к опросам.
+                Получайте понятные отчёты и реальные инсайты сразу после прохождения опроса. Всё визуально, без Excel и сложных таблиц.
               </p>
               <ul className="space-y-4">
-                {benefits.map((benefit, index) => (
+                {[
+                  {
+                    icon: <BarChart3 className="h-6 w-6 text-primary-600 mr-3 mt-0.5 flex-shrink-0" />, 
+                    text: 'Графики по каждому вопросу'
+                  },
+                  {
+                    icon: <CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-0.5 flex-shrink-0" />, 
+                    text: 'Ключевые темы и эмоции в ответах'
+                  },
+                  {
+                    icon: <FileText className="h-6 w-6 text-primary-400 mr-3 mt-0.5 flex-shrink-0" />, 
+                    text: 'Экспорт в Excel одним кликом'
+                  }
+                ].map((item, index) => (
                   <motion.li
-                    key={index}
+                    key={item.text}
                     initial={{ opacity: 0, x: -20 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
                     viewport={{ once: true }}
                     className="flex items-start"
                   >
-                    <CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">{benefit}</span>
+                    {item.icon}
+                    <span className="text-gray-700">{item.text}</span>
                   </motion.li>
                 ))}
               </ul>
             </div>
             <div className="relative">
-              <div className="bg-white rounded-2xl shadow-xl p-8">
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center">
-                      <MessageSquare className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="flex-1 bg-gray-100 rounded-2xl rounded-bl-md p-3">
-                      <p className="text-sm text-gray-700">Привет! О какой теме вы хотите провести опрос?</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3 justify-end">
-                    <div className="flex-1 bg-primary-600 rounded-2xl rounded-br-md p-3 max-w-xs">
-                      <p className="text-sm text-white">Удовлетворенность клиентов нашим сервисом</p>
-                    </div>
-                    <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-primary-600 rounded-full flex items-center justify-center">
-                      <MessageSquare className="h-5 w-5 text-white" />
-                    </div>
-                    <div className="flex-1 bg-gray-100 rounded-2xl rounded-bl-md p-3">
-                      <p className="text-sm text-gray-700">Отлично! Что конкретно вас интересует в удовлетворенности клиентов?</p>
-                    </div>
-                  </div>
+              <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
+                {/* Здесь можно вставить реальный скриншот аналитики, если появится */}
+                <div className="w-full h-56 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
+                  <span className="text-2xl text-primary-600 font-bold">Пример аналитики</span>
+                </div>
+                <div className="w-full">
+                  <p className="text-gray-700 text-sm mb-2">Опрос: "Удовлетворенность сервисом"</p>
+                  <ul className="text-gray-600 text-sm space-y-1">
+                    <li>Средняя оценка: <span className="font-semibold text-gray-900">4.7</span></li>
+                    <li>Топ-ответ: <span className="font-semibold text-gray-900">"Очень быстрое обслуживание!"</span></li>
+                    <li>Положительных эмоций: <span className="font-semibold text-green-600">87%</span></li>
+                    <li>Экспорт: <span className="font-semibold text-primary-600">Excel</span></li>
+                  </ul>
                 </div>
               </div>
             </div>
@@ -209,11 +269,15 @@ function LandingPage() {
                 </div>
                 <p className="text-gray-700 mb-6 italic">"{testimonial.content}"</p>
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mr-4">
-                    <span className="text-primary-600 font-semibold">
-                      {testimonial.name.split(' ').map(n => n[0]).join('')}
-                    </span>
-                  </div>
+                  {testimonial.avatar ? (
+                    <img src={testimonial.avatar} alt={testimonial.name} className="w-12 h-12 rounded-full object-cover mr-4" />
+                  ) : (
+                    <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center mr-4">
+                      <span className="text-primary-600 font-semibold">
+                        {testimonial.name.split(' ').map(n => n[0]).join('')}
+                      </span>
+                    </div>
+                  )}
                   <div>
                     <p className="font-semibold text-gray-900">{testimonial.name}</p>
                     <p className="text-gray-600 text-sm">{testimonial.role}</p>
@@ -251,6 +315,31 @@ function LandingPage() {
               </button>
             </div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="py-20 bg-white">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-8 text-center">FAQ</h2>
+          <div className="space-y-4">
+            {faq.map((item, idx) => (
+              <div key={idx} className="border border-gray-200 rounded-xl bg-gray-50">
+                <button
+                  className="w-full flex items-center justify-between px-6 py-4 text-left text-lg font-medium text-gray-800 focus:outline-none"
+                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                >
+                  <span>{item.q}</span>
+                  <ChevronDown className={`h-5 w-5 ml-2 transition-transform ${openFaq === idx ? 'rotate-180' : ''}`} />
+                </button>
+                {openFaq === idx && (
+                  <div className="px-6 pb-4 text-gray-600 text-base animate-fade-in">
+                    {item.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
     </div>

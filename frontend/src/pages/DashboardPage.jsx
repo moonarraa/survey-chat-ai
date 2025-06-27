@@ -362,6 +362,29 @@ function DashboardPage() {
     }
   }
 
+  // После получения surveys и analytics, вычисляем summaryStats
+  useEffect(() => {
+    const totalSurveys = surveys.length;
+    const activeSurveys = surveys.filter(s => !s.archived).length;
+    // Если есть аналитика по выбранному опросу, используем её для "Всего ответов"
+    let totalResponses = 0;
+    if (analytics && typeof analytics.total_responses === 'number') {
+      totalResponses = analytics.total_responses;
+    } else {
+      // Fallback: сумма по всем опросам
+      totalResponses = surveys.reduce((acc, s) => acc + (s.answersCount || 0), 0);
+    }
+    // Среднее кол-во ответов на опрос
+    const averageResponseRate = totalSurveys > 0 ? Math.round(totalResponses / totalSurveys) : 0;
+    setSummaryStats(prev => ({
+      ...prev,
+      totalSurveys,
+      activeSurveys,
+      totalResponses,
+      averageResponseRate
+    }));
+  }, [surveys, analytics]);
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar for Desktop */}
@@ -503,287 +526,231 @@ function DashboardPage() {
             {activeTab === 'analytics' && (
               <motion.div
                 key="analytics"
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, y: -40 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="relative px-0 sm:px-0"
               >
-                <div className="flex items-center justify-between mb-8">
-                  <h1 className="text-3xl font-bold text-gray-900">Аналитика по опросам</h1>
+                {/* Фон секции аналитики */}
+                <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-50 via-white to-purple-100 opacity-90" />
+                <div className="flex items-center justify-between mb-10">
+                  <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight drop-shadow-sm">Аналитика по опросам</h1>
                   {analytics && (
                     <button
-                      className="btn-secondary px-4 py-2 rounded-xl font-semibold shadow"
+                      className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all duration-200 text-lg"
                       onClick={handleExportCSV}
                     >
-                      Экспорт в CSV
+                      <BarChart3 className="h-6 w-6" /> Экспорт CSV
                     </button>
                   )}
                 </div>
-
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                {/* Карточки-метрики */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
+                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-blue-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-primary-100 rounded-xl">
-                        <ChartBar className="w-6 h-6 text-primary-600" />
-                      </div>
-                      <div>
-                        <div className="text-3xl font-bold text-gray-900">{summaryStats.totalSurveys}</div>
-                        <div className="text-sm text-gray-500">Всего опросов</div>
-                      </div>
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-t-3xl" />
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 shadow-inner">
+                      <ChartBar className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.totalSurveys}</div>
+                      <div className="text-base text-gray-500 font-medium mt-1">Всего опросов</div>
                     </div>
                   </motion.div>
-
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
+                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-green-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-green-100 rounded-xl">
-                        <Activity className="w-6 h-6 text-green-600" />
-                      </div>
-                      <div>
-                        <div className="text-3xl font-bold text-gray-900">{summaryStats.activeSurveys}</div>
-                        <div className="text-sm text-gray-500">Активных опросов</div>
-                      </div>
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-blue-400 rounded-t-3xl" />
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-100 to-blue-100 shadow-inner">
+                      <Activity className="w-8 h-8 text-green-600" />
+                    </div>
+                    <div>
+                      <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.activeSurveys}</div>
+                      <div className="text-base text-gray-500 font-medium mt-1">Активных опросов</div>
                     </div>
                   </motion.div>
-
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
+                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-blue-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-blue-100 rounded-xl">
-                        <MessageCircle className="w-6 h-6 text-blue-600" />
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-green-400 rounded-t-3xl" />
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-green-100 shadow-inner">
+                      <MessageCircle className="w-8 h-8 text-blue-600" />
+                    </div>
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.totalResponses}</div>
+                        {summaryStats.totalResponses > 0 && (
+                          <div className="text-lg font-bold text-green-600">
+                            {summaryStats.totalSurveys > 0 
+                              ? `${Math.round((summaryStats.totalResponses / summaryStats.totalSurveys) * 100)}%`
+                              : '0%'}
+                          </div>
+                        )}
                       </div>
-                      <div>
-                        <div className="flex items-baseline gap-2">
-                          <div className="text-3xl font-bold text-gray-900">{summaryStats.totalResponses}</div>
-                          {summaryStats.totalResponses > 0 && (
-                            <div className="text-sm font-medium text-green-600">
-                              {summaryStats.totalSurveys > 0 
-                                ? `${Math.round((summaryStats.totalResponses / summaryStats.totalSurveys) * 100)}%`
-                                : '0%'} 
-                            </div>
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-500">Всего ответов</div>
-                      </div>
+                      <div className="text-base text-gray-500 font-medium mt-1">Всего ответов</div>
                     </div>
                   </motion.div>
-
                   <motion.div
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.4 }}
-                    className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
+                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-yellow-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-yellow-100 rounded-xl">
-                        <PieChart className="w-6 h-6 text-yellow-600" />
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-yellow-400 to-pink-400 rounded-t-3xl" />
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-yellow-100 to-pink-100 shadow-inner">
+                      <PieChart className="w-8 h-8 text-yellow-600" />
+                    </div>
+                    <div>
+                      <div className="flex items-baseline gap-2">
+                        <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.averageResponseRate}</div>
+                        <div className="text-lg font-medium text-gray-500">/ опрос</div>
                       </div>
-                      <div>
-                        <div className="flex items-baseline gap-2">
-                          <div className="text-3xl font-bold text-gray-900">{summaryStats.averageResponseRate}</div>
-                          <div className="text-sm font-medium text-gray-500">/ опрос</div>
-                        </div>
-                        <div className="text-sm text-gray-500">Среднее кол-во ответов</div>
-                      </div>
+                      <div className="text-base text-gray-500 font-medium mt-1">Среднее кол-во ответов</div>
                     </div>
                   </motion.div>
                 </div>
-
-                {/* Response Analysis */}
+                {/* Аналитика по выбранному опросу */}
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.5 }}
-                  className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"
+                  className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-gray-200 mb-12"
                 >
-                  {/* Question Types Distribution */}
-                  <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-900">Распределение типов вопросов</h2>
-                    <div className="space-y-4">
-                      {Object.entries(summaryStats.questionTypes).map(([type, count]) => (
-                        <div key={type} className="flex items-center gap-4">
-                          <div className="w-12 text-lg font-semibold text-gray-900">{count}</div>
-                          <div className="flex-1">
-                            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                              <div 
-                                className="h-full bg-primary-600 rounded-full"
-                                style={{ 
-                                  width: `${Math.round((count / Object.values(summaryStats.questionTypes)
-                                    .reduce((a, b) => a + b, 0)) * 100)}%` 
-                                }}
-                              />
-                            </div>
-                          </div>
-                          <div className="w-32 text-sm text-gray-600">
-                            {type === 'multiple_choice' && 'С выбором ответа'}
-                            {type === 'rating' && 'Оценка'}
-                            {type === 'open_ended' && 'Открытые'}
-                            {type === 'long_text' && 'Развёрнутые'}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Response Rate Over Time */}
-                  <div className="bg-gray-100 rounded-2xl p-6 shadow-sm border border-gray-200">
-                    <h2 className="text-xl font-semibold mb-4 text-gray-900">Статистика ответов</h2>
-                    {analytics && analytics.total_responses > 0 ? (
-                      <div className="space-y-6">
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <div>Среднее время между ответами:</div>
-                          <div className="font-medium text-gray-900">{analytics.avg_time_between_responses ? analytics.avg_time_between_responses + ' мин' : '-'}</div>
-                        </div>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <div>Самый популярный день:</div>
-                          <div className="font-medium text-gray-900">{analytics.popular_day || '-'}</div>
-                        </div>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <div>Пик активности:</div>
-                          <div className="font-medium text-gray-900">{analytics.popular_hour || '-'}</div>
-                        </div>
-                        <div className="flex items-center justify-between text-sm text-gray-500">
-                          <div>Завершаемость:</div>
-                          <div className="font-medium text-green-600">{analytics.response_rate ? analytics.response_rate + '%' : '-'}</div>
-                        </div>
-                        {/* Качество ответов можно вычислять отдельно, если появится логика */}
-                      </div>
-                    ) : (
-                      <div className="text-gray-500">Нет данных для статистики.</div>
-                    )}
-                  </div>
-                </motion.div>
-
-                {/* Active vs Archived */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200"
-                >
-                  <h2 className="text-xl font-semibold mb-4">Статус опросов</h2>
-                  <div className="flex items-center gap-8">
-                    <div className="flex-1 bg-gray-50 rounded-xl p-4">
-                      <div className="text-2xl font-bold text-primary-600">{summaryStats.activeSurveys}</div>
-                      <div className="text-sm text-gray-500">Активные</div>
-                    </div>
-                    <div className="flex-1 bg-gray-50 rounded-xl p-4">
-                      <div className="text-2xl font-bold text-gray-600">
-                        {summaryStats.totalSurveys - summaryStats.activeSurveys}
-                      </div>
-                      <div className="text-sm text-gray-500">В архиве</div>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Аналитика по выбранному опросу */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
-                  <h2 className="text-xl font-semibold mb-4 text-gray-900">Аналитика по опросу</h2>
-                  {loadingAnalytics && <div className="p-4 text-center">Загрузка аналитики...</div>}
+                  <h2 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
+                    <BarChart3 className="h-7 w-7 text-primary-600" /> Аналитика по опросу
+                  </h2>
+                  {loadingAnalytics && <div className="p-4 text-center text-lg">Загрузка аналитики...</div>}
                   {!loadingAnalytics && analytics && (
-                    <div className="space-y-8">
-                      <div className="bg-gray-100 p-4 rounded-lg">
-                        <p className="text-lg">Всего ответов: <span className="font-bold">{analytics.total_responses}</span></p>
-                      </div>
-                      {/* Статистика ответов */}
-                      <div className="bg-gray-100 p-4 rounded-lg">
-                        <h3 className="text-lg font-semibold mb-2">Статистика ответов</h3>
-                        {/* Пример: дата первого и последнего ответа, если есть */}
-                        {analytics.total_responses > 0 ? (
-                          <>
-                            <p>Первый ответ: {analytics.first_response_date ? new Date(analytics.first_response_date).toLocaleString('ru-RU') : '-'}</p>
-                            <p>Последний ответ: {analytics.last_response_date ? new Date(analytics.last_response_date).toLocaleString('ru-RU') : '-'}</p>
-                            <p>Уникальных респондентов: {analytics.unique_respondents || '-'}</p>
-                            <p>Среднее время между ответами: {analytics.avg_time_between_responses ? analytics.avg_time_between_responses + ' мин' : '-'}</p>
-                          </>
-                        ) : (
-                          <p>Ответов пока нет.</p>
-                        )}
+                    <div className="space-y-10">
+                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl flex flex-col sm:flex-row gap-6 items-center shadow-inner">
+                        <div className="flex-1">
+                          <p className="text-xl font-semibold text-gray-800">Всего ответов: <span className="font-extrabold text-3xl text-blue-700">{analytics.total_responses}</span></p>
+                        </div>
+                        <div className="flex-1 flex flex-col gap-2 text-gray-600 text-base">
+                          <span>Первый ответ: <span className="font-medium text-gray-900">{analytics.first_response_date ? new Date(analytics.first_response_date).toLocaleString('ru-RU') : '-'}</span></span>
+                          <span>Последний ответ: <span className="font-medium text-gray-900">{analytics.last_response_date ? new Date(analytics.last_response_date).toLocaleString('ru-RU') : '-'}</span></span>
+                          <span>Уникальных респондентов: <span className="font-medium text-gray-900">{analytics.unique_respondents || '-'}</span></span>
+                          <span>Среднее время между ответами: <span className="font-medium text-gray-900">{analytics.avg_time_between_responses ? analytics.avg_time_between_responses + ' мин' : '-'}</span></span>
+                        </div>
                       </div>
                       {/* Остальная аналитика по вопросам */}
-                      {Object.entries(analytics.question_analytics).map(([question, data]) => {
-                        const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF19AF'];
-                        return (
-                          <div key={question} className="border rounded-xl p-4">
-                            <h3 className="text-lg font-semibold mb-3">{question}</h3>
-                            {data.type === 'rating' && (
-                              <div>
-                                <p>Средняя оценка: {data.average}</p>
-                                <p>Медиана: {data.median}</p>
-                                <p>Мода: {data.mode}</p>
-                                <div className="mt-2">
-                                  <strong>Распределение:</strong>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {Object.entries(analytics.question_analytics).map(([question, data], idx) => {
+                          const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF19AF'];
+                          return (
+                            <motion.div
+                              key={question}
+                              initial={{ opacity: 0, y: 30 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: 0.1 * idx }}
+                              className="border border-gray-100 rounded-2xl p-6 bg-white/90 shadow-lg flex flex-col gap-4"
+                            >
+                              <h3 className="text-lg font-bold mb-2 text-gray-900 flex items-center gap-2">
+                                <PieChart className="h-5 w-5 text-primary-500" /> {question}
+                              </h3>
+                              {data.type === 'rating' && (
+                                <div>
+                                  <div className="flex gap-4 mb-2">
+                                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">Средняя: {data.average}</span>
+                                    <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">Медиана: {data.median}</span>
+                                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">Мода: {data.mode}</span>
+                                  </div>
+                                  <div className="mt-2">
+                                    <strong className="text-gray-700">Распределение:</strong>
+                                    <ul className="pl-4 mt-1 text-gray-600">
+                                      {Object.entries(data.distribution).map(([score, count]) => (
+                                        <li key={score}>{score}: <span className="font-bold text-gray-900">{count}</span></li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              )}
+                              {data.type === 'ranking' && (
+                                <div>
+                                  <p className="mb-2 font-medium text-gray-700">Средний ранг по каждому элементу:</p>
                                   <ul className="pl-4">
-                                    {Object.entries(data.distribution).map(([score, count]) => (
-                                      <li key={score}>{score}: {count}</li>
+                                    {data.items && Object.entries(data.average_ranks || {}).map(([item, avg]) => (
+                                      <li key={item}><span className="font-semibold text-gray-900">{item}</span>: <span className="text-blue-700 font-bold">{avg ? avg : '—'}</span></li>
                                     ))}
                                   </ul>
                                 </div>
-                              </div>
-                            )}
-                            {data.type === 'ranking' && (
-                              <div>
-                                <p className="mb-2 font-medium">Средний ранг по каждому элементу:</p>
-                                <ul className="pl-4">
-                                  {data.items && Object.entries(data.average_ranks || {}).map(([item, avg]) => (
-                                    <li key={item}>{item}: {avg ? avg : '—'}</li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-                            {data.type === 'multiple_choice' && (
-                              <ResponsiveContainer width="100%" height={300}>
-                                <RBarChart data={Object.entries(data.answers).map(([name, value]) => ({ name, value }))}>
-                                  <XAxis dataKey="name" />
-                                  <YAxis />
-                                  <Tooltip />
-                                  <Legend />
-                                  <Bar dataKey="value" fill="#8884d8" />
-                                </RBarChart>
-                              </ResponsiveContainer>
-                            )}
-                            {data.type === 'text' && data.sentiment && (
-                              <ResponsiveContainer width="100%" height={300}>
-                                <RPieChart>
-                                  <Pie
-                                    data={Object.entries(data.sentiment).map(([name, value]) => ({ name, value: value * 100 }))}
-                                    cx="50%"
-                                    cy="50%"
-                                    labelLine={false}
-                                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                                    outerRadius={80}
-                                    fill="#8884d8"
-                                    dataKey="value"
-                                  >
-                                    {Object.entries(data.sentiment).map((entry, index) => (
-                                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              )}
+                              {data.type === 'multiple_choice' && (
+                                <ResponsiveContainer width="100%" height={220}>
+                                  <RBarChart data={Object.entries(data.answers).map(([name, value]) => ({ name, value }))}>
+                                    <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                                    <YAxis tick={{ fontSize: 12 }} />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Bar dataKey="value" fill="#6366f1" radius={[8, 8, 0, 0]}>
+                                      {Object.entries(data.answers).map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                      ))}
+                                    </Bar>
+                                  </RBarChart>
+                                </ResponsiveContainer>
+                              )}
+                              {data.type === 'text' && data.sentiment && (
+                                <ResponsiveContainer width="100%" height={220}>
+                                  <RPieChart>
+                                    <Pie
+                                      data={Object.entries(data.sentiment).map(([name, value]) => ({ name, value: value * 100 }))}
+                                      cx="50%"
+                                      cy="50%"
+                                      labelLine={false}
+                                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                      outerRadius={70}
+                                      fill="#6366f1"
+                                      dataKey="value"
+                                    >
+                                      {Object.entries(data.sentiment).map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                      ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
+                                    <Legend />
+                                  </RPieChart>
+                                </ResponsiveContainer>
+                              )}
+                              {/* Для текстовых и других типов — просто список ответов */}
+                              {data.type === 'text' && !data.sentiment && data.answers && (
+                                <div className="mt-2">
+                                  <strong className="text-gray-700">Ответы:</strong>
+                                  <ul className="pl-4 mt-1 text-gray-600 max-h-32 overflow-y-auto custom-scrollbar">
+                                    {data.answers.map((ans, idx) => (
+                                      <li key={idx} className="mb-1">{ans}</li>
                                     ))}
-                                  </Pie>
-                                  <Tooltip formatter={(value) => `${value.toFixed(2)}%`} />
-                                  <Legend />
-                                </RPieChart>
-                              </ResponsiveContainer>
-                            )}
-                          </div>
-                        );
-                      })}
+                                  </ul>
+                                </div>
+                              )}
+                              {data.type === 'ranking' && data.answers && (
+                                <div className="mt-2">
+                                  <strong className="text-gray-700">Ответы:</strong>
+                                  <ul className="pl-4 mt-1 text-gray-600 max-h-32 overflow-y-auto custom-scrollbar">
+                                    {data.answers.map((ans, idx) => (
+                                      <li key={idx} className="mb-1">{JSON.stringify(ans)}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+                            </motion.div>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
-                </div>
+                </motion.div>
               </motion.div>
             )}
 
