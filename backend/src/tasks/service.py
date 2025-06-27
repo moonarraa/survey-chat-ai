@@ -55,9 +55,7 @@ class AuthService:
         new_user = DBUser(
             email=credentials.email,
             hashed_password=hashed_password,
-            name=credentials.name,
-            company=credentials.company,
-            role=credentials.role
+            name=credentials.name
         )
 
         created_user = await UserDAO.create_user(new_user, db)

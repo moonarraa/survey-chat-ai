@@ -16,6 +16,7 @@ import json
 from pydantic import BaseModel
 from typing import Any
 from sqlalchemy import select, func
+from collections import Counter
 
 router = APIRouter(tags=["surveys"])
 
@@ -358,39 +359,103 @@ async def get_survey_analytics(
 
     total_responses = len(answers)
     question_analytics = {}
-    
-    # Placeholder for real analytics
-    # In a real app, you would process answers here
-    # For now, let's return some dummy data based on question types
 
     questions = json.loads(survey.questions)
+    # Собираем ответы по вопросам (answers: list[str] по индексу)
+    all_answers = [json.loads(a.answers) for a in answers]
     for i, q in enumerate(questions):
         q_text = q.get('text', f'Question {i+1}')
         q_type = q.get('type', 'unknown')
-        
+        # Собираем все ответы на этот вопрос (по индексу)
+        q_answers = [a[i] if len(a) > i else None for a in all_answers]
         if q_type == 'rating':
-            # Dummy data for rating
+            # Считаем распределение, среднее, медиану, моду
+            dist = {}
+            total = 0
+            count = 0
+            values = []
+            for ans in q_answers:
+                try:
+                    val = int(ans)
+                    dist[str(val)] = dist.get(str(val), 0) + 1
+                    total += val
+                    count += 1
+                    values.append(val)
+                except (TypeError, ValueError):
+                    continue
+            avg = round(total / count, 2) if count else 0
+            median = 0
+            mode = None
+            if values:
+                sorted_vals = sorted(values)
+                n = len(sorted_vals)
+                if n % 2 == 1:
+                    median = sorted_vals[n // 2]
+                else:
+                    median = (sorted_vals[n // 2 - 1] + sorted_vals[n // 2]) / 2
+                # Мода
+                counter = Counter(values)
+                mode = counter.most_common(1)[0][0] if counter else None
             question_analytics[q_text] = {
                 "type": "rating",
-                "average": 4.2,
-                "distribution": {"1": 5, "2": 10, "3": 20, "4": 50, "5": 15}
+                "average": avg,
+                "median": median,
+                "mode": mode,
+                "distribution": dist
             }
         elif q_type == 'multiple_choice':
-            # Dummy data for multiple choice
+            # Считаем количество по каждому варианту
+            opts = q.get('options', [])
+            opt_counts = {opt: 0 for opt in opts}
+            for ans in q_answers:
+                if ans in opt_counts:
+                    opt_counts[ans] += 1
             question_analytics[q_text] = {
                 "type": "multiple_choice",
-                "answers": {
-                    opt: (i+1)*10 for i, opt in enumerate(q.get('options', []))
-                }
+                "answers": opt_counts
             }
-        else: # open_ended, long_text
-            # Dummy data for open text
+        elif q_type in ('open_ended', 'long_text'):
+            # Собираем все текстовые ответы
+            texts = [ans for ans in q_answers if ans]
             question_analytics[q_text] = {
                 "type": "text",
-                "wordcloud": {"AI": 15, "удобно": 12, "быстро": 10, "интерфейс": 8},
-                "sentiment": {"positive": 0.7, "neutral": 0.2, "negative": 0.1}
+                "answers": texts
             }
-
+        elif q_type == 'ranking':
+            # Для ranking: средний ранг по каждому элементу
+            items = q.get('items', [])
+            rankings = [ans for ans in q_answers if isinstance(ans, list) and len(ans) == len(items)]
+            # Для каждого item считаем средний ранг (позицию)
+            item_positions = {item: [] for item in items}
+            for ranking in rankings:
+                for pos, item in enumerate(ranking):
+                    if item in item_positions:
+                        item_positions[item].append(pos + 1)  # ранг с 1
+            avg_ranks = {item: round(sum(pos_list)/len(pos_list), 2) if pos_list else None for item, pos_list in item_positions.items()}
+            question_analytics[q_text] = {
+                "type": "ranking",
+                "answers": rankings,
+                "items": items,
+                "average_ranks": avg_ranks
+            }
+        elif q_type == 'image_choice':
+            # Для image_choice: считаем по label или url
+            images = q.get('images', [])
+            img_labels = [img['label'] if isinstance(img, dict) and 'label' in img else str(img) for img in images]
+            img_counts = {label: 0 for label in img_labels}
+            for ans in q_answers:
+                if ans in img_counts:
+                    img_counts[ans] += 1
+            question_analytics[q_text] = {
+                "type": "image_choice",
+                "answers": img_counts
+            }
+        else:
+            # Прочие типы — просто список ответов
+            question_analytics[q_text] = {
+                "type": q_type,
+                "answers": [ans for ans in q_answers if ans]
+            }
 
     return SurveyAnalytics(
         total_responses=total_responses,

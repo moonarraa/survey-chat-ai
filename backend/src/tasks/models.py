@@ -27,8 +27,6 @@ class UserCredentials(BaseModel):
     email: EmailStr
     password: str
     name: str
-    company: str
-    role: str
 
 
 class SurveyCreate(BaseModel):
@@ -47,5 +45,9 @@ class SurveyOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class UserProfileUpdate(BaseModel):
+    pass
 
  

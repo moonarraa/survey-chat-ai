@@ -14,8 +14,6 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     age = Column(Integer)
     name = Column(String)
-    company = Column(String)
-    role = Column(String)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
     tg_user_id = Column(String, unique=True, index=True, nullable=True)

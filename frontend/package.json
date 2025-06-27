@@ -12,6 +12,7 @@
     "build:css": "tailwindcss -i ./src/index.css -o ./src/output.css --watch"
   },
   "dependencies": {
+    "file-saver": "^2.0.5",
     "framer-motion": "^11.18.2",
     "lucide-react": "^0.468.0",
     "qrcode.react": "^4.2.0",

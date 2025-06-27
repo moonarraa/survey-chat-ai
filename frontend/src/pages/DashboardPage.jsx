@@ -32,6 +32,7 @@ import CreateSurveyModal from "../components/CreateSurveyModal";
 import SurveyEditPage from "./SurveyEditPage";
 import { BACKEND_URL, getApiUrl } from '../config';
 import { BarChart as RBarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart as RPieChart, Pie, Cell } from 'recharts';
+import { saveAs } from "file-saver";
 
 function DashboardPage() {
   const [activeTab, setActiveTab] = useState('projects');
@@ -114,7 +115,7 @@ function DashboardPage() {
 
   const sidebarItems = [
     { id: 'projects', icon: FolderOpen, label: 'Мои опросы', active: activeTab === 'projects' },
-    { id: 'summary', icon: Home, label: 'Сводка', active: activeTab === 'summary' },
+    { id: 'analytics', icon: Home, label: 'Аналитика', active: activeTab === 'analytics' },
     { id: 'profile', icon: User, label: 'Личный кабинет', active: activeTab === 'profile' },
     { id: 'help', icon: HelpCircle, label: 'Справка', active: false },
     { id: 'settings', icon: Settings, label: 'Настройки', active: false }
@@ -170,7 +171,7 @@ function DashboardPage() {
   }, [surveyTab]);
 
   useEffect(() => {
-    if (activeTab === 'summary') {
+    if (activeTab === 'analytics') {
       const stats = {
         totalSurveys: surveys.length,
         activeSurveys: surveys.filter(s => !s.archived).length,
@@ -194,7 +195,7 @@ function DashboardPage() {
   }, [activeTab, surveys]);
 
   useEffect(() => {
-    if (activeTab === 'summary' && selectedAnalyticsSurveyId) {
+    if (activeTab === 'analytics' && selectedAnalyticsSurveyId) {
       fetchAnalytics(selectedAnalyticsSurveyId);
     }
   }, [activeTab, selectedAnalyticsSurveyId]);
@@ -326,6 +327,51 @@ function DashboardPage() {
 
     setOpen(true);
   };
+
+  function handleExportCSV() {
+    if (!analytics) return;
+    const rows = [];
+    rows.push(["Вопрос", "Тип", "Ответ", "Количество"]);
+    Object.entries(analytics.question_analytics).forEach(([question, data]) => {
+      if (data.type === "multiple_choice" || data.type === "image_choice") {
+        Object.entries(data.answers).forEach(([opt, count]) => {
+          rows.push([question, data.type, opt, count]);
+        });
+      } else if (data.type === "rating") {
+        Object.entries(data.distribution).forEach(([score, count]) => {
+          rows.push([question, data.type, score, count]);
+        });
+        rows.push([question, data.type, "Среднее", data.average]);
+      } else if (data.type === "text") {
+        data.answers.forEach((ans, idx) => {
+          rows.push([question, data.type, ans, ""]);
+        });
+      } else if (data.type === "ranking") {
+        data.answers.forEach((ans, idx) => {
+          rows.push([question, data.type, JSON.stringify(ans), ""]);
+        });
+      } else {
+        (data.answers || []).forEach((ans) => {
+          rows.push([question, data.type, ans, ""]);
+        });
+      }
+    });
+    // Формируем CSV-строку
+    const csv = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+    // Скачиваем файл
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const filename = `survey-analytics-${selectedAnalyticsSurveyId || 'all'}.csv`;
+    if (window.navigator.msSaveOrOpenBlob) {
+      window.navigator.msSaveBlob(blob, filename);
+    } else {
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute("download", filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex">
@@ -465,16 +511,24 @@ function DashboardPage() {
 
         <main className="flex-1 p-4 sm:p-8 overflow-y-auto">
           <AnimatePresence mode="wait">
-            {activeTab === 'summary' && (
+            {activeTab === 'analytics' && (
               <motion.div
-                key="summary"
+                key="analytics"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
               >
                 <div className="flex items-center justify-between mb-8">
-                  <h1 className="text-3xl font-bold text-gray-900">Сводка по опросам</h1>
+                  <h1 className="text-3xl font-bold text-gray-900">Аналитика по опросам</h1>
+                  {analytics && (
+                    <button
+                      className="btn-secondary px-4 py-2 rounded-xl font-semibold shadow"
+                      onClick={handleExportCSV}
+                    >
+                      Экспорт в CSV
+                    </button>
+                  )}
                 </div>
 
                 {/* Stats Grid */}
@@ -680,6 +734,26 @@ function DashboardPage() {
                             {data.type === 'rating' && (
                               <div>
                                 <p>Средняя оценка: {data.average}</p>
+                                <p>Медиана: {data.median}</p>
+                                <p>Мода: {data.mode}</p>
+                                <div className="mt-2">
+                                  <strong>Распределение:</strong>
+                                  <ul className="pl-4">
+                                    {Object.entries(data.distribution).map(([score, count]) => (
+                                      <li key={score}>{score}: {count}</li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              </div>
+                            )}
+                            {data.type === 'ranking' && (
+                              <div>
+                                <p className="mb-2 font-medium">Средний ранг по каждому элементу:</p>
+                                <ul className="pl-4">
+                                  {data.items && Object.entries(data.average_ranks || {}).map(([item, avg]) => (
+                                    <li key={item}>{item}: {avg ? avg : '—'}</li>
+                                  ))}
+                                </ul>
                               </div>
                             )}
                             {data.type === 'multiple_choice' && (

@@ -38,8 +38,9 @@ class AnswerResponse(BaseModel):
     summary: str = None
 
 class UserProfileUpdate(BaseModel):
-    company: str
-    role: str
+    # company: str
+    # role: str
+    pass
 
 @router.post("/token", response_model=Token)
 async def login_for_access_token(
@@ -110,8 +111,8 @@ async def update_profile(
     db: AsyncSession = Depends(get_async_db)
 ):
     db_user = await UserDAO.get_user_by_email(current_user.email, db)
-    db_user.company = profile.company
-    db_user.role = profile.role
+    # db_user.company = profile.company
+    # db_user.role = profile.role
     await db.commit()
     await db.refresh(db_user)
     return db_user
