@@ -590,13 +590,6 @@ function DashboardPage() {
                     <div>
                       <div className="flex items-baseline gap-2">
                         <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.totalResponses}</div>
-                        {summaryStats.totalResponses > 0 && (
-                          <div className="text-lg font-bold text-green-600">
-                            {summaryStats.totalSurveys > 0 
-                              ? `${Math.round((summaryStats.totalResponses / summaryStats.totalSurveys) * 100)}%`
-                              : '0%'}
-                          </div>
-                        )}
                       </div>
                       <div className="text-base text-gray-500 font-medium mt-1">Всего ответов</div>
                     </div>
