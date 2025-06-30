@@ -4,6 +4,7 @@ import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
 import { getApiUrl } from '../config';
 import { Plus, Trash2, BarChart2, Edit, Settings } from 'lucide-react';
+import Select from '../components/ui/Select';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },
@@ -167,13 +168,13 @@ export default function SurveyDetailPage({ id, onClose }) {
           />
 
           <label className="block text-sm font-medium text-gray-700 mb-1">Тип вопроса</label>
-          <select
+          <Select
             value={q.type}
-            onChange={(e) => handleQuestionChange(qIndex, 'type', e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md mb-4"
-          >
-            {QUESTION_TYPES.map(qt => <option key={qt.value} value={qt.value}>{qt.label}</option>)}
-          </select>
+            onValueChange={value => handleQuestionChange(qIndex, 'type', value)}
+            options={QUESTION_TYPES}
+            placeholder="Тип вопроса"
+            className="w-full mb-4"
+          />
 
           {q.type === 'multiple_choice' && (
             <div>

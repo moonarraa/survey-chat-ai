@@ -4,6 +4,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
 import { BACKEND_URL, getApiUrl } from '../config';
+import Select from '../components/ui/Select';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },
@@ -315,15 +316,13 @@ export default function SurveyEditPage({ id: propId, onClose }) {
                           </span>
                           <div className="border rounded-2xl p-4 sm:p-6 bg-white mb-2 shadow-md transition-all duration-200 hover:shadow-lg">
                             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-2">
-                              <select
+                              <Select
                                 value={q.type}
-                                onChange={e => handleQuestionChange(idx, "type", e.target.value)}
-                                className="border rounded px-2 py-1 text-sm w-full sm:w-auto"
-                              >
-                                {QUESTION_TYPES.map(t => (
-                                  <option key={t.value} value={t.value}>{t.label}</option>
-                                ))}
-                              </select>
+                                onValueChange={value => handleQuestionChange(idx, "type", value)}
+                                options={QUESTION_TYPES}
+                                placeholder="Тип вопроса"
+                                className="w-full sm:w-auto"
+                              />
                               <textarea
                                 className="border rounded-xl px-4 py-3 w-full flex-1 min-h-[48px] max-h-40 resize-y bg-gray-50 focus:bg-white focus:ring-2 focus:ring-primary-200 transition-all text-base shadow-sm"
                                 value={q.text || ""}
