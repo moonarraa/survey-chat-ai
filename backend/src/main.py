@@ -30,6 +30,11 @@ origins = [
     "https://grateful-adventure-production-91c0.up.railway.app",  # Your new frontend on Railway
     "https://survey-chat-frontend-production.up.railway.app",
     "https://survey-ai.up.railway.app",
+    "https://survey-ai.live",
+    "http://159.89.11.66:8080/",
+    "http://survey-ai.live",
+    "https://www.survey-ai.live",
+    "http://www.survey-ai.live"
 ]
 
 @app.on_event("startup")
