@@ -1,5 +1,5 @@
 # Forcing a clean rebuild on Railway by adding a comment
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Install Python dependencies
-COPY requirements.txt .
+COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project files
@@ -29,5 +29,5 @@ ENV WEBSITE_PORT=8000
 EXPOSE 8000
 
 # Start command uses the PORT environment variable provided by Railway
-CMD ./migrate.sh && gunicorn src.main:app --workers 4 --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT
+CMD ./migrate.sh && uvicorn src.main:app --host 0.0.0.0 --port $PORT
 
