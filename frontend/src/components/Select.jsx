@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 export default function Select({ value, onValueChange, options, placeholder = 'Выберите...', className = '' }) {
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
+  const [dropdownStyle, setDropdownStyle] = useState({});
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -14,6 +16,19 @@ export default function Select({ value, onValueChange, options, placeholder = '�
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  useEffect(() => {
+    if (open && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: 'absolute',
+        top: rect.bottom + window.scrollY,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    }
+  }, [open]);
 
   const selected = options.find(opt => opt.value === value);
 
@@ -38,15 +53,11 @@ export default function Select({ value, onValueChange, options, placeholder = '�
         </span>
         <ChevronDown className={`w-5 h-5 ml-2 transition-transform ${open ? 'rotate-180' : ''} text-gray-400`} />
       </button>
-      {open && (
-        <ul
-          className={`
-            absolute z-20 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-xl
-            max-h-60 overflow-auto py-1 animate-fade-in
-          `}
-          tabIndex={-1}
-          role="listbox"
-        >
+      {open && createPortal(
+        <ul style={dropdownStyle} className={`
+          absolute z-50 mt-2 w-full bg-white border border-gray-200 rounded-xl shadow-xl
+          max-h-60 overflow-auto py-1 animate-fade-in
+        `} tabIndex={-1} role="listbox">
           {options.map(opt => (
             <li
               key={opt.value}
@@ -66,7 +77,8 @@ export default function Select({ value, onValueChange, options, placeholder = '�
               {value === opt.value && <Check className="w-5 h-5 ml-auto text-primary-600" />}
             </li>
           ))}
-        </ul>
+        </ul>,
+        document.body
       )}
     </div>
   );

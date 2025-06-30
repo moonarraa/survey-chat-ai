@@ -3,8 +3,9 @@ import { useNavigate, Link } from "react-router-dom";
 import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
 import { getApiUrl } from '../config';
-import { Plus, Trash2, BarChart2, Edit, Settings } from 'lucide-react';
-import Select from '../components/ui/Select';
+import { Plus, Trash2, BarChart2, Edit, Settings, Star, List, Image as ImageIcon, MessageCircle, AlignLeft } from 'lucide-react';
+import Select from '../components/Select';
+import { motion } from 'framer-motion';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },
@@ -31,6 +32,25 @@ function getDefaultQuestion(type = "multiple_choice") {
       return { type, text: "" };
   }
 }
+
+console.log('Select:', Select);
+
+const typeStyles = {
+  multiple_choice: 'from-blue-100 to-blue-50 border-blue-200',
+  rating: 'from-yellow-100 to-yellow-50 border-yellow-200',
+  ranking: 'from-green-100 to-green-50 border-green-200',
+  image_choice: 'from-pink-100 to-pink-50 border-pink-200',
+  open_ended: 'from-purple-100 to-purple-50 border-purple-200',
+  long_text: 'from-gray-100 to-gray-50 border-gray-200',
+};
+const typeIcons = {
+  multiple_choice: List,
+  rating: Star,
+  ranking: List,
+  image_choice: ImageIcon,
+  open_ended: MessageCircle,
+  long_text: AlignLeft,
+};
 
 export default function SurveyDetailPage({ id, onClose }) {
   const [survey, setSurvey] = useState(null);
@@ -157,64 +177,84 @@ export default function SurveyDetailPage({ id, onClose }) {
 
   const renderEditView = () => (
     <div>
-      {survey.questions.map((q, qIndex) => (
-        <div key={qIndex} className="border rounded-xl p-4 mb-4 bg-gray-50 relative">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Текст вопроса</label>
-          <input
-            type="text"
-            value={q.text}
-            onChange={(e) => handleQuestionChange(qIndex, 'text', e.target.value)}
-            className="w-full p-2 border border-gray-300 rounded-md mb-2"
-          />
-
-          <label className="block text-sm font-medium text-gray-700 mb-1">Тип вопроса</label>
-          <Select
-            value={q.type}
-            onValueChange={value => handleQuestionChange(qIndex, 'type', value)}
-            options={QUESTION_TYPES}
-            placeholder="Тип вопроса"
-            className="w-full mb-4"
-          />
-
-          {q.type === 'multiple_choice' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Варианты ответа</label>
-              {q.options.map((opt, oIndex) => (
-                <div key={oIndex} className="flex items-center gap-2 mb-2">
-                  <input
-                    type="text"
-                    value={opt}
-                    onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
-                    className="flex-grow p-2 border border-gray-300 rounded-md"
-                  />
-                  <button onClick={() => handleRemoveOption(qIndex, oIndex)} className="p-2 text-red-500 hover:text-red-700">
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-              ))}
-              <button onClick={() => handleAddOption(qIndex)} className="btn-secondary text-sm">Добавить вариант</button>
+      {survey.questions.map((q, qIndex) => {
+        const Icon = typeIcons[q.type] || List;
+        return (
+          <motion.div
+            key={qIndex}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: qIndex * 0.08 }}
+            className={`relative rounded-2xl shadow-lg border-2 bg-gradient-to-br ${typeStyles[q.type] || 'from-gray-50 to-white border-gray-200'} p-6 mb-6 hover:scale-[1.02] hover:shadow-2xl transition-transform duration-300`}
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <span className={`inline-flex items-center justify-center rounded-full p-2 bg-white shadow border ${typeStyles[q.type]?.split(' ')[2] || 'border-gray-200'}`}> 
+                <Icon className={`w-6 h-6 ${q.type === 'rating' ? 'text-yellow-400' : 'text-blue-500'}`} />
+              </span>
+              <span className="uppercase text-xs font-bold tracking-wider text-gray-500">{QUESTION_TYPES.find(t => t.value === q.type)?.label || q.type}</span>
             </div>
-          )}
-
-          {q.type === 'rating' && (
-             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Шкала (1-10)</label>
-               <input
-                type="number"
-                min="2"
-                max="10"
-                value={q.scale || 5}
-                onChange={(e) => handleQuestionChange(qIndex, 'scale', parseInt(e.target.value))}
-                className="w-full p-2 border border-gray-300 rounded-md"
-              />
-            </div>
-          )}
-
-          <button onClick={() => handleRemoveQuestion(qIndex)} className="absolute top-2 right-2 p-2 text-gray-400 hover:text-red-600">
-            <Trash2 size={20}/>
-          </button>
-        </div>
-      ))}
+            <input
+              type="text"
+              value={q.text}
+              onChange={(e) => handleQuestionChange(qIndex, 'text', e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-xl font-semibold text-lg mb-4 focus:ring-2 focus:ring-primary-400 transition"
+              placeholder="Текст вопроса"
+            />
+            <Select
+              value={q.type}
+              onValueChange={value => handleQuestionChange(qIndex, 'type', value)}
+              options={QUESTION_TYPES}
+              placeholder="Тип вопроса"
+              className="w-full mb-4"
+            />
+            {q.type === 'multiple_choice' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Варианты ответа</label>
+                <ul className="space-y-2">
+                  {q.options.map((opt, oIndex) => (
+                    <motion.li
+                      key={oIndex}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: oIndex * 0.05 }}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 border border-blue-100 text-blue-900 shadow-sm hover:bg-blue-100 transition"
+                    >
+                      <input
+                        type="text"
+                        value={opt}
+                        onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
+                        className="flex-grow bg-transparent border-none outline-none text-base"
+                        placeholder={`Вариант ${oIndex + 1}`}
+                      />
+                      <button onClick={() => handleRemoveOption(qIndex, oIndex)} className="p-2 text-red-500 hover:text-red-700">
+                        <Trash2 size={18} />
+                      </button>
+                    </motion.li>
+                  ))}
+                </ul>
+                <button onClick={() => handleAddOption(qIndex)} className="btn-secondary text-sm mt-2">Добавить вариант</button>
+              </div>
+            )}
+            {q.type === 'rating' && (
+              <div className="mt-2 flex items-center gap-2">
+                <label className="text-sm text-gray-700">Шкала:</label>
+                <input
+                  type="number"
+                  min="2"
+                  max="10"
+                  value={q.scale || 5}
+                  onChange={(e) => handleQuestionChange(qIndex, 'scale', parseInt(e.target.value))}
+                  className="w-20 p-2 border border-yellow-200 rounded-xl text-yellow-700 font-semibold bg-yellow-50 focus:ring-2 focus:ring-yellow-300 transition"
+                />
+                <span className="text-xs text-yellow-600">(звёзды/сердечки)</span>
+              </div>
+            )}
+            <button onClick={() => handleRemoveQuestion(qIndex)} className="absolute top-2 right-2 p-2 text-gray-400 hover:text-red-600">
+              <Trash2 size={20}/>
+            </button>
+          </motion.div>
+        );
+      })}
       <button onClick={handleAddQuestion} className="btn-primary w-full flex items-center justify-center gap-2">
         <Plus/> Добавить вопрос
       </button>
@@ -223,54 +263,94 @@ export default function SurveyDetailPage({ id, onClose }) {
 
   const renderDisplayView = () => (
     <>
-      <h3 className="text-lg font-semibold mb-2">Вопросы:</h3>
-      <ul className="list-decimal pl-6 text-gray-800 mb-6">
-        {survey.questions && survey.questions.map((q, idx) => (
-          <li key={idx} className="mb-4 bg-white">
-            <div className="border rounded-xl p-4 bg-gray-50">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xs font-semibold text-gray-500 uppercase">
-                  {q.type === 'multiple_choice' ? 'Multiple Choice' : q.type === 'rating' ? 'Rating' : q.type === 'ranking' ? 'Ranking' : q.type === 'image_choice' ? 'Image Choice' : 'Open-ended'}
+      <h3 className="text-lg font-semibold mb-4">Вопросы:</h3>
+      <ul className="space-y-6">
+        {survey.questions && survey.questions.map((q, idx) => {
+          const Icon = typeIcons[q.type] || List;
+          return (
+            <motion.li
+              key={idx}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: idx * 0.08 }}
+              className={`rounded-2xl shadow-lg border-2 bg-gradient-to-br ${typeStyles[q.type] || 'from-gray-50 to-white border-gray-200'} p-6 hover:scale-[1.02] hover:shadow-2xl transition-transform duration-300`}
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <span className={`inline-flex items-center justify-center rounded-full p-2 bg-white shadow border ${typeStyles[q.type]?.split(' ')[2] || 'border-gray-200'}`}> 
+                  <Icon className={`w-6 h-6 ${q.type === 'rating' ? 'text-yellow-400' : 'text-blue-500'}`} />
                 </span>
+                <span className="uppercase text-xs font-bold tracking-wider text-gray-500">{QUESTION_TYPES.find(t => t.value === q.type)?.label || q.type}</span>
               </div>
-              <div className="font-medium mb-2">{q.text || ""}</div>
+              <div className="font-semibold text-lg mb-3 text-gray-800">{q.text || ''}</div>
               {q.type === "multiple_choice" && q.options && (
-                <ul className="pl-4 list-disc text-sm text-gray-700">
+                <ul className="space-y-2 mt-2">
                   {q.options.map((opt, oIdx) => (
-                    <li key={oIdx}>{opt}</li>
+                    <motion.li
+                      key={oIdx}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: oIdx * 0.05 }}
+                      className="px-4 py-2 rounded-xl bg-blue-50 border border-blue-100 text-blue-900 shadow-sm hover:bg-blue-100 transition"
+                    >
+                      {opt}
+                    </motion.li>
                   ))}
                 </ul>
               )}
               {q.type === "rating" && (
-                <div className="flex items-center gap-1 mt-1">
+                <div className="flex items-center gap-1 mt-2">
                   {[...Array(q.scale || 5)].map((_, i) => (
-                    <span key={i} className="inline-block w-6 h-6 text-yellow-400">★</span>
+                    <Star key={i} className="w-6 h-6 text-yellow-400" fill="currentColor" />
                   ))}
                   <span className="ml-2 text-xs text-gray-500">Шкала: 1–{q.scale || 5}</span>
                 </div>
               )}
               {q.type === "ranking" && q.items && (
-                <ol className="pl-4 list-decimal text-sm text-gray-700">
+                <ol className="space-y-1 mt-2">
                   {q.items.map((item, iIdx) => (
-                    <li key={iIdx}>{item}</li>
+                    <motion.li
+                      key={iIdx}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.4, delay: iIdx * 0.05 }}
+                      className="px-4 py-2 rounded-xl bg-green-50 border border-green-100 text-green-900 shadow-sm hover:bg-green-100 transition"
+                    >
+                      {item}
+                    </motion.li>
                   ))}
                 </ol>
               )}
               {q.type === "image_choice" && q.images && (
-                <div className="flex gap-2 mt-2">
+                <div className="flex gap-4 mt-3 flex-wrap">
                   {q.images.map((img, iIdx) => (
-                    <div key={iIdx} className="flex flex-col items-center">
-                      <img src={img.url} alt={img.label} className="w-16 h-16 object-cover rounded" />
+                    <motion.div
+                      key={iIdx}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.4, delay: iIdx * 0.07 }}
+                      className="flex flex-col items-center bg-pink-50 border border-pink-100 rounded-xl p-2 shadow-sm hover:bg-pink-100 transition"
+                    >
+                      <img src={img.url} alt={img.label} className="w-20 h-20 object-cover rounded-lg mb-1" />
                       <span className="text-xs text-gray-600 mt-1">{img.label}</span>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
-            </div>
-          </li>
-        ))}
+              {q.type === "open_ended" && (
+                <div className="mt-2 px-4 py-2 rounded-xl bg-purple-50 border border-purple-100 text-purple-900 shadow-sm">
+                  Открытый вопрос
+                </div>
+              )}
+              {q.type === "long_text" && (
+                <div className="mt-2 px-4 py-2 rounded-xl bg-gray-100 border border-gray-200 text-gray-700 shadow-sm">
+                  Ответ в свободной форме
+                </div>
+              )}
+            </motion.li>
+          );
+        })}
       </ul>
-      <div className="flex flex-col sm:flex-row flex-wrap gap-4 mt-2">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-4 mt-6">
         <button
           className="btn-secondary w-full sm:w-auto flex items-center justify-center gap-2 text-base px-6 py-3 rounded-xl shadow hover:shadow-md transition"
           onClick={() => navigate("/dashboard")}
@@ -288,105 +368,111 @@ export default function SurveyDetailPage({ id, onClose }) {
   );
 
   return (
-    <div className="p-4 sm:p-6 bg-white rounded-2xl shadow-lg border border-gray-200 w-full">
-       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-800 truncate" title={survey.topic}>{survey.topic}</h2>
-        {/* Actions can go here */}
+    <>
+      <div style={{background: 'blue', color: 'white', padding: 8, borderRadius: 8, marginBottom: 16, fontWeight: 'bold', fontSize: 18, textAlign: 'center'}}>
+        TEST MARKER DETAIL
       </div>
+      <div className="p-4 sm:p-6 bg-white rounded-2xl shadow-lg border border-gray-200 w-full">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-gray-800 truncate" title={survey.topic}>{survey.topic}</h2>
+          {/* Actions can go here */}
+        </div>
 
-       <div className="flex border-b mb-6">
-        <button
-          onClick={() => setActiveTab('questions')}
-          className={`px-4 py-2 flex items-center gap-2 border-b-2 border-blue-500 text-blue-600`}
-        >
-          <Edit size={16} /> Вопросы
-        </button>
-         <button
-          onClick={() => setActiveTab('settings')}
-          className={`px-4 py-2 flex items-center gap-2 ${activeTab === 'settings' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
-        >
-          <User size={16} /> Личный кабинет
-        </button>
+        <div className="flex border-b mb-6">
+          <button
+            onClick={() => setActiveTab('questions')}
+            className={`px-4 py-2 flex items-center gap-2 border-b-2 border-blue-500 text-blue-600`}
+          >
+            <Edit size={16} /> Вопросы
+          </button>
+          <button
+            onClick={() => setActiveTab('settings')}
+            className={`px-4 py-2 flex items-center gap-2 ${activeTab === 'settings' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
+          >
+            <User size={16} /> Личный кабинет
+          </button>
+        </div>
+
+        {activeTab === 'questions' && (
+          <>
+            {isEditing ? renderEditView() : renderDisplayView()}
+            <div className="mt-6 flex gap-4">
+              {isEditing ? (
+                <>
+                  <button onClick={handleSave} className="btn-primary">Сохранить</button>
+                  <button onClick={handleCancel} className="btn-secondary">Отмена</button>
+                </>
+              ) : (
+                <button onClick={() => setIsEditing(true)} className="btn-primary">Редактировать</button>
+              )}
+            </div>
+          </>
+        )}
+
+        {activeTab === 'settings' && (
+          <div>
+            <h2 className="text-xl font-bold">Настройки опроса</h2>
+            {/* Settings content goes here */}
+            <p>Раздел настроек в разработке.</p>
+          </div>
+        )}
+
+        {showShare && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4">
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg relative w-full max-w-lg flex flex-col items-center">
+              <button
+                onClick={() => setShowShare(false)}
+                className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+                aria-label="Закрыть"
+              >×</button>
+              <div className="text-lg font-semibold mb-6 text-center">Поделиться опросом</div>
+              <div className="flex flex-col gap-4 w-full mb-8">
+                <button
+                  className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition text-lg"
+                  style={{ minWidth: 220 }}
+                  onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess('Публичная ссылка скопирована!'); setTimeout(()=>setCopySuccess(''), 1500);}}
+                >
+                  Скопировать публичную ссылку
+                </button>
+                <button
+                  className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition text-lg"
+                  style={{ minWidth: 220 }}
+                  onClick={() => {navigator.clipboard.writeText(telegramUrl); setCopySuccess('Ссылка на Telegram скопирована!'); setTimeout(()=>setCopySuccess(''), 1500);}}
+                >
+                  Скопировать ссылку на Telegram
+                </button>
+              </div>
+              {copySuccess && <span className="text-green-600 text-center w-full mb-4">{copySuccess}</span>}
+              <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
+              <div className="flex flex-col items-center gap-2">
+                <QRCode id="qr-download" value={publicUrl} size={160} />
+                <button
+                  className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl font-medium transition"
+                  onClick={() => {
+                    const canvas = document.querySelector('#qr-download canvas');
+                    if (canvas) {
+                      const url = canvas.toDataURL('image/png');
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = 'survey-qr.png';
+                      a.click();
+                    }
+                  }}
+                >
+                  Скачать QR
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        <ErrorModal
+          isOpen={errorModal.open}
+          onClose={() => setErrorModal({ open: false, title: '', message: '' })}
+          title={errorModal.title}
+          message={errorModal.message}
+        />
+        <div style={{background: 'lime', color: 'black'}}>TEST LOCAL 5173</div>
       </div>
-
-      {activeTab === 'questions' && (
-        <>
-          {isEditing ? renderEditView() : renderDisplayView()}
-          <div className="mt-6 flex gap-4">
-            {isEditing ? (
-              <>
-                <button onClick={handleSave} className="btn-primary">Сохранить</button>
-                <button onClick={handleCancel} className="btn-secondary">Отмена</button>
-              </>
-            ) : (
-              <button onClick={() => setIsEditing(true)} className="btn-primary">Редактировать</button>
-            )}
-          </div>
-        </>
-      )}
-
-      {activeTab === 'settings' && (
-        <div>
-          <h2 className="text-xl font-bold">Настройки опроса</h2>
-          {/* Settings content goes here */}
-          <p>Раздел настроек в разработке.</p>
-        </div>
-      )}
-
-      {showShare && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4">
-          <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg relative w-full max-w-lg flex flex-col items-center">
-            <button
-              onClick={() => setShowShare(false)}
-              className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
-              aria-label="Закрыть"
-            >×</button>
-            <div className="text-lg font-semibold mb-6 text-center">Поделиться опросом</div>
-            <div className="flex flex-col gap-4 w-full mb-8">
-              <button
-                className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition text-lg"
-                style={{ minWidth: 220 }}
-                onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess('Публичная ссылка скопирована!'); setTimeout(()=>setCopySuccess(''), 1500);}}
-              >
-                Скопировать публичную ссылку
-              </button>
-              <button
-                className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition text-lg"
-                style={{ minWidth: 220 }}
-                onClick={() => {navigator.clipboard.writeText(telegramUrl); setCopySuccess('Ссылка на Telegram скопирована!'); setTimeout(()=>setCopySuccess(''), 1500);}}
-              >
-                Скопировать ссылку на Telegram
-              </button>
-            </div>
-            {copySuccess && <span className="text-green-600 text-center w-full mb-4">{copySuccess}</span>}
-            <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
-            <div className="flex flex-col items-center gap-2">
-              <QRCode id="qr-download" value={publicUrl} size={160} />
-              <button
-                className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl font-medium transition"
-                onClick={() => {
-                  const canvas = document.querySelector('#qr-download canvas');
-                  if (canvas) {
-                    const url = canvas.toDataURL('image/png');
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'survey-qr.png';
-                    a.click();
-                  }
-                }}
-              >
-                Скачать QR
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      <ErrorModal
-        isOpen={errorModal.open}
-        onClose={() => setErrorModal({ open: false, title: '', message: '' })}
-        title={errorModal.title}
-        message={errorModal.message}
-      />
-    </div>
+    </>
   );
 }
