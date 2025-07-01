@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { QRCode } from "qrcode.react";
+import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
 import { getApiUrl } from '../config';
 import { Plus, Trash2, BarChart2, Edit, Settings, Star, List, Image as ImageIcon, MessageCircle, AlignLeft } from 'lucide-react';
@@ -460,7 +460,7 @@ export default function SurveyDetailPage({ id, onClose }) {
               <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
               <div className="flex flex-col items-center gap-2">
                 <div ref={qrRef}>
-                  <QRCode value={publicUrl} size={160} renderAs="canvas" />
+                  <QRCode value={publicUrl} size={160} />
                 </div>
               </div>
             </div>
