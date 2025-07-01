@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, MessageSquare, Brain, BarChart3, FileText, CheckCircle, Star, ChevronDown } from 'lucide-react';
+import { ArrowRight, MessageSquare, Brain, BarChart3, FileText, CheckCircle, Star, ChevronDown, Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Typewriter } from 'react-simple-typewriter';
 import surveyCreateImg from '../assets/survey-create.png';
@@ -57,6 +57,15 @@ const testimonials = [
 
 function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null);
+  const [newSurveyTitle, setNewSurveyTitle] = useState('');
+
+  const handleCreateSurvey = () => {
+    if (!newSurveyTitle.trim()) return;
+    // Если пользователь не авторизован — редирект на регистрацию с темой
+    window.location.href = `/register?topic=${encodeURIComponent(newSurveyTitle)}`;
+    // Если хочешь другой UX — можно показать модалку или что-то ещё
+  };
+
   const faq = [
     {
       q: 'Как быстро я получу аналитику по опросу?',
@@ -113,7 +122,29 @@ function LandingPage() {
           <div className="mb-[80px]" />
           {/* Screenshot below headline */}
           <div className="w-full flex justify-center">
-            <img src={surveyCreateImg} alt="Survey Example" className="max-w-md w-full rounded-2xl shadow-xl border border-gray-100" />
+            <div className="backdrop-blur-md bg-white/70 rounded-2xl shadow-2xl border border-gray-200 max-w-xl w-full p-8 flex flex-col items-center gap-4">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="inline-flex items-center justify-center rounded-full p-3 bg-blue-100">
+                  <Plus className="w-7 h-7 text-blue-500" />
+                </span>
+                <span className="text-xl font-bold text-gray-900">Создать новый опрос</span>
+              </div>
+              <input
+                type="text"
+                className="w-full px-5 py-4 bg-white/80 text-gray-900 placeholder:text-gray-400 border-none rounded-2xl focus:ring-2 focus:ring-blue-400 outline-none transition-all duration-200 text-lg shadow"
+                placeholder="Введите тему опроса..."
+                value={newSurveyTitle}
+                onChange={e => setNewSurveyTitle(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleCreateSurvey(); }}
+              />
+              <button
+                className="w-full py-3 text-lg rounded-2xl bg-gradient-to-r from-blue-500 to-blue-600 text-white font-semibold shadow hover:from-blue-600 hover:to-blue-700 transition-all duration-200 disabled:opacity-50"
+                onClick={handleCreateSurvey}
+                disabled={!newSurveyTitle.trim()}
+              >
+                Создать опрос
+              </button>
+            </div>
           </div>
         </div>
       </section>

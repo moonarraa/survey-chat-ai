@@ -33,6 +33,7 @@ import SurveyEditPage from "./SurveyEditPage";
 import { BACKEND_URL, getApiUrl } from '../config';
 import { BarChart as RBarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart as RPieChart, Pie, Cell } from 'recharts';
 import { saveAs } from "file-saver";
+import LogoutButton from "./LogoutButton";
 
 function DashboardPage() {
   const [activeTab, setActiveTab] = useState('projects');
@@ -506,18 +507,14 @@ function DashboardPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Top bar */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+        {/* Header */}
+        <div className="flex items-center justify-between px-8 py-4 bg-white shadow-sm border-b">
           <div className="flex items-center gap-4">
-            <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 md:hidden">
-              <Menu className="h-6 w-6" />
-            </button>
-            <button
-              className="btn-primary flex items-center gap-1 text-sm px-4 py-2"
-              onClick={() => navigate("/")}
-            >
-              <ChevronLeft className="h-4 w-4" /> На главную
-            </button>
+            {/* Place for logo or title */}
+            <span className="text-xl font-bold text-primary-700">Survey AI</span>
+          </div>
+          <div>
+            <LogoutButton />
           </div>
         </div>
 
@@ -764,26 +761,32 @@ function DashboardPage() {
                       <div className="flex items-center gap-4">
                         <h1 className="text-3xl font-bold text-gray-900">Мои опросы</h1>
                       </div>
-                      <motion.button
-                        whileHover={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 1.05 }}
-                        whileTap={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 0.95 }}
-                        onClick={handleCreateSurveyClick}
-                        className={`${
-                          hasActiveSurvey || isArchiveTab
-                            ? 'bg-gray-400 cursor-not-allowed' 
-                            : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-xl'
-                        } text-white px-4 py-2 rounded-xl font-semibold shadow-lg transition-all duration-200 flex items-center gap-2`}
-                        title={
-                          isArchiveTab 
-                            ? 'Создание опросов недоступно в архиве' 
-                            : hasActiveSurvey 
-                              ? 'У вас уже есть активный опрос' 
-                              : 'Создать новый опрос'
-                        }
-                      >
-                        <Plus className="h-5 w-5" />
-                        Создать опрос
-                      </motion.button>
+                      <div className="flex items-center space-x-2">
+                        <motion.button
+                          whileHover={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 1.05 }}
+                          whileTap={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 0.95 }}
+                          onClick={handleCreateSurveyClick}
+                          className={`${
+                            hasActiveSurvey || isArchiveTab
+                              ? 'bg-gray-400 cursor-not-allowed' 
+                              : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-xl'
+                          } text-white px-4 py-2 rounded-xl font-semibold shadow-lg transition-all duration-200 flex items-center gap-2`}
+                          title={
+                            isArchiveTab 
+                              ? 'Создание опросов недоступно в архиве' 
+                              : hasActiveSurvey 
+                                ? 'У вас уже есть активный опрос' 
+                                : 'Создать новый опрос'
+                          }
+                        >
+                          <Plus className="h-5 w-5" />
+                          Создать опрос
+                        </motion.button>
+                        <Link to="/create-template-survey" className="btn-secondary-small">
+                          <Plus size={16} className="h-5 w-5" />
+                          MVP Feedback
+                        </Link>
+                      </div>
                     </div>
 
                     {/* Search and Filter */}
