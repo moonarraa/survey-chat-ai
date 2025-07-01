@@ -80,7 +80,7 @@ export default function SurveyEditPage({ id: propId, onClose }) {
         });
         if (res.status === 401) {
           localStorage.removeItem('token');
-          window.location.href = '/login?expired=1';
+          window.location.href = '/login';
           return;
         }
         if (res.ok) {

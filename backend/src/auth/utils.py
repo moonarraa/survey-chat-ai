@@ -10,7 +10,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 SECRET_KEY = settings.secret_key
 ALGORITHM = settings.algorithm
-ACCESS_TOKEN_EXPIRE_MINUTES = settings.access_token_expire_minutes
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -24,15 +23,8 @@ def get_password_hash(password: str) -> str:
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    """Create a JWT access token."""
+    """Create a JWT access token without expiration."""
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(
-            minutes=ACCESS_TOKEN_EXPIRE_MINUTES
-        )
-    to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -40,16 +32,14 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 def decode_access_token(token: str) -> str:
     """
     Decode JWT token and return email.
-    Raises InvalidTokenException or TokenExpiredException.
+    Raises InvalidTokenException.
     """
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM], options={"verify_exp": False})
         email: str = payload.get("sub")
         if email is None:
             raise InvalidTokenException()
         return email
-    except jwt.ExpiredSignatureError:
-        raise TokenExpiredException()
     except JWTError:
         raise InvalidTokenException()
 

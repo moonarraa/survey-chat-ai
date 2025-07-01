@@ -149,7 +149,7 @@ export default function CreateSurveyPage() {
       });
       if (res.status === 401) {
         localStorage.removeItem('token');
-        window.location.href = '/login?expired=1';
+        window.location.href = '/login';
         return;
       }
       if (!res.ok) {

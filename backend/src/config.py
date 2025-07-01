@@ -7,7 +7,6 @@ class Settings(BaseSettings):
     async_database_url: str
     secret_key: str
     algorithm: str
-    access_token_expire_minutes: int
     openai_api_key: str
     google_client_id: str
     google_client_secret: str

@@ -74,7 +74,7 @@ function DashboardPage() {
         } else {
            // Handle error, e.g. redirect to login if 401
            if (res.status === 401) {
-             navigate('/login?expired=1');
+             navigate('/login');
            }
         }
       } catch (error) {
@@ -150,7 +150,7 @@ function DashboardPage() {
       });
       if (res.status === 401) {
         localStorage.removeItem('token');
-        window.location.href = '/login?expired=1';
+        window.location.href = '/login';
         return;
       }
       if (res.ok) {

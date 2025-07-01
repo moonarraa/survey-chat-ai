@@ -26,10 +26,8 @@ class AuthService:
         if not user or not verify_password(password, user.hashed_password):
             raise InvalidCredentialsException()
 
-        access_token_expires = timedelta(hours=1)
         access_token = create_access_token(
-            data={"sub": user.email},
-            expires_delta=access_token_expires
+            data={"sub": user.email}
         )
 
         return {

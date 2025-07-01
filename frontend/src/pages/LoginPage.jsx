@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const expired = new URLSearchParams(location.search).get("expired");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -76,18 +75,6 @@ export default function LoginPage() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white/20 p-8"
         >
-          {expired && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl"
-            >
-              <p className="text-red-600 text-sm text-center">
-                Ваша сессия истекла. Пожалуйста, войдите снова.
-              </p>
-            </motion.div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <motion.div

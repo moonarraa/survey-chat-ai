@@ -119,7 +119,6 @@ async def auth_via_google(request: Request):
     payload = {
         "sub": user_info["email"],
         "name": user_info.get("name"),
-        "exp": datetime.utcnow() + timedelta(hours=1),
     }
     jwt_token = jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
     frontend_url = "https://survey-ai.live" + f"/auth/callback/google?token={jwt_token}"
