@@ -599,21 +599,6 @@ export default function SurveyEditPage({ id: propId, onClose }) {
             <div className="mt-6 flex flex-col items-center">
               <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
               <QRCode ref={qrRef} value={publicUrl} size={160} />
-              <button
-                className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl font-medium transition shadow focus:outline-none focus:ring-2 focus:ring-primary-300"
-                onClick={() => {
-                  const canvas = qrRef.current?.querySelector('canvas');
-                  if (canvas) {
-                    const url = canvas.toDataURL('image/png');
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'survey-qr.png';
-                    a.click();
-                  }
-                }}
-              >
-                Скачать QR
-              </button>
             </div>
           </div>
         )}

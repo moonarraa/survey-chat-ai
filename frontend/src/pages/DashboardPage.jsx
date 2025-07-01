@@ -782,10 +782,6 @@ function DashboardPage() {
                           <Plus className="h-5 w-5" />
                           Создать опрос
                         </motion.button>
-                        <Link to="/create-template-survey" className="btn-secondary-small">
-                          <Plus size={16} className="h-5 w-5" />
-                          MVP Feedback
-                        </Link>
                       </div>
                     </div>
 
