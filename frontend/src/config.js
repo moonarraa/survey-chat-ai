@@ -6,7 +6,7 @@ const normalizeUrl = (url) => {
   return baseUrl;
 };
 
-const rawUrl = import.meta.env.VITE_BACKEND_URL || '//localhost:8000'; // ← protocol-relative fallback
+const rawUrl = import.meta.env.VITE_BACKEND_URL || 'https://survey-ai.live'; // ← Live site fallback
 
 // 2. OPTIONAL: auto-upgrade if someone still passes http:// in prod
 const safeUrl =

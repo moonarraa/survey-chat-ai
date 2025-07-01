@@ -15,8 +15,9 @@ from src.assistant.openai_assistant import (
 import json
 from pydantic import BaseModel
 from typing import Any
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_
 from collections import Counter
+from src.leaderboard.api import broadcast_leaderboard_update
 
 router = APIRouter(tags=["surveys"])
 
@@ -192,6 +193,22 @@ async def submit_public_survey_answer(
         raise HTTPException(status_code=404, detail="Survey not found")
     survey = survey._mapping
     
+    # Check if this IP has already answered
+    if request and request.client:
+        existing_answer = await db.execute(
+            select(SurveyAnswer).where(
+                and_(
+                    SurveyAnswer.survey_id == survey["id"],
+                    SurveyAnswer.ip == request.client.host
+                )
+            )
+        )
+        if existing_answer.first():
+            raise HTTPException(
+                status_code=403,
+                detail="You have already submitted a response for this survey from this IP address."
+            )
+
     # Проверяем, не архивирован ли опрос
     if survey["archived"]:
         raise HTTPException(
@@ -209,6 +226,11 @@ async def submit_public_survey_answer(
     )
     db.add(db_answer)
     await db.commit()
+
+    # If it's a template survey, broadcast the leaderboard update
+    if survey["is_template_survey"]:
+        await broadcast_leaderboard_update(db)
+
     return PublicSurveyAnswerOut(ok=True, message="Ответ успешно сохранён!")
 
 @router.post("/s/{public_id}/next-question")

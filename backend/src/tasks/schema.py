@@ -31,6 +31,12 @@ class Survey(Base):
     public_id = Column(String, unique=True, index=True, nullable=False, default=lambda: secrets.token_urlsafe(6))
     archived = Column(Boolean, default=False, nullable=False)
 
+    # For template-based surveys
+    is_template_survey = Column(Boolean, default=False, nullable=False)
+    app_name = Column(String, nullable=True)
+    app_purpose = Column(Text, nullable=True)
+    app_functionality = Column(Text, nullable=True)
+
 
 class SurveyAnswer(Base):
     __tablename__ = "survey_answers"

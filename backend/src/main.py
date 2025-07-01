@@ -14,6 +14,8 @@ from src.tasks.api import router as tasks_router
 from src.database import get_async_db
 from src.auth.api import router as auth_router
 from src.tasks.survey_api import router as survey_router
+from src.assistant.template_survey import router as template_survey_router
+from src.leaderboard.api import router as leaderboard_router
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -91,6 +93,8 @@ async def log_requests(request, call_next):
 app.include_router(tasks_router, tags=["tasks"])
 app.include_router(auth_router, prefix="/auth")
 app.include_router(survey_router, prefix="/surveys")
+app.include_router(template_survey_router, prefix="/surveys", tags=["surveys"])
+app.include_router(leaderboard_router, prefix="/leaderboard", tags=["leaderboard"])
 
 @app.get("/")
 def read_root():
