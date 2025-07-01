@@ -29,7 +29,7 @@ const LeaderboardPage = () => {
 
         const backendUrl = new URL(BACKEND_URL);
         const wsProtocol = backendUrl.protocol === 'https:' ? 'wss:' : 'ws:';
-        const wsUrl = `${wsProtocol}//${backendUrl.host}/leaderboard/ws/leaderboard`;
+        const wsUrl = `${wsProtocol}//${backendUrl.host}/ws/leaderboard`;
 
         const ws = new WebSocket(wsUrl);
         
