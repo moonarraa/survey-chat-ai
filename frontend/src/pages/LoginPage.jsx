@@ -88,6 +88,8 @@ export default function LoginPage() {
             </motion.div>
           )}
 
+          <OAuthButtons />
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <motion.div
