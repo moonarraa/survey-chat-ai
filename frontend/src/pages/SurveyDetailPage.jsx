@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { QRCode } from "qrcode.react";
+import QRCode from "qrcode.react";
 import ErrorModal from '../components/ErrorModal';
 import { getApiUrl } from '../config';
 import { Plus, Trash2, BarChart2, Edit, Settings, Star, List, Image as ImageIcon, MessageCircle, AlignLeft } from 'lucide-react';
@@ -462,12 +462,6 @@ export default function SurveyDetailPage({ id, onClose }) {
                 <div ref={qrRef}>
                   <QRCode value={publicUrl} size={160} renderAs="canvas" />
                 </div>
-                <button
-                  className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl font-medium transition"
-                  onClick={handleDownloadQR}
-                >
-                  Скачать QR
-                </button>
               </div>
             </div>
           </div>
