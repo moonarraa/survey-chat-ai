@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import QRCode from "react-qr-code";
+import QRCode from "qrcode.react";
 import ErrorModal from '../components/ErrorModal';
 import { getApiUrl } from '../config';
 import { Plus, Trash2, BarChart2, Edit, Settings, Star, List, Image as ImageIcon, MessageCircle, AlignLeft } from 'lucide-react';
@@ -62,6 +62,7 @@ export default function SurveyDetailPage({ id, onClose }) {
   const navigate = useNavigate();
   const [errorModal, setErrorModal] = useState({ open: false, title: '', message: '' });
   const [activeTab, setActiveTab] = useState('questions'); // 'questions', 'analytics', 'settings'
+  const qrRef = useRef(null);
 
   useEffect(() => {
     async function fetchSurvey() {
@@ -167,6 +168,19 @@ export default function SurveyDetailPage({ id, onClose }) {
     const newSurvey = { ...survey };
     newSurvey.questions.splice(qIndex, 1);
     setSurvey(newSurvey);
+  };
+
+  const handleDownloadQR = () => {
+    const canvas = qrRef.current?.querySelector('canvas');
+    if (canvas) {
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'survey-qr.png';
+      a.click();
+    } else {
+      alert('QR-код еще не загрузился. Попробуйте чуть позже.');
+    }
   };
 
   if (loading) return <div className="p-8 text-center">Загрузка...</div>;
@@ -445,19 +459,12 @@ export default function SurveyDetailPage({ id, onClose }) {
               {copySuccess && <span className="text-green-600 text-center w-full mb-4">{copySuccess}</span>}
               <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
               <div className="flex flex-col items-center gap-2">
-                <QRCode id="qr-download" value={publicUrl} size={160} />
+                <div ref={qrRef}>
+                  <QRCode value={publicUrl} size={160} renderAs="canvas" />
+                </div>
                 <button
                   className="mt-4 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-xl font-medium transition"
-                  onClick={() => {
-                    const canvas = document.querySelector('#qr-download canvas');
-                    if (canvas) {
-                      const url = canvas.toDataURL('image/png');
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = 'survey-qr.png';
-                      a.click();
-                    }
-                  }}
+                  onClick={handleDownloadQR}
                 >
                   Скачать QR
                 </button>
