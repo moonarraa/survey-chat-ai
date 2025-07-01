@@ -7,6 +7,7 @@ from authlib.integrations.starlette_client import OAuth # type: ignore
 import jwt
 from datetime import datetime, timedelta
 import uuid
+import os
 
 from src.auth.dependencies import get_current_user
 from src.auth.exceptions import (InvalidCredentialsException,
@@ -121,7 +122,7 @@ async def auth_via_google(request: Request):
         "exp": datetime.utcnow() + timedelta(hours=1),
     }
     jwt_token = jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
-    frontend_url = f"http://localhost:5173/auth/callback/google?token={jwt_token}"
+    frontend_url = "https://survey-ai.live" + f"/auth/callback/google?token={jwt_token}"
     return RedirectResponse(frontend_url)
 
 
