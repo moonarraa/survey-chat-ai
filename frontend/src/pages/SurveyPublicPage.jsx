@@ -51,7 +51,7 @@ export default function SurveyPublicPage() {
 
   useEffect(() => {
     setCopySuccess('');
-  }, [activeTab]);
+  }, []);
 
   const handleInputChange = (e) => {
     setInput(e.target.value);

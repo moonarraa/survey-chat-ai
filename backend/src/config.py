@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import Field
 
 
 class Settings(BaseSettings):
@@ -11,7 +12,7 @@ class Settings(BaseSettings):
     google_client_id: str
     google_client_secret: str
     google_redirect_url: str
-    frontend_url: str
+    frontend_url: str = Field(alias="FRONTEND_URL")
     environment: str = "development"  # По умолчанию development, в Railway переопределим на production
     simple_api_key: str = "change-me-in-production" # Simple key for convenience endpoints
 
