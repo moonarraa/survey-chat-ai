@@ -22,7 +22,9 @@ async def get_current_user(
         return User(
             id=db_user.id,
             email=db_user.email,
-            name=db_user.name
+            name=db_user.name,
+            created_at=db_user.created_at,
+            updated_at=db_user.updated_at
         )
     except (
         InvalidTokenException,
