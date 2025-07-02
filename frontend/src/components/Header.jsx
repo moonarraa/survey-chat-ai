@@ -11,7 +11,6 @@ function Header() {
   const navigation = [
     { name: 'Главная', href: '/' },
     { name: 'Опросы', href: '/dashboard' },
-    { name: 'Leaderboard', href: '/leaderboard' },
     { name: 'Тарифы', href: '/pricing' }
   ];
 

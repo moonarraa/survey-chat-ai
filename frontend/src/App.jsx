@@ -12,7 +12,6 @@ import CreateSurveyPage from './pages/CreateSurveyPage';
 import SurveyDetailPage from './pages/SurveyDetailPage';
 import SurveyPublicPage from './pages/SurveyPublicPage';
 import TemplateSurveyPage from './pages/TemplateSurveyPage';
-import LeaderboardPage from './pages/LeaderboardPage';
 
 function AppLayout() {
   const location = useLocation();
@@ -29,7 +28,6 @@ function AppLayout() {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/leaderboard" element={<LeaderboardPage />} />
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/dashboard/surveys/:id" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/dashboard/surveys/:id/edit" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />

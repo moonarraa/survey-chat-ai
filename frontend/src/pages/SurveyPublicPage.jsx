@@ -205,16 +205,6 @@ export default function SurveyPublicPage() {
                   <MessageCircle className="h-6 w-6 text-white" />
                 </div>
                 <h1 className="text-xl font-bold text-gray-900 flex-1 truncate">{topic}</h1>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => navigate('/leaderboard')}
-                  className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white p-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-1"
-                  title="View MVP Leaderboard"
-                >
-                  <Trophy className="h-5 w-5" />
-                  <span className="hidden sm:inline text-sm font-semibold">Leaderboard</span>
-                </motion.button>
               </div>
               <div className="flex items-center justify-between mt-2">
                 <p className="text-gray-500 text-sm">
