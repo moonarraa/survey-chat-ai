@@ -1043,8 +1043,6 @@ function ProfileSection({ currentUser, surveys }) {
   return (
     <div>
       <div className="mb-4">
-        <div className="font-semibold">Имя:</div>
-        <div className="mb-2">{currentUser?.name || "-"}</div>
         <div className="font-semibold">Email:</div>
         <div>{currentUser?.email || "-"}</div>
       </div>

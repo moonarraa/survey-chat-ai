@@ -32,15 +32,14 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body,
       });
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.detail || "Ошибка входа. Проверьте email и пароль.");
-        setIsSubmitting(false);
-        return;
-      }
       const data = await res.json();
-      localStorage.setItem("token", data.access_token);
-      navigate("/dashboard");
+      console.log("Login response:", data);
+      if (res.ok && data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        navigate("/dashboard");
+      } else {
+        setError(data.detail || "Ошибка: токен не получен от сервера.");
+      }
     } catch (err) {
       setError("Ошибка сети. Попробуйте позже.");
     } finally {
