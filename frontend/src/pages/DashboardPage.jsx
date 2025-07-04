@@ -142,7 +142,7 @@ function DashboardPage() {
       params.append('archived', 'true');
     }
     
-    let url = getApiUrl(`/api/surveys?${params.toString()}`);
+    let url = getApiUrl(`api/surveys?${params.toString()}`);
 
     try {
       const res = await fetch(url, {
@@ -195,7 +195,7 @@ function DashboardPage() {
     setAnalytics(null);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(getApiUrl(`surveys/${surveyId}/analytics`), {
+      const res = await fetch(getApiUrl(`api/surveys/${surveyId}/analytics`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -221,7 +221,7 @@ function DashboardPage() {
   const confirmDelete = async () => {
     if (!surveyToDelete) return;
     const token = localStorage.getItem('token');
-    const res = await fetch(getApiUrl(`surveys/${surveyToDelete}`), {
+    const res = await fetch(getApiUrl(`api/surveys/${surveyToDelete}`), {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -239,7 +239,7 @@ function DashboardPage() {
 
   const handleArchive = async (surveyId) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(getApiUrl(`surveys/${surveyId}/archive`), {
+    const res = await fetch(getApiUrl(`api/surveys/${surveyId}/archive`), {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -256,7 +256,7 @@ function DashboardPage() {
 
   const handleRestore = async (surveyId) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(getApiUrl(`surveys/${surveyId}/restore`), {
+    const res = await fetch(getApiUrl(`api/surveys/${surveyId}/restore`), {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` }
     });

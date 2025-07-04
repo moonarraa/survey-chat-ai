@@ -25,7 +25,7 @@ export default function TemplateSurveyPage() {
                 return;
             }
 
-            const response = await fetch(getApiUrl('surveys/from-template'), {
+            const response = await fetch(getApiUrl('api/surveys/from-template'), {
                  method: 'POST',
                  headers: { 
                     'Content-Type': 'application/json',

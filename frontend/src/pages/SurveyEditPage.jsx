@@ -75,7 +75,7 @@ export default function SurveyEditPage({ id: propId, onClose }) {
       setLoading(true);
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch(getApiUrl(`surveys/${id}`), {
+        const res = await fetch(getApiUrl(`api/surveys/${id}`), {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.status === 401) {
@@ -89,7 +89,7 @@ export default function SurveyEditPage({ id: propId, onClose }) {
           setQuestions(data.questions);
           // Загружаем ответы, если есть public_id
           if (data.public_id) {
-            const res2 = await fetch(getApiUrl(`surveys/s/${data.public_id}/answers`));
+            const res2 = await fetch(getApiUrl(`api/surveys/s/${data.public_id}/answers`));
             if (res2.ok) {
               const answers = await res2.json();
               setResponses(answers);
@@ -182,7 +182,7 @@ export default function SurveyEditPage({ id: propId, onClose }) {
     setSuccess("");
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(getApiUrl(`surveys/${id}`), {
+      const res = await fetch(getApiUrl(`api/surveys/${id}`), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

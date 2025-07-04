@@ -69,7 +69,7 @@ export default function SurveyDetailPage({ id, onClose }) {
       setLoading(true);
       const token = localStorage.getItem("token");
       try {
-        const res = await fetch(getApiUrl(`surveys/${id}`), {
+        const res = await fetch(getApiUrl(`api/surveys/${id}`), {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.status === 401) {
@@ -97,7 +97,7 @@ export default function SurveyDetailPage({ id, onClose }) {
   const handleSave = async () => {
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(getApiUrl(`surveys/${id}`), {
+      const res = await fetch(getApiUrl(`api/surveys/${id}`), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
