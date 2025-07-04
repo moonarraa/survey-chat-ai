@@ -142,7 +142,7 @@ function DashboardPage() {
       params.append('archived', 'true');
     }
     
-    let url = getApiUrl(`api/surveys?${params.toString()}`);
+    let url = getApiUrl(`api/surveys/?${params.toString()}`);
 
     try {
       const res = await fetch(url, {
