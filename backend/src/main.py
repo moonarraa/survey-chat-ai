@@ -25,6 +25,9 @@ app = FastAPI()
 
 # Список разрешенных origins
 origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:8000",
     "https://survey-ai.live",
     "https://www.survey-ai.live"
 ]
@@ -82,7 +85,7 @@ async def log_requests(request, call_next):
 
 app.include_router(tasks_router, tags=["tasks"])
 app.include_router(auth_router, prefix="/auth")
-app.include_router(survey_router, prefix="/surveys")
+app.include_router(survey_router, prefix="/api/surveys")
 app.include_router(template_survey_router, prefix="/surveys", tags=["surveys"])
 app.include_router(leaderboard_router, prefix="/leaderboard", tags=["leaderboard"])
 
