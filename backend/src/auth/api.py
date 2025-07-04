@@ -146,7 +146,7 @@ async def auth_via_google(request: Request, db: AsyncSession = Depends(get_async
     )
 
     # Используем FRONTEND_URL из настроек вместо жестко заданного
-    frontend_url = f"{settings.frontend_url}/auth/callback?token={access_token}"
+    frontend_url = f"{settings.frontend_url}/auth/callback/google?token={access_token}"
     # Обратите внимание, я изменил путь на /auth/callback в соответствии с вашим AuthCallback.jsx
     # Если у вас роут /auth/callback/google, верните его.
     
