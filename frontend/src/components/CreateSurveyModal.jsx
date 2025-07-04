@@ -163,7 +163,7 @@ export default function CreateSurveyModal({ onSuccess }) {
         return;
       }
       const token = localStorage.getItem("token");
-      const res = await fetch(`${BACKEND_URL}/surveys/`, {
+      const res = await fetch(`/api/surveys/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
