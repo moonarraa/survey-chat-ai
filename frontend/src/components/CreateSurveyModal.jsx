@@ -145,7 +145,7 @@ export default function CreateSurveyModal({ onSuccess }) {
     setIsSubmitting(true);
     try {
       // Generate questions
-      const resGen = await fetch(`${BACKEND_URL}/surveys/generate-questions-advanced`, {
+      const resGen = await fetch(`/api/surveys/generate-questions-advanced`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ context, n: 6 })
