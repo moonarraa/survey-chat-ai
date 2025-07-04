@@ -147,7 +147,7 @@ async def auth_via_google(request: Request, db: AsyncSession = Depends(get_async
 
     # ПРАВИЛЬНО: Редирект на эндпоинт ФРОНТЕНДА, который умеет обрабатывать токен
     # Путь /auth/callback соответствует вашему компоненту AuthCallback.jsx
-    frontend_url = f"{settings.frontend_url}/auth/callback?token={jwt_token}"
+    frontend_url = f"{settings.frontend_url}/auth/callback?token={access_token}"
     # Если у вас роут /auth/callback/google, верните его.
     
     return RedirectResponse(frontend_url)
