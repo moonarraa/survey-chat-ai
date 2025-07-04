@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import OAuthButtons from "../components/OAuthButtons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -36,8 +36,13 @@ export default function LoginPage() {
       console.log("Login response:", data);
       if (res.ok && data.access_token) {
         localStorage.setItem("token", data.access_token);
-        navigate("/dashboard");
+        console.log("Token saved to localStorage:", data.access_token);
+        setTimeout(() => {
+          console.log("About to redirect to dashboard or reload page");
+          navigate("/dashboard");
+        }, 0);
       } else {
+        console.log("Login failed or no access_token in response");
         setError(data.detail || "Ошибка: токен не получен от сервера.");
       }
     } catch (err) {

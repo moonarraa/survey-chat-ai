@@ -75,16 +75,19 @@ function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      if (!res.ok) {
-        const data = await res.json();
-        // Show backend error (e.g. user exists)
-        setErrors({ api: data.detail || 'Ошибка регистрации' });
-        setIsSubmitting(false);
-        return;
-      }
       const data = await res.json();
-      localStorage.setItem('token', data.access_token);
-      navigate('/dashboard');
+      console.log("Register response:", data);
+      if (res.ok && data.access_token) {
+        localStorage.setItem('token', data.access_token);
+        console.log("Token saved to localStorage:", data.access_token);
+        setTimeout(() => {
+          console.log("About to redirect to dashboard or reload page");
+          navigate('/dashboard');
+        }, 0);
+      } else {
+        console.log("Registration failed or no access_token in response");
+        setErrors({ api: data.detail || 'Ошибка регистрации' });
+      }
     } catch (error) {
       setErrors({ api: 'Ошибка сети. Попробуйте позже.' });
       console.error('Registration error:', error);
