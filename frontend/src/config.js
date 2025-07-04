@@ -6,21 +6,24 @@ const normalizeUrl = (url) => {
   return baseUrl;
 };
 
-const rawUrl = import.meta.env.VITE_BACKEND_URL || 'https://survey-ai.live'; // ← Live site fallback
+const isProduction = process.env.NODE_ENV === 'production';
+export const BACKEND_URL = isProduction 
+  ? 'https://survey-ai.live' // Ваш продакшен URL бэкенда
+  : 'http://localhost:8000'; // Ваш локальный URL бэкенда
 
 // 2. OPTIONAL: auto-upgrade if someone still passes http:// in prod
 const safeUrl =
-  window.location.protocol === 'https:' && rawUrl.startsWith('http://')
-    ? rawUrl.replace('http://', 'https://')
-    : rawUrl;
+  window.location.protocol === 'https:' && BACKEND_URL.startsWith('http://')
+    ? BACKEND_URL.replace('http://', 'https://')
+    : BACKEND_URL;
 
-export const BACKEND_URL = normalizeUrl(safeUrl);
+export const BACKEND_URL_NORMALIZED = normalizeUrl(safeUrl);
 
 // Helper function to construct API URLs
 export const getApiUrl = (path) => {
   // Remove leading slash if present
   const cleanPath = path.startsWith('/') ? path.slice(1) : path;
-  return `${BACKEND_URL}/${cleanPath}`;
+  return `${BACKEND_URL_NORMALIZED}/${cleanPath}`;
 };
 
 // Other configuration variables can be added here

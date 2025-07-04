@@ -91,3 +91,9 @@ class AuthService:
         """Delete user account."""
         user = await UserDAO.get_user_by_id_or_raise(user_id, db)
         return await UserDAO.delete_user(user, db)
+    
+    @staticmethod
+    async def create_access_token(user_id: int, db: AsyncSession) -> str:
+        """Create access token for user."""
+        user = await UserDAO.get_user_by_id_or_raise(user_id, db)
+        return create_access_token(data={"sub": user.email})

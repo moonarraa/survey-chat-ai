@@ -31,7 +31,7 @@ function AppLayout() {
           <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/dashboard/surveys/:id" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
           <Route path="/dashboard/surveys/:id/edit" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
-          <Route path="/auth/callback/google" element={<AuthCallback />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/create-survey" element={<ProtectedRoute><CreateSurveyPage /></ProtectedRoute>} />
           <Route path="/create-template-survey" element={<ProtectedRoute><TemplateSurveyPage /></ProtectedRoute>} />
           <Route path="/survey/:id" element={<ProtectedRoute><SurveyDetailPage /></ProtectedRoute>} />

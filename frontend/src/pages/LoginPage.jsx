@@ -161,10 +161,8 @@ export default function LoginPage() {
                 "Войти в аккаунт"
               )}
             </motion.button>
-          </form>
 
-          <div className="mt-6">
-            <div className="relative">
+            <div className="mt-6 relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
               </div>
@@ -173,7 +171,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-          </div>
+            <OAuthButtons />
+          </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">

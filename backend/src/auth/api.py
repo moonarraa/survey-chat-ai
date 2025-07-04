@@ -17,6 +17,7 @@ from src.tasks.service import AuthService
 from src.database import get_async_db
 from src.config import settings
 from src.tasks.crud import UserDAO
+from src.auth.utils import create_access_token
 
 router = APIRouter()
 
@@ -105,25 +106,53 @@ async def login_via_google(request: Request):
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
+# api.py
+
 @router.get('/callback/google')
-async def auth_via_google(request: Request):
+async def auth_via_google(request: Request, db: AsyncSession = Depends(get_async_db)): # Добавил зависимость для БД
     token = await oauth.google.authorize_access_token(request)
-    print("TOKEN:", token)
     user_info = token.get("userinfo")
     if not user_info:
-        # fallback to parsing id_token if userinfo is not present
         if "id_token" not in token:
             raise HTTPException(status_code=400, detail="No id_token in token response from Google")
         user_info = await oauth.google.parse_id_token(request, token)
-    # Generate JWT for the user
-    payload = {
-        "sub": user_info["email"],
-        "name": user_info.get("name"),
-    }
-    jwt_token = jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
-    frontend_url = "https://survey-ai.live" + f"/auth/callback/google?token={jwt_token}"
-    return RedirectResponse(frontend_url)
 
+
+    # --- Начало изменений ---
+
+    # Проверяем, есть ли такой пользователь в базе, если нет - создаем
+    email = user_info["email"]
+    user = await UserDAO.get_user_by_email(email, db)
+    if not user:
+        # Создаем нового пользователя, если он вошел через Google впервые
+        new_user_data = UserCredentials(
+            email=email,
+            password=uuid.uuid4().hex # Генерируем случайный пароль, он не будет использоваться
+        )
+        # Предполагается, что AuthService.register_user вернет токен, но нам здесь нужен пользователь
+        # Лучше использовать UserDAO напрямую для создания
+        user = await UserDAO.create_user(
+            email=email,
+            hashed_password="" # Пароль не нужен для OAuth юзеров
+        )
+        await db.commit()
+        await db.refresh(user)
+
+
+    # Создаем наш внутренний токен доступа
+    access_token_expires = timedelta(minutes=settings.access_token_expire_minutes)
+    access_token = create_access_token(
+        data={"sub": user.email}, expires_delta=access_token_expires
+    )
+
+    # Используем FRONTEND_URL из настроек вместо жестко заданного
+    frontend_url = f"{settings.frontend_url}/auth/callback?token={access_token}"
+    # Обратите внимание, я изменил путь на /auth/callback в соответствии с вашим AuthCallback.jsx
+    # Если у вас роут /auth/callback/google, верните его.
+    
+    return RedirectResponse(frontend_url)
+    
+    # --- Конец изменений ---
 
 @router.post("/users/generate-tg-link-code")
 async def generate_tg_link_code(
