@@ -147,10 +147,9 @@ async def auth_via_google(request: Request, db: AsyncSession = Depends(get_async
 
     # ПРАВИЛЬНО: Редирект на эндпоинт ФРОНТЕНДА, который умеет обрабатывать токен
     # Путь /auth/callback соответствует вашему компоненту AuthCallback.jsx
-    frontend_url = f"{settings.frontend_url}/auth/callback?token={access_token}"
-    # Если у вас роут /auth/callback/google, верните его.
-    
-    return RedirectResponse(frontend_url)
+    frontend = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    frontend_url = f"{frontend}/auth/callback?token={access_token}"
+    return RedirectResponse(url=frontend_url, status_code=302)
     
     # --- Конец изменений ---
 
