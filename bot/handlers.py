@@ -2,7 +2,7 @@ from aiogram import Router, F, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from . import api
+import api
 import httpx
 from .config import BACKEND_URL, BOT_API_TOKEN
 
