@@ -18,6 +18,7 @@ from typing import Any
 from sqlalchemy import select, func, and_
 from collections import Counter
 from src.leaderboard.api import broadcast_leaderboard_update
+import os
 
 router = APIRouter(tags=["surveys"])
 
@@ -80,8 +81,11 @@ async def create_survey(
             status_code=400,
             detail="У вас уже есть активный опрос. Пожалуйста, архивируйте его перед созданием нового."
         )
-    
-    return await SurveyDAO.create_survey(current_user.id, survey.topic, survey.questions, db)
+    survey_obj = await SurveyDAO.create_survey(current_user.id, survey.topic, survey.questions, db)
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    public_url = f"{frontend_url}/s/{survey_obj.public_id}"
+    # Return all SurveyOut fields plus public_url
+    return {**survey_obj.model_dump(), "public_url": public_url}
 
 @router.get("/", response_model=list[SurveyOut])
 async def list_surveys(

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ErrorModal from '../components/ErrorModal';
 import { BACKEND_URL } from '../config';
+import QRCode from 'react-qr-code';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple choice" },
@@ -33,6 +34,8 @@ export default function CreateSurveyPage() {
   const [questions, setQuestions] = useState([]);
   const [errorModal, setErrorModal] = useState({ open: false, title: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [createdSurvey, setCreatedSurvey] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
   const navigate = useNavigate();
 
   const handleTypeChange = (idx, type) => {
@@ -121,7 +124,6 @@ export default function CreateSurveyPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ context, n: 5 }),
         referrerPolicy: "unsafe-url" 
-        //TODO: remove this
       });
       if (!resGen.ok) {
         setErrorModal({ open: true, title: 'Ошибка генерации', message: 'Не удалось сгенерировать вопросы. Попробуйте позже.' });
@@ -145,7 +147,6 @@ export default function CreateSurveyPage() {
         },
         body: JSON.stringify({ topic: context, questions }),
         referrerPolicy: "unsafe-url" 
-        //TODO: remove this
       });
       if (res.status === 401) {
         localStorage.removeItem('token');
@@ -158,10 +159,13 @@ export default function CreateSurveyPage() {
         setIsSubmitting(false);
         return;
       }
-      navigate("/dashboard");
+      const surveyData = await res.json();
+      setCreatedSurvey(surveyData);
+      setShowShareModal(true);
+      setIsSubmitting(false);
+      // Do not navigate immediately
     } catch (err) {
       setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение к интернету и попробуйте ещё раз.' });
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -198,8 +202,45 @@ export default function CreateSurveyPage() {
             {isSubmitting ? <><Spinner /> Создание...</> : "Создать опрос"}
           </button>
         </form>
+        {showShareModal && createdSurvey && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 p-4">
+            <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg relative w-full max-w-lg flex flex-col items-center">
+              <button
+                onClick={() => { setShowShareModal(false); navigate('/dashboard'); }}
+                className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
+                aria-label="Закрыть"
+              >×</button>
+              <div className="text-lg font-semibold mb-6 text-center">Опрос создан! Поделитесь ссылкой с респондентами</div>
+              <div className="flex flex-col gap-4 w-full mb-8">
+                <button
+                  className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition text-lg"
+                  style={{ minWidth: 220 }}
+                  onClick={() => {navigator.clipboard.writeText(createdSurvey.public_url || `${window.location.origin}/s/${createdSurvey.public_id}`);}}
+                >
+                  Скопировать публичную ссылку
+                </button>
+                <button
+                  className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition text-lg"
+                  style={{ minWidth: 220 }}
+                  onClick={() => {navigator.clipboard.writeText(`https://t.me/survey_chat_ai_bot?start=${createdSurvey.public_id}`);}}
+                >
+                  Скопировать ссылку на Telegram
+                </button>
+              </div>
+              <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
+              <div className="flex flex-col items-center gap-2">
+                <QRCode value={createdSurvey.public_url || `${window.location.origin}/s/${createdSurvey.public_id}`} size={160} />
+              </div>
+            </div>
+          </div>
+        )}
+        <ErrorModal
+          open={errorModal.open}
+          onClose={() => setErrorModal({ open: false, title: '', message: '' })}
+          title={errorModal.title}
+          message={errorModal.message}
+        />
       </div>
-      <ErrorModal open={errorModal.open} title={errorModal.title} message={errorModal.message} onClose={() => setErrorModal({ open: false, title: '', message: '' })} />
     </div>
   );
 }

@@ -9,78 +9,46 @@ from .config import BACKEND_URL, BOT_API_TOKEN
 router = Router()
 
 class SurveyStates(StatesGroup):
-    waiting_for_context = State()
     answering = State()
 
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
-    parts = message.text.strip().split()
-    if len(parts) == 2:
-        public_id = parts[1]
-        try:
-            survey = await api.get_survey_by_public_id(public_id)
-        except Exception:
-            await message.answer("Опрос не найден или недоступен.")
-            return
-        await state.update_data(
-            public_id=public_id,
-            questions=survey["questions"],
-            topic=survey.get("topic", "Опрос"),
-            answers=[],
-            current=0
-        )
-        await message.answer(f"Опрос: {survey.get('topic', '')}\n\n{survey['questions'][0]['text']}")
-        await state.set_state(SurveyStates.answering)
-    else:
-        await message.answer(
-            "👋 Привет! Я помогу быстро собрать фидбек о твоём продукте.\n\n" \
-            "Команды:\n" \
-            "/create_survey — создать опрос\n" \
-            "/results — посмотреть аналитику\n\n" \
-            "Чтобы пройти опрос, перейдите по специальной ссылке из сайта."
-        )
-
-@router.message(Command("create_survey"))
-async def cmd_create_survey(message: types.Message, state: FSMContext):
-    await message.answer("Опиши цель или контекст опроса (например, 'Фидбек о приложении для учёта расходов'):")
-    await state.set_state(SurveyStates.waiting_for_context)
-
-@router.message(SurveyStates.waiting_for_context)
-async def process_context(message: types.Message, state: FSMContext):
-    context = message.text.strip()
-    await message.answer("Генерирую опрос... ⏳")
-    try:
-        FRONTEND_URL = "https://survey-ai.up.railway.app"
-        survey = await api.create_survey(context, message.from_user.id)
-        link = f"{FRONTEND_URL}/s/{survey['public_id']}"
-        await message.answer(f"Готово! Вот ссылка на опрос:\n{link}\n\nОтправь её тестировщикам или добавь на лендинг.")
-    except Exception as e:
-        import traceback
-        traceback.print_exc()
-        await message.answer(f"Ошибка: {e}")
+    await message.answer(
+        "👋 Привет! Я бот для прохождения опросов.\n\n" \
+        "Чтобы пройти опрос, отправьте мне ссылку на опрос или его код (например: s/abc123)."
+    )
     await state.clear()
 
-@router.message(Command("link"))
-async def cmd_link(message: types.Message):
-    import traceback
-    try:
-        parts = message.text.strip().split()
+@router.message(lambda message: message.text and (message.text.startswith("http") or message.text.startswith("s/")))
+async def handle_survey_link_or_code(message: types.Message, state: FSMContext):
+    # Extract public_id from link or code
+    text = message.text.strip()
+    if text.startswith("http"):
+        # Assume link format: .../s/<public_id>
+        parts = text.split("/s/")
         if len(parts) != 2:
-            await message.answer("Пожалуйста, отправьте команду в формате: /link <код>")
+            await message.answer("Не удалось распознать ссылку. Пожалуйста, отправьте корректную ссылку на опрос.")
             return
-        code = parts[1]
-        await message.answer("Пробую привязать Telegram...")  # Для отладки
-        async with httpx.AsyncClient() as client:
-            res = await client.post(
-                f"{BACKEND_URL}/auth/users/link-telegram",
-                json={"tg_link_code": code, "tg_user_id": str(message.from_user.id)},
-                headers={"Authorization": f"Bearer {BOT_API_TOKEN}"}
-            )
-            res.raise_for_status()
-        await message.answer("Ваш Telegram успешно привязан к аккаунту!")
-    except Exception as e:
-        traceback.print_exc()
-        await message.answer(f"Ошибка при привязке: {e}")
+        public_id = parts[1].split("/")[0]
+    elif text.startswith("s/"):
+        public_id = text[2:]
+    else:
+        await message.answer("Пожалуйста, отправьте ссылку на опрос или его код (например: s/abc123).")
+        return
+    try:
+        survey = await api.get_survey_by_public_id(public_id)
+    except Exception:
+        await message.answer("Опрос не найден или недоступен.")
+        return
+    await state.update_data(
+        public_id=public_id,
+        questions=survey["questions"],
+        topic=survey.get("topic", "Опрос"),
+        answers=[],
+        current=0
+    )
+    await message.answer(f"Опрос: {survey.get('topic', '')}\n\n{survey['questions'][0]['text']}")
+    await state.set_state(SurveyStates.answering)
 
 @router.message(SurveyStates.answering)
 async def process_survey_answer(message: types.Message, state: FSMContext):
