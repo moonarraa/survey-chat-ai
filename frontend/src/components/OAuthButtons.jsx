@@ -29,7 +29,7 @@ export default function OAuthButtons({ onGoogleClick }) {
       style={{ boxShadow: '0 1px 2px rgba(60,64,67,.08)' }}
     >
       <GoogleIcon />
-      Войти через GOOGLE
+      Войти через Google
     </button>
   );
 }
