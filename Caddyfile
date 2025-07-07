@@ -1,0 +1,14 @@
+   survey-ai.live, www.survey-ai.live {
+       reverse_proxy /api/* backend:8000
+       reverse_proxy /auth/* backend:8000
+       reverse_proxy /surveys/* backend:8000
+       reverse_proxy /docs/* backend:8000
+       reverse_proxy /redoc/* backend:8000
+       reverse_proxy /openapi.json backend:8000
+       reverse_proxy /static/* backend:8000
+
+       root * /frontend/dist
+       file_server
+
+       try_files {path} /index.html
+   }
