@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 import json
+import os
+from openai import AzureOpenAI
 
 from src.database import get_async_db
 from src.tasks.models import User
 from src.auth.dependencies import get_current_user
 from src.tasks.schema import Survey
 from src.config import settings
-
-import openai
 
 router = APIRouter()
 
@@ -33,7 +33,11 @@ async def create_survey_from_template(
     Creates a new survey from a template, using AI to generate questions.
     """
     try:
-        client = openai.AsyncOpenAI(api_key=settings.openai_api_key)
+        client = AzureOpenAI(
+            api_version="2025-01-01-preview",
+            azure_endpoint="https://surveyai-resource.openai.azure.com/",
+            api_key=os.getenv("AZURE_OPENAI_KEY"),
+        )
         prompt = f"""
         Generate 3 open-ended questions for a survey about an application with the following details:
         - Application Name: {request.app_name}
@@ -45,7 +49,7 @@ async def create_survey_from_template(
         ["What was your initial reaction to the app?", "What features did you find most useful?", "Is there anything you would change?"]
         """
         response = await client.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7,
         )
