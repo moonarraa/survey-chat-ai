@@ -90,7 +90,7 @@ function LandingPage() {
       <section className="relative min-h-[70vh] flex flex-col items-center justify-center bg-white">
         <div className="w-full max-w-2xl flex flex-col items-center justify-center text-center px-4">
           <div className="mt-[120px]" />
-          <h1 className="text-5xl font-bold text-black mb-4">AI-опросы за 2 минуты</h1>
+          <h1 className="text-5xl font-bold text-black mb-4">AI-опросы за 3 минуты</h1>
           <div className="text-xl text-primary-600 font-semibold h-8 mb-2">
             <Typewriter
               words={["Создайте опрос за 2 минуты...", "Получайте честные ответы...", "Всё просто, быстро, AI!"]}
