@@ -1,5 +1,5 @@
 import httpx
-from .config import BACKEND_URL
+from config import BACKEND_URL
 
 async def get_survey_by_public_id(public_id: str):
     async with httpx.AsyncClient() as client:

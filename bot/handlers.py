@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 import api
 import httpx
-from .config import BACKEND_URL, BOT_API_TOKEN
+from config import BACKEND_URL, BOT_API_TOKEN
 
 router = Router()
 
