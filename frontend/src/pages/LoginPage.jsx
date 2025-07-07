@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"
 import OAuthButtons from "../components/OAuthButtons";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -12,7 +12,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
-  const expired = new URLSearchParams(location.search).get("expired");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -33,15 +32,19 @@ export default function LoginPage() {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body,
       });
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.detail || "Ошибка входа. Проверьте email и пароль.");
-        setIsSubmitting(false);
-        return;
-      }
       const data = await res.json();
-      localStorage.setItem("token", data.access_token);
-      navigate("/dashboard");
+      console.log("Login response:", data);
+      if (res.ok && data.access_token) {
+        localStorage.setItem("token", data.access_token);
+        console.log("Token saved to localStorage:", data.access_token);
+        setTimeout(() => {
+          console.log("About to redirect to dashboard or reload page");
+          navigate("/dashboard");
+        }, 0);
+      } else {
+        console.log("Login failed or no access_token in response");
+        setError(data.detail || "Ошибка: токен не получен от сервера.");
+      }
     } catch (err) {
       setError("Ошибка сети. Попробуйте позже.");
     } finally {
@@ -58,14 +61,6 @@ export default function LoginPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
         >
-          <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mx-auto h-16 w-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
-          >
-            <User className="h-8 w-8 text-white" />
-          </motion.div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Добро пожаловать!</h1>
           <p className="text-gray-600">Войдите в свой аккаунт Survey AI</p>
         </motion.div>
@@ -76,18 +71,6 @@ export default function LoginPage() {
           transition={{ duration: 0.6, delay: 0.1 }}
           className="bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl border border-white/20 p-8"
         >
-          {expired && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl"
-            >
-              <p className="text-red-600 text-sm text-center">
-                Ваша сессия истекла. Пожалуйста, войдите снова.
-              </p>
-            </motion.div>
-          )}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
               <motion.div
@@ -170,10 +153,8 @@ export default function LoginPage() {
                 "Войти в аккаунт"
               )}
             </motion.button>
-          </form>
 
-          <div className="mt-6">
-            <div className="relative">
+            <div className="mt-6 relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300" />
               </div>
@@ -182,7 +163,8 @@ export default function LoginPage() {
               </div>
             </div>
 
-          </div>
+            <OAuthButtons />
+          </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">

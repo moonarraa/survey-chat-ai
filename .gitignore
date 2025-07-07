@@ -50,15 +50,6 @@ logs/
 log/
 *.log.*
 
-# Build
-dist/
-build/
-out/
-coverage/
-*.egg-info/
-.eggs/
-*.egg
-
 # Misc
 *.bak
 *.swp
@@ -67,8 +58,6 @@ coverage/
 *.old
 
 # Frontend build
-frontend/dist/
-frontend/build/
 frontend/.next/
 frontend/.nuxt/
 frontend/.cache/
@@ -96,3 +85,5 @@ backend/alembic/versions/__pycache__/
 # OS
 Thumbs.db
 ehthumbs.db
+
+backup.sql

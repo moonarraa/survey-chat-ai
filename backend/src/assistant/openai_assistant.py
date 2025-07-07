@@ -1,16 +1,20 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-import openai
 import os
+from openai import AzureOpenAI
 import json
 
-client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = AzureOpenAI(
+    api_version="2025-01-01-preview",
+    azure_endpoint="https://surveyai-resource.openai.azure.com/",
+    api_key=os.getenv("AZURE_OPENAI_KEY"),
+)
 
 def ai_generate_first_question(topic):
     prompt = f"Сформулируй первый открытый вопрос для опроса на тему: \"{topic}\"."
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "Ты — AI-бот для опросов."},
             {"role": "user", "content": prompt}
@@ -28,7 +32,7 @@ def ai_generate_questions_for_topic(topic, n=5):
         "Верни только список вопросов, по одному на строку, без нумерации и лишнего текста."
     )
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "Ты — AI-бот для опросов."},
             {"role": "user", "content": prompt}
@@ -70,7 +74,7 @@ def ai_is_meaningful_answer(answer, question=None):
         "Ответь только 'YES' если ответ осмысленный, иначе 'NO'."
     )
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "Ты — AI-бот для проверки качества ответов на опросы."},
             {"role": "user", "content": prompt}
@@ -98,7 +102,7 @@ def ai_generate_followup_question(topic, history, last_answer):
         "Если респондент уже дал исчерпывающий ответ, предложи подытожить или спроси о чувствах/эмоциях по теме."
     )
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "Ты — AI-бот для опросов."},
             {"role": "user", "content": prompt}
@@ -117,7 +121,7 @@ def ai_analyze_answers(topic, history):
         "Сделай краткое резюме для заказчика опроса."
     )
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "Ты — AI-бот для анализа опросов."},
             {"role": "user", "content": prompt}
@@ -143,7 +147,7 @@ def ai_generate_advanced_questions_for_context(context, n=6):
         "Верни только JSON-массив, без пояснений и текста вокруг. Вопросы должны быть максимально разнообразными по типу."
     )
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "Ты — AI-бот для опросов."},
             {"role": "user", "content": prompt}
@@ -180,7 +184,7 @@ def ai_is_meaningful_context(context: str) -> bool:
     
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             messages=[
                 {"role": "system", "content": "Ты — AI-ассистент, который помогает в создании качественных опросов."},
                 {"role": "user", "content": prompt}

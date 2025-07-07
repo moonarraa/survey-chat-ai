@@ -9,9 +9,11 @@ function RegisterPage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
@@ -50,6 +52,12 @@ function RegisterPage() {
       newErrors.password = 'Пароль должен содержать минимум 8 символов';
     }
     
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Повторите пароль';
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Пароли не совпадают';
+    }
+    
     return newErrors;
   };
 
@@ -67,16 +75,19 @@ function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       });
-      if (!res.ok) {
-        const data = await res.json();
-        // Show backend error (e.g. user exists)
-        setErrors({ api: data.detail || 'Ошибка регистрации' });
-        setIsSubmitting(false);
-        return;
-      }
       const data = await res.json();
-      localStorage.setItem('token', data.access_token);
-      navigate('/dashboard');
+      console.log("Register response:", data);
+      if (res.ok && data.access_token) {
+        localStorage.setItem('token', data.access_token);
+        console.log("Token saved to localStorage:", data.access_token);
+        setTimeout(() => {
+          console.log("About to redirect to dashboard or reload page");
+          navigate('/dashboard');
+        }, 0);
+      } else {
+        console.log("Registration failed or no access_token in response");
+        setErrors({ api: data.detail || 'Ошибка регистрации' });
+      }
     } catch (error) {
       setErrors({ api: 'Ошибка сети. Попробуйте позже.' });
       console.error('Registration error:', error);
@@ -94,18 +105,15 @@ function RegisterPage() {
         className="max-w-md w-full space-y-8"
       >
         {/* Header */}
-        <div className="text-center">
-          <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mx-auto h-16 w-16 bg-primary-600 rounded-2xl flex items-center justify-center mb-6"
-          >
-            <User className="h-8 w-8 text-white" />
-          </motion.div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Создать аккаунт</h2>
-          <p className="text-gray-600">Присоединяйтесь к  AI</p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Создать аккаунт</h1>
+          <p className="text-gray-600">Зарегистрируйтесь в Survey AI</p>
+        </motion.div>
 
         {/* Registration Form */}
         <motion.div
@@ -233,6 +241,49 @@ function RegisterPage() {
               )}
             </div>
 
+            {/* Confirm Password Field */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                Повторите пароль
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={formData.confirmPassword}
+                  onChange={handleInputChange}
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 ${
+                    errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                  placeholder="Повторите пароль"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  )}
+                </button>
+              </div>
+              {errors.confirmPassword && (
+                <motion.p
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-1 text-sm text-red-600"
+                >
+                  {errors.confirmPassword}
+                </motion.p>
+              )}
+            </div>
+
             {/* Submit Button */}
             <motion.button
               type="submit"
@@ -253,6 +304,19 @@ function RegisterPage() {
                 </>
               )}
             </motion.button>
+
+            {/* Divider */}
+            <div className="mt-6 relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">или</span>
+              </div>
+            </div>
+
+            {/* Google OAuth Button */}
+            <OAuthButtons />
           </form>
 
           {/* Login Link */}

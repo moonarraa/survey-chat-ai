@@ -33,6 +33,7 @@ import SurveyEditPage from "./SurveyEditPage";
 import { BACKEND_URL, getApiUrl } from '../config';
 import { BarChart as RBarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart as RPieChart, Pie, Cell } from 'recharts';
 import { saveAs } from "file-saver";
+import LogoutButton from "./LogoutButton";
 
 function DashboardPage() {
   const [activeTab, setActiveTab] = useState('projects');
@@ -73,7 +74,7 @@ function DashboardPage() {
         } else {
            // Handle error, e.g. redirect to login if 401
            if (res.status === 401) {
-             navigate('/login?expired=1');
+             navigate('/login');
            }
         }
       } catch (error) {
@@ -141,7 +142,7 @@ function DashboardPage() {
       params.append('archived', 'true');
     }
     
-    let url = getApiUrl(`surveys?${params.toString()}`);
+    let url = getApiUrl(`api/surveys/?${params.toString()}`);
 
     try {
       const res = await fetch(url, {
@@ -149,7 +150,7 @@ function DashboardPage() {
       });
       if (res.status === 401) {
         localStorage.removeItem('token');
-        window.location.href = '/login?expired=1';
+        window.location.href = '/login';
         return;
       }
       if (res.ok) {
@@ -194,7 +195,7 @@ function DashboardPage() {
     setAnalytics(null);
     const token = localStorage.getItem("token");
     try {
-      const res = await fetch(getApiUrl(`surveys/${surveyId}/analytics`), {
+      const res = await fetch(getApiUrl(`api/surveys/${surveyId}/analytics`), {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -220,7 +221,7 @@ function DashboardPage() {
   const confirmDelete = async () => {
     if (!surveyToDelete) return;
     const token = localStorage.getItem('token');
-    const res = await fetch(getApiUrl(`surveys/${surveyToDelete}`), {
+    const res = await fetch(getApiUrl(`api/surveys/${surveyToDelete}`), {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -238,7 +239,7 @@ function DashboardPage() {
 
   const handleArchive = async (surveyId) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(getApiUrl(`surveys/${surveyId}/archive`), {
+    const res = await fetch(getApiUrl(`api/surveys/${surveyId}/archive`), {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -255,7 +256,7 @@ function DashboardPage() {
 
   const handleRestore = async (surveyId) => {
     const token = localStorage.getItem('token');
-    const res = await fetch(getApiUrl(`surveys/${surveyId}/restore`), {
+    const res = await fetch(getApiUrl(`api/surveys/${surveyId}/restore`), {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` }
     });
@@ -506,18 +507,14 @@ function DashboardPage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Top bar */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
+        {/* Header */}
+        <div className="flex items-center justify-between px-8 py-4 bg-white shadow-sm border-b">
           <div className="flex items-center gap-4">
-            <button onClick={() => setIsSidebarOpen(true)} className="text-gray-600 md:hidden">
-              <Menu className="h-6 w-6" />
-            </button>
-            <button
-              className="btn-primary flex items-center gap-1 text-sm px-4 py-2"
-              onClick={() => navigate("/")}
-            >
-              <ChevronLeft className="h-4 w-4" /> На главную
-            </button>
+            {/* Place for logo or title */}
+            <span className="text-xl font-bold text-primary-700">Survey AI</span>
+          </div>
+          <div>
+            <LogoutButton />
           </div>
         </div>
 
@@ -590,13 +587,6 @@ function DashboardPage() {
                     <div>
                       <div className="flex items-baseline gap-2">
                         <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.totalResponses}</div>
-                        {summaryStats.totalResponses > 0 && (
-                          <div className="text-lg font-bold text-green-600">
-                            {summaryStats.totalSurveys > 0 
-                              ? `${Math.round((summaryStats.totalResponses / summaryStats.totalSurveys) * 100)}%`
-                              : '0%'}
-                          </div>
-                        )}
                       </div>
                       <div className="text-base text-gray-500 font-medium mt-1">Всего ответов</div>
                     </div>
@@ -771,26 +761,28 @@ function DashboardPage() {
                       <div className="flex items-center gap-4">
                         <h1 className="text-3xl font-bold text-gray-900">Мои опросы</h1>
                       </div>
-                      <motion.button
-                        whileHover={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 1.05 }}
-                        whileTap={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 0.95 }}
-                        onClick={handleCreateSurveyClick}
-                        className={`${
-                          hasActiveSurvey || isArchiveTab
-                            ? 'bg-gray-400 cursor-not-allowed' 
-                            : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-xl'
-                        } text-white px-4 py-2 rounded-xl font-semibold shadow-lg transition-all duration-200 flex items-center gap-2`}
-                        title={
-                          isArchiveTab 
-                            ? 'Создание опросов недоступно в архиве' 
-                            : hasActiveSurvey 
-                              ? 'У вас уже есть активный опрос' 
-                              : 'Создать новый опрос'
-                        }
-                      >
-                        <Plus className="h-5 w-5" />
-                        Создать опрос
-                      </motion.button>
+                      <div className="flex items-center space-x-2">
+                        <motion.button
+                          whileHover={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 1.05 }}
+                          whileTap={{ scale: hasActiveSurvey || isArchiveTab ? 1 : 0.95 }}
+                          onClick={handleCreateSurveyClick}
+                          className={`${
+                            hasActiveSurvey || isArchiveTab
+                              ? 'bg-gray-400 cursor-not-allowed' 
+                              : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-xl'
+                          } text-white px-4 py-2 rounded-xl font-semibold shadow-lg transition-all duration-200 flex items-center gap-2`}
+                          title={
+                            isArchiveTab 
+                              ? 'Создание опросов недоступно в архиве' 
+                              : hasActiveSurvey 
+                                ? 'У вас уже есть активный опрос' 
+                                : 'Создать новый опрос'
+                          }
+                        >
+                          <Plus className="h-5 w-5" />
+                          Создать опрос
+                        </motion.button>
+                      </div>
                     </div>
 
                     {/* Search and Filter */}
@@ -976,6 +968,33 @@ function DashboardPage() {
                 <ProfileSection currentUser={currentUser} surveys={surveys} />
               </motion.div>
             )}
+
+            {activeTab === 'help' && (
+              <motion.div
+                key="help"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8 border border-gray-200 text-center"
+              >
+                <h2 className="text-2xl font-bold mb-4">Справка</h2>
+                <p className="text-gray-500 text-lg">Раздел в процессе разработки.</p>
+              </motion.div>
+            )}
+            {activeTab === 'settings' && (
+              <motion.div
+                key="settings"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8 border border-gray-200 text-center"
+              >
+                <h2 className="text-2xl font-bold mb-4">Настройки</h2>
+                <p className="text-gray-500 text-lg">Раздел в процессе разработки.</p>
+              </motion.div>
+            )}
           </AnimatePresence>
         </main>
       </div>
@@ -1021,35 +1040,12 @@ function DashboardPage() {
 }
 
 function ProfileSection({ currentUser, surveys }) {
-  // Найти активный опрос
-  const activeSurvey = surveys?.find(s => !s.archived);
-  const BOT_USERNAME = "survey_chat_ai_bot";
-
   return (
     <div>
       <div className="mb-4">
-        <div className="font-semibold">Имя:</div>
-        <div className="mb-2">{currentUser?.name || "-"}</div>
         <div className="font-semibold">Email:</div>
         <div>{currentUser?.email || "-"}</div>
       </div>
-      {/* Кнопка для Telegram */}
-      {activeSurvey && (
-        <div className="mt-6 p-4 bg-primary-50 rounded-xl">
-          <div className="font-semibold mb-2">Пройти опрос в Telegram:</div>
-          <a
-            href={`https://t.me/${BOT_USERNAME}?start=${activeSurvey.public_id}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary inline-block"
-          >
-            Открыть чат с ботом
-          </a>
-          <div className="text-gray-600 text-sm mt-2">
-            Просто перейдите по ссылке — бот начнёт опрос автоматически.
-          </div>
-        </div>
-      )}
     </div>
   );
 }

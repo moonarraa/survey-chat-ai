@@ -10,6 +10,11 @@ class UserCreate(BaseModel):
 class User(BaseModel):
     id: int
     email: EmailStr
+    name: str
+    created_at: datetime
+    updated_at: datetime
+    tg_user_id: str | None = None
+    tg_link_code: str | None = None
 
 
 

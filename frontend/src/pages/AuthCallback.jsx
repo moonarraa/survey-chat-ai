@@ -10,7 +10,7 @@ export default function AuthCallback() {
     const token = params.get("token");
     if (token) {
       localStorage.setItem("token", token);
-      navigate("/"); // Redirect to home or dashboard
+      navigate("/dashboard"); // Redirect to home or dashboard
     } else {
       alert("Ошибка входа: токен не получен.");
       navigate("/login");

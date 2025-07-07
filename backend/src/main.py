@@ -14,22 +14,23 @@ from src.tasks.api import router as tasks_router
 from src.database import get_async_db
 from src.auth.api import router as auth_router
 from src.tasks.survey_api import router as survey_router
+from src.assistant.template_survey import router as template_survey_router
+from src.leaderboard.api import router as leaderboard_router
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
+app.router.redirect_slashes = False
 
 # Список разрешенных origins
 origins = [
-    "http://localhost:3000",  # Для локальной разработки
-    "http://localhost:5173",  # Для Vite dev server
-    "https://survey-chat-ai.vercel.app",  # Ваш домен на Vercel
-    "https://survey-chat-ai*.vercel.app",  # Для preview deployments
-    "https://grateful-adventure-production-91c0.up.railway.app",  # Your new frontend on Railway
-    "https://survey-chat-frontend-production.up.railway.app",
-    "https://survey-ai.up.railway.app",
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://localhost:8000",
+    "https://survey-ai.live",
+    "https://www.survey-ai.live"
 ]
 
 @app.on_event("startup")
@@ -85,7 +86,9 @@ async def log_requests(request, call_next):
 
 app.include_router(tasks_router, tags=["tasks"])
 app.include_router(auth_router, prefix="/auth")
-app.include_router(survey_router, prefix="/surveys")
+app.include_router(survey_router, prefix="/api/surveys")
+app.include_router(template_survey_router, prefix="/surveys", tags=["surveys"])
+app.include_router(leaderboard_router, prefix="/leaderboard", tags=["leaderboard"])
 
 @app.get("/")
 def read_root():

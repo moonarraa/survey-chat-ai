@@ -21,7 +21,10 @@ async def get_current_user(
         db_user = await UserDAO.get_user_by_email_or_raise(email, db)
         return User(
             id=db_user.id,
-            email=db_user.email
+            email=db_user.email,
+            name=db_user.name,
+            created_at=db_user.created_at,
+            updated_at=db_user.updated_at
         )
     except (
         InvalidTokenException,

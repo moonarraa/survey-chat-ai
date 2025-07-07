@@ -15,8 +15,10 @@ from src.assistant.openai_assistant import (
 import json
 from pydantic import BaseModel
 from typing import Any
-from sqlalchemy import select, func
+from sqlalchemy import select, func, and_
 from collections import Counter
+from src.leaderboard.api import broadcast_leaderboard_update
+import os
 
 router = APIRouter(tags=["surveys"])
 
@@ -79,8 +81,11 @@ async def create_survey(
             status_code=400,
             detail="У вас уже есть активный опрос. Пожалуйста, архивируйте его перед созданием нового."
         )
-    
-    return await SurveyDAO.create_survey(current_user.id, survey.topic, survey.questions, db)
+    survey_obj = await SurveyDAO.create_survey(current_user.id, survey.topic, survey.questions, db)
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    public_url = f"{frontend_url}/s/{survey_obj.public_id}"
+    # Return all SurveyOut fields plus public_url
+    return {**survey_obj.model_dump(), "public_url": public_url}
 
 @router.get("/", response_model=list[SurveyOut])
 async def list_surveys(
@@ -192,6 +197,22 @@ async def submit_public_survey_answer(
         raise HTTPException(status_code=404, detail="Survey not found")
     survey = survey._mapping
     
+    # Check if this IP has already answered
+    if request and request.client:
+        existing_answer = await db.execute(
+            select(SurveyAnswer).where(
+                and_(
+                    SurveyAnswer.survey_id == survey["id"],
+                    SurveyAnswer.ip == request.client.host
+                )
+            )
+        )
+        if existing_answer.first():
+            raise HTTPException(
+                status_code=403,
+                detail="You have already submitted a response for this survey from this IP address."
+            )
+
     # Проверяем, не архивирован ли опрос
     if survey["archived"]:
         raise HTTPException(
@@ -209,6 +230,11 @@ async def submit_public_survey_answer(
     )
     db.add(db_answer)
     await db.commit()
+
+    # If it's a template survey, broadcast the leaderboard update
+    if survey["is_template_survey"]:
+        await broadcast_leaderboard_update(db)
+
     return PublicSurveyAnswerOut(ok=True, message="Ответ успешно сохранён!")
 
 @router.post("/s/{public_id}/next-question")
