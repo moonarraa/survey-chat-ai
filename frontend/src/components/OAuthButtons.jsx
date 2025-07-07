@@ -1,6 +1,8 @@
 import React from "react";
 import { getApiUrl } from '../config';
 
+console.log('OAuthButtons component loaded - deployment check');
+
 const GoogleIcon = () => (
   <svg className="h-5 w-5 mr-2" viewBox="0 0 48 48">
     <g>
