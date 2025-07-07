@@ -61,14 +61,6 @@ export default function LoginPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
         >
-          <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mx-auto h-16 w-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg"
-          >
-            <User className="h-8 w-8 text-white" />
-          </motion.div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Добро пожаловать!</h1>
           <p className="text-gray-600">Войдите в свой аккаунт Survey AI</p>
         </motion.div>

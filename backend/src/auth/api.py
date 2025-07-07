@@ -127,13 +127,15 @@ async def auth_via_google(request: Request, db: AsyncSession = Depends(get_async
         # Создаем нового пользователя, если он вошел через Google впервые
         new_user_data = UserCredentials(
             email=email,
-            password=uuid.uuid4().hex # Генерируем случайный пароль, он не будет использоваться
+            password=uuid.uuid4().hex, # Генерируем случайный пароль, он не будет использоваться
+            name=user_info.get("name") or email.split("@")[0]
         )
         # Предполагается, что AuthService.register_user вернет токен, но нам здесь нужен пользователь
         # Лучше использовать UserDAO напрямую для создания
         user = await UserDAO.create_user(
             email=email,
-            hashed_password="" # Пароль не нужен для OAuth юзеров
+            hashed_password="", # Пароль не нужен для OAuth юзеров
+            name=new_user_data.name
         )
         await db.commit()
         await db.refresh(user)

@@ -105,18 +105,15 @@ function RegisterPage() {
         className="max-w-md w-full space-y-8"
       >
         {/* Header */}
-        <div className="text-center">
-          <motion.div
-            initial={{ scale: 0.8 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="mx-auto h-16 w-16 bg-primary-600 rounded-2xl flex items-center justify-center mb-6"
-          >
-            <User className="h-8 w-8 text-white" />
-          </motion.div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">Создать аккаунт</h2>
-          <p className="text-gray-600">Присоединяйтесь к  AI</p>
-        </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8"
+        >
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Создать аккаунт</h1>
+          <p className="text-gray-600">Зарегистрируйтесь в Survey AI</p>
+        </motion.div>
 
         {/* Registration Form */}
         <motion.div
