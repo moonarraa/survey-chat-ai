@@ -11,8 +11,6 @@ services:
     ports:
       - "8000:8000"
     depends_on: []
-    # volumes: # <-- ЗАКОММЕНТИРУЙТЕ ИЛИ УДАЛИТЕ ЭТУ СТРОКУ
-    #   - ./backend:/app
 
   frontend:
     build:
