@@ -13,6 +13,7 @@ class SurveyStates(StatesGroup):
 
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, command: CommandObject, state: FSMContext):
+    print(f"Received /start with payload: {command.args}")
     payload = command.args
     if payload and payload.startswith("s_"):
         public_id = payload[2:]
@@ -31,8 +32,9 @@ async def cmd_start(message: types.Message, command: CommandObject, state: FSMCo
         await message.answer(f"Опрос: {survey.get('topic', '')}\n\n{survey['questions'][0]['text']}")
         await state.set_state(SurveyStates.answering)
         return
+    # Only show the welcome message if no valid payload
     await message.answer(
-        "👋 Привет! Я бот для прохождения опросов.\n\n" \
+        "👋 Привет! Я бот для прохождения опросов.\n\n"
         "Чтобы пройти опрос, отправьте мне ссылку на опрос или его код (например: s/abc123)."
     )
     await state.clear()
@@ -56,7 +58,7 @@ async def handle_survey_link_or_code(message: types.Message, state: FSMContext):
             await message.answer("Не удалось распознать ссылку. Пожалуйста, отправьте корректную ссылку на опрос.")
             return
         public_id = parts[1].split("/")[0]
-    elif text.startswith("s/"):
+    elif text.startswith("s/") or text.startswith("s_"):
         public_id = text[2:]
     else:
         await message.answer("Пожалуйста, отправьте ссылку на опрос или его код (например: s/abc123).")
