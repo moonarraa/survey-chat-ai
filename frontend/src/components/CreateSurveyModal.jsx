@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
 import { BACKEND_URL } from '../config';
+import { useTranslation } from 'react-i18next';
 
 const TEMPLATES = [
   {
@@ -124,6 +125,7 @@ const TEMPLATES = [
 ];
 
 export default function CreateSurveyModal({ onSuccess }) {
+  const { t } = useTranslation();
   const [context, setContext] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -135,11 +137,11 @@ export default function CreateSurveyModal({ onSuccess }) {
     e.preventDefault();
     setError("");
     if (!context.trim()) {
-      setError("Заполните цель/контекст опроса.");
+      setError(t('Please fill in the survey goal/context.'));
       return;
     }
     if (context.trim().split(/\s+/).length < 3) {
-      setError("Пожалуйста, опишите цель опроса более подробно. Нужно как минимум 3 слова, чтобы AI понял задачу.");
+      setError(t('Please describe the survey goal in more detail. At least 3 words are required for AI to understand the task.'));
       return;
     }
     setIsSubmitting(true);
@@ -151,14 +153,14 @@ export default function CreateSurveyModal({ onSuccess }) {
         body: JSON.stringify({ context, n: 6 })
       });
       if (!resGen.ok) {
-        setError("Ошибка генерации вопросов. Попробуйте позже.");
+        setError(t('Error generating questions. Please try again later.'));
         setIsSubmitting(false);
         return;
       }
       const dataGen = await resGen.json();
       const questions = dataGen.questions;
       if (!questions || questions.length === 0) {
-        setError("AI не смог сгенерировать вопросы. Попробуйте другую формулировку.");
+        setError(t('AI could not generate questions. Try a different wording.'));
         setIsSubmitting(false);
         return;
       }
@@ -174,9 +176,9 @@ export default function CreateSurveyModal({ onSuccess }) {
       if (!res.ok) {
         const data = await res.json();
         if (data.detail && data.detail.includes("уже есть активный опрос")) {
-          setError("У вас уже есть активный опрос. Пожалуйста, архивируйте его в разделе 'Текущие' перед созданием нового.");
+          setError(t('You already have an active survey. Please archive it in the "Current" section before creating a new one.'));
         } else {
-          setError(data.detail || "Ошибка создания опроса");
+          setError(data.detail || t('Error creating survey'));
         }
         setIsSubmitting(false);
         return;
@@ -187,7 +189,7 @@ export default function CreateSurveyModal({ onSuccess }) {
       }
       navigate(`/dashboard/surveys/${created.id}/edit`);
     } catch {
-      setError("Ошибка сети. Попробуйте позже.");
+      setError(t('Network error. Please try again later.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -203,25 +205,25 @@ export default function CreateSurveyModal({ onSuccess }) {
         <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-3 rounded-2xl w-fit mx-auto mb-4">
           <Sparkles className="h-8 w-8 text-white" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Создать новый опрос</h2>
-        <p className="text-gray-600">AI автоматически сгенерирует вопросы на основе вашей цели</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('Create new survey')}</h2>
+        <p className="text-gray-600">{t('AI will automatically generate questions based on your goal')}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label className="block mb-3 text-sm font-medium text-gray-700">
-            Цель/контекст опроса
+            {t('Survey goal/context')}
           </label>
           <textarea
             value={context}
             onChange={e => setContext(e.target.value)}
             className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 hover:border-gray-400 min-h-[120px] resize-none"
-            placeholder="Например: Оценка удовлетворенности студентов университетом, исследование потребностей клиентов, анализ работы команды..."
+            placeholder={t('For example: Student satisfaction assessment, customer needs research, team performance analysis...')}
             rows={4}
             disabled={isSubmitting}
           />
           <p className="text-xs text-gray-500 mt-2">
-            Чем подробнее опишете цель, тем лучше будут вопросы
+            {t('The more detailed the goal, the better the questions will be')}
           </p>
         </div>
 
@@ -245,12 +247,12 @@ export default function CreateSurveyModal({ onSuccess }) {
           {isSubmitting ? (
             <>
               <Loader2 className="h-5 w-5 animate-spin" />
-              AI создает вопросы...
+              {t('AI is creating questions...')}
             </>
           ) : (
             <>
               <Sparkles className="h-5 w-5" />
-              Создать опрос с AI
+              {t('Create survey with AI')}
             </>
           )}
         </motion.button>
@@ -271,7 +273,7 @@ export default function CreateSurveyModal({ onSuccess }) {
               <button
                 onClick={() => setSelectedSegment(null)}
                 className="absolute top-6 left-6 z-10 bg-white/80 backdrop-blur rounded-full p-2 shadow hover:bg-gray-100 transition"
-                aria-label="Назад"
+                aria-label={t('Back')}
                 type="button"
               >
                 <ArrowLeft className="h-7 w-7 text-gray-500" />
@@ -281,7 +283,7 @@ export default function CreateSurveyModal({ onSuccess }) {
               <button
                 onClick={() => setShowTemplateModal(false)}
                 className="absolute top-6 left-6 z-10 bg-white/80 backdrop-blur rounded-full p-2 shadow hover:bg-gray-100 transition"
-                aria-label="Назад"
+                aria-label={t('Back')}
                 type="button"
               >
                 <ArrowLeft className="h-7 w-7 text-gray-500" />
@@ -290,11 +292,11 @@ export default function CreateSurveyModal({ onSuccess }) {
             {/* Title */}
             <div className="pt-10 pb-2 px-8 text-center">
               <h3 className="text-3xl font-bold text-gray-900 mb-1">
-                {selectedSegment === null ? 'Выберите сегмент' : 'Выберите шаблон'}
+                {selectedSegment === null ? t('Choose a segment') : t('Choose a template')}
               </h3>
               <p className="text-gray-500 text-lg">
                 {selectedSegment === null
-                  ? 'AI поможет быстро начать с готовых сценариев'
+                  ? t('AI will help you get started quickly with ready-made scenarios')
                   : TEMPLATES[selectedSegment].segment}
               </p>
             </div>
@@ -330,7 +332,7 @@ export default function CreateSurveyModal({ onSuccess }) {
                         }}
                         type="button"
                       >
-                        Использовать этот шаблон
+                        {t('Use this template')}
                       </button>
                     </div>
                   ))}
@@ -347,7 +349,7 @@ export default function CreateSurveyModal({ onSuccess }) {
         onClick={() => setShowTemplateModal(true)}
         tabIndex={-1}
       >
-        Выбрать шаблон
+        {t('Choose a template')}
       </button>
     </motion.div>
   );

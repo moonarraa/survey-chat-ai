@@ -4,8 +4,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { User, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { BACKEND_URL, getApiUrl } from '../config';
+import { useTranslation } from 'react-i18next';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,20 +35,16 @@ export default function LoginPage() {
         body,
       });
       const data = await res.json();
-      console.log("Login response:", data);
       if (res.ok && data.access_token) {
         localStorage.setItem("token", data.access_token);
-        console.log("Token saved to localStorage:", data.access_token);
         setTimeout(() => {
-          console.log("About to redirect to dashboard or reload page");
           navigate("/dashboard");
         }, 0);
       } else {
-        console.log("Login failed or no access_token in response");
-        setError(data.detail || "Ошибка: токен не получен от сервера.");
+        setError(data.detail || t('Error: token not received from server.'));
       }
     } catch (err) {
-      setError("Ошибка сети. Попробуйте позже.");
+      setError(t('Network error. Please try again later.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -61,8 +59,8 @@ export default function LoginPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Добро пожаловать!</h1>
-          <p className="text-gray-600">Войдите в свой аккаунт Survey AI</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('Welcome!')}</h1>
+          <p className="text-gray-600">{t('Sign in to your Survey AI account')}</p>
         </motion.div>
 
         <motion.div
@@ -84,7 +82,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email адрес
+                {t('Email address')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -98,7 +96,7 @@ export default function LoginPage() {
                   value={formData.email}
                   onChange={handleInputChange}
                   className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 bg-white/50 backdrop-blur-sm hover:bg-white/70"
-                  placeholder="example@company.com"
+                  placeholder={t('example@company.com')}
                   required
                 />
               </div>
@@ -106,7 +104,7 @@ export default function LoginPage() {
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Пароль
+                {t('Password')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -120,7 +118,7 @@ export default function LoginPage() {
                   value={formData.password}
                   onChange={handleInputChange}
                   className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 bg-white/50 backdrop-blur-sm hover:bg-white/70"
-                  placeholder="Введите пароль"
+                  placeholder={t('Enter your password')}
                   required
                 />
                 <button
@@ -147,10 +145,10 @@ export default function LoginPage() {
               {isSubmitting ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Вход...
+                  {t('Signing in...')}
                 </>
               ) : (
-                "Войти в аккаунт"
+                t('Sign in to account')
               )}
             </motion.button>
 
@@ -159,7 +157,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">или</span>
+                <span className="px-2 bg-white text-gray-500">{t('or')}</span>
               </div>
             </div>
 
@@ -168,9 +166,9 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Нет аккаунта?{" "}
+              {t('No account?')} {" "}
               <Link to="/register" className="font-medium text-primary-600 hover:text-primary-500 transition-colors">
-                Зарегистрироваться бесплатно
+                {t('Register for free')}
               </Link>
             </p>
           </div>

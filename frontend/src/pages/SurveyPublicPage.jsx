@@ -4,8 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { MessageCircle, Send, CheckCircle, Star, Trophy } from "lucide-react";
 import ErrorModal from '../components/ErrorModal';
 import { BACKEND_URL } from '../config';
+import { useTranslation } from 'react-i18next';
 
 export default function SurveyPublicPage() {
+  const { t } = useTranslation();
   const { public_id } = useParams();
   const navigate = useNavigate();
   const [topic, setTopic] = useState("");
@@ -38,17 +40,17 @@ export default function SurveyPublicPage() {
             setIsTyping(false);
           }, 700);
         } else if (res.status === 404) {
-          setErrorModal({ open: true, title: 'Опрос не найден', message: 'Возможно, ссылка устарела или опрос был удалён.' });
+          setErrorModal({ open: true, title: t('Survey not found'), message: t('Maybe the link is outdated or the survey was deleted.') });
         } else {
-          setErrorModal({ open: true, title: 'Ошибка сервера', message: 'Не удалось загрузить опрос. Попробуйте позже.' });
+          setErrorModal({ open: true, title: t('Server error'), message: t('Failed to load survey. Please try again later.') });
         }
       } catch {
-        setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение к интернету и попробуйте ещё раз.' });
+        setErrorModal({ open: true, title: t('Network error'), message: t('Check your internet connection and try again.') });
       }
       setLoading(false);
     }
     fetchSurvey();
-  }, [public_id]);
+  }, [public_id, t]);
 
   useEffect(() => {
     setCopySuccess('');
@@ -97,10 +99,10 @@ export default function SurveyPublicPage() {
       if (res.ok) {
         setSubmitted(true);
       } else {
-        setErrorModal({ open: true, title: 'Ошибка отправки', message: 'Не удалось отправить ответы. Попробуйте позже.' });
+        setErrorModal({ open: true, title: t('Send error'), message: t('Failed to send answers. Please try again later.') });
       }
     } catch {
-      setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение к интернету и попробуйте ещё раз.' });
+      setErrorModal({ open: true, title: t('Network error'), message: t('Check your internet connection and try again.') });
     }
   };
 
@@ -165,7 +167,7 @@ export default function SurveyPublicPage() {
             className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto bg-white/80 rounded-3xl shadow-2xl p-8 min-h-[420px]"
           >
             <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-primary-600 mb-6"></div>
-            <p className="text-gray-600 text-lg font-medium">Загружаем опрос...</p>
+            <p className="text-gray-600 text-lg font-medium">{t('Loading survey...')}</p>
           </motion.div>
         ) : submitted ? (
           <motion.div
@@ -184,9 +186,9 @@ export default function SurveyPublicPage() {
             >
               <CheckCircle className="h-20 w-20 mx-auto" />
             </motion.div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">Спасибо!</h2>
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">{t('Thank you!')}</h2>
             <p className="text-gray-600 text-lg text-center mb-4">
-              Ваши ответы успешно отправлены.<br/>Мы ценим ваше участие!
+              {t('Your answers have been successfully submitted.')}<br/>{t('We appreciate your participation!')}
             </p>
           </motion.div>
         ) : (
@@ -208,7 +210,7 @@ export default function SurveyPublicPage() {
               </div>
               <div className="flex items-center justify-between mt-2">
                 <p className="text-gray-500 text-sm">
-                  Вопрос {Math.min(chat.length + 1, questions.length)} из {questions.length}
+                  {t('Question')} {Math.min(chat.length + 1, questions.length)} {t('of')} {questions.length}
                 </p>
                 <span className="text-xs text-primary-600 font-semibold">
                   {Math.round((Math.min(chat.length, questions.length) / questions.length) * 100)}%
@@ -323,7 +325,7 @@ export default function SurveyPublicPage() {
                     onClick={() => handleSend({ preventDefault: () => {} })}
                     disabled={submitting}
                   >
-                    Далее
+                    {t('Next')}
                   </button>
                 ) : (
                   <form onSubmit={handleSend} className="flex gap-2 mt-2">
@@ -331,7 +333,7 @@ export default function SurveyPublicPage() {
                       type="text"
                       value={input}
                       onChange={handleInputChange}
-                      placeholder="Введите ваш ответ..."
+                      placeholder={t('Enter your answer...')}
                       className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 bg-white/70 backdrop-blur-sm text-base shadow-sm"
                       disabled={submitting}
                     />

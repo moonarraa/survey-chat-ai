@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ErrorModal from '../components/ErrorModal';
 import { BACKEND_URL } from '../config';
 import QRCode from 'react-qr-code';
+import { useTranslation } from 'react-i18next';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple choice" },
@@ -30,6 +31,7 @@ function getDefaultQuestion(type = "multiple_choice") {
 }
 
 export default function CreateSurveyPage() {
+  const { t } = useTranslation();
   const [context, setContext] = useState("");
   const [questions, setQuestions] = useState([]);
   const [errorModal, setErrorModal] = useState({ open: false, title: '', message: '' });
@@ -113,7 +115,7 @@ export default function CreateSurveyPage() {
     e.preventDefault();
     setErrorModal({ open: false, title: '', message: '' });
     if (!context.trim()) {
-      setErrorModal({ open: true, title: 'Не заполнено', message: 'Заполните цель/контекст опроса.' });
+      setErrorModal({ open: true, title: t('Not filled'), message: t('Please fill in the survey goal/context.') });
       return;
     }
     setIsSubmitting(true);
@@ -126,14 +128,14 @@ export default function CreateSurveyPage() {
         referrerPolicy: "unsafe-url" 
       });
       if (!resGen.ok) {
-        setErrorModal({ open: true, title: 'Ошибка генерации', message: 'Не удалось сгенерировать вопросы. Попробуйте позже.' });
+        setErrorModal({ open: true, title: t('Generation error'), message: t('Failed to generate questions. Please try again later.') });
         setIsSubmitting(false);
         return;
       }
       const dataGen = await resGen.json();
       const questions = dataGen.questions;
       if (!questions || questions.length === 0) {
-        setErrorModal({ open: true, title: 'Ошибка AI', message: 'AI не смог сгенерировать вопросы. Попробуйте другую формулировку.' });
+        setErrorModal({ open: true, title: t('AI error'), message: t('AI could not generate questions. Try a different wording.') });
         setIsSubmitting(false);
         return;
       }
@@ -155,7 +157,7 @@ export default function CreateSurveyPage() {
       }
       if (!res.ok) {
         const data = await res.json();
-        setErrorModal({ open: true, title: 'Ошибка создания', message: data.detail || 'Ошибка создания опроса' });
+        setErrorModal({ open: true, title: t('Creation error'), message: data.detail || t('Error creating survey') });
         setIsSubmitting(false);
         return;
       }
@@ -165,7 +167,7 @@ export default function CreateSurveyPage() {
       setIsSubmitting(false);
       // Do not navigate immediately
     } catch (err) {
-      setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение к интернету и попробуйте ещё раз.' });
+      setErrorModal({ open: true, title: t('Network error'), message: t('Check your internet connection and try again.') });
       setIsSubmitting(false);
     }
   };
@@ -179,17 +181,17 @@ export default function CreateSurveyPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 w-full max-w-2xl">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Создать новый опрос</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">{t('Create new survey')}</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block mb-2 text-sm font-medium text-gray-700">
-              Цель/контекст опроса
+              {t('Survey goal/context')}
             </label>
             <textarea
               value={context}
               onChange={e => setContext(e.target.value)}
               className="w-full border rounded-xl px-4 py-3 mb-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 border-gray-300 hover:border-gray-400"
-              placeholder="Например: Оценка удовлетворенности студентов университетом"
+              placeholder={t('For example: Student satisfaction assessment')}
               rows={2}
               disabled={isSubmitting}
             />
@@ -199,7 +201,7 @@ export default function CreateSurveyPage() {
             disabled={isSubmitting}
             className="w-full bg-primary-600 text-white py-3 rounded-xl font-semibold transition-all duration-200 hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? <><Spinner /> Создание...</> : "Создать опрос"}
+            {isSubmitting ? <><Spinner /> {t('Creating...')}</> : t('Create survey')}
           </button>
         </form>
         {showShareModal && createdSurvey && (
@@ -208,26 +210,26 @@ export default function CreateSurveyPage() {
               <button
                 onClick={() => { setShowShareModal(false); navigate('/dashboard'); }}
                 className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
-                aria-label="Закрыть"
+                aria-label={t('Close')}
               >×</button>
-              <div className="text-lg font-semibold mb-6 text-center">Опрос создан! Поделитесь ссылкой с респондентами</div>
+              <div className="text-lg font-semibold mb-6 text-center">{t('Survey created! Share the link with respondents')}</div>
               <div className="flex flex-col gap-4 w-full mb-8">
                 <button
                   className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition text-lg"
                   style={{ minWidth: 220 }}
                   onClick={() => {navigator.clipboard.writeText(createdSurvey.public_url || `${window.location.origin}/s/${createdSurvey.public_id}`);}}
                 >
-                  Скопировать публичную ссылку
+                  {t('Copy public link')}
                 </button>
                 <button
                   className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition text-lg"
                   style={{ minWidth: 220 }}
                   onClick={() => {navigator.clipboard.writeText(`https://t.me/survey_chat_ai_bot?start=${createdSurvey.public_id}`);}}
                 >
-                  Скопировать ссылку на Telegram
+                  {t('Copy Telegram link')}
                 </button>
               </div>
-              <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
+              <div className="mb-2 text-gray-500">{t('QR code for quick access')}:</div>
               <div className="flex flex-col items-center gap-2">
                 <QRCode value={createdSurvey.public_url || `${window.location.origin}/s/${createdSurvey.public_id}`} size={160} />
               </div>

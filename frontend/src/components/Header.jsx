@@ -2,16 +2,19 @@ import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, MessageCircle, ArrowRight, User } from 'lucide-react';
 import logoo from '../assets/logoo.png';
+import LanguageSwitcher from './LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 function Header() {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
   const navigation = [
-    { name: 'Главная', href: '/' },
-    { name: 'Опросы', href: '/dashboard' },
-    { name: 'Тарифы', href: '/pricing' }
+    { name: t('Home'), href: '/' },
+    { name: t('Surveys'), href: '/dashboard' },
+    { name: t('Pricing'), href: '/pricing' }
   ];
 
   const isLoggedIn = Boolean(localStorage.getItem('token'));
@@ -49,18 +52,23 @@ function Header() {
             {!isLoggedIn && (
               <>
                 <Link to="/login" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow flex items-center gap-2 text-base transition">
-                  Войти <ArrowRight className="h-5 w-5" />
+                  {t('Login')} <ArrowRight className="h-5 w-5" />
                 </Link>
+                {/* Only show LanguageSwitcher here for not logged in */}
+                <LanguageSwitcher className="ml-2" styleType="header" />
               </>
             )}
             {isLoggedIn && (
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-full transition shadow"
-              >
-                <User className="h-6 w-6 text-blue-600" />
-                Профиль
-              </button>
+              <>
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-full transition shadow"
+                >
+                  <User className="h-6 w-6 text-blue-600" />
+                  {t('Profile')}
+                </button>
+                <LanguageSwitcher className="ml-2" styleType="header" />
+              </>
             )}
           </div>
         </div>
@@ -99,25 +107,29 @@ function Header() {
                   className="text-gray-700 hover:text-blue-700 font-medium px-4 py-2 rounded-lg transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Войти
+                  {t('Login')}
                 </Link>
                 <Link
                   to="/register"
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow flex items-center gap-2 text-base transition"
                   onClick={() => setIsMenuOpen(false)}
                 >
-                  Начать бесплатно <ArrowRight className="h-5 w-5" />
+                  {t('Start for free')} <ArrowRight className="h-5 w-5" />
                 </Link>
+                <LanguageSwitcher className="mt-2" styleType="header" />
               </>
             )}
             {isLoggedIn && (
-              <button
-                onClick={() => { setIsMenuOpen(false); navigate('/dashboard'); }}
-                className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-full transition shadow"
-              >
-                <User className="h-6 w-6 text-blue-600" />
-                Профиль
-              </button>
+              <>
+                <button
+                  onClick={() => { setIsMenuOpen(false); navigate('/dashboard'); }}
+                  className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium px-4 py-2 rounded-full transition shadow"
+                >
+                  <User className="h-6 w-6 text-blue-600" />
+                  {t('Profile')}
+                </button>
+                <LanguageSwitcher className="mt-2" styleType="header" />
+              </>
             )}
           </div>
         </div>

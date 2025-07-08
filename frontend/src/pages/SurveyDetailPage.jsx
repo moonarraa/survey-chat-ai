@@ -3,9 +3,10 @@ import { useNavigate, Link } from "react-router-dom";
 import QRCode from "react-qr-code";
 import ErrorModal from '../components/ErrorModal';
 import { getApiUrl } from '../config';
-import { Plus, Trash2, BarChart2, Edit, Settings, Star, List, Image as ImageIcon, MessageCircle, AlignLeft } from 'lucide-react';
+import { Plus, Trash2, BarChart2, Edit, Settings, Star, List, Image as ImageIcon, MessageCircle, AlignLeft, User } from 'lucide-react';
 import Select from '../components/Select';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },
@@ -53,6 +54,7 @@ const typeIcons = {
 };
 
 export default function SurveyDetailPage({ id, onClose }) {
+  const { t } = useTranslation();
   const [survey, setSurvey] = useState(null);
   const [originalSurvey, setOriginalSurvey] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -82,17 +84,17 @@ export default function SurveyDetailPage({ id, onClose }) {
           setSurvey(data);
           setOriginalSurvey(JSON.parse(JSON.stringify(data)));
         } else if (res.status === 404) {
-          setErrorModal({ open: true, title: 'Опрос не найден', message: 'Возможно, ссылка устарела или опрос был удалён.' });
+          setErrorModal({ open: true, title: t('Survey not found'), message: t('Maybe the link is outdated or the survey was deleted.') });
         } else {
-          setErrorModal({ open: true, title: 'Ошибка сервера', message: 'Не удалось загрузить опрос. Попробуйте позже.' });
+          setErrorModal({ open: true, title: t('Server error'), message: t('Failed to load survey. Please try again later.') });
         }
       } catch {
-        setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение к интернету и попробуйте ещё раз.' });
+        setErrorModal({ open: true, title: t('Network error'), message: t('Check your internet connection and try again.') });
       }
       setLoading(false);
     }
     fetchSurvey();
-  }, [id, navigate]);
+  }, [id, navigate, t]);
 
   const handleSave = async () => {
     const token = localStorage.getItem("token");
@@ -115,11 +117,11 @@ export default function SurveyDetailPage({ id, onClose }) {
         setOriginalSurvey(JSON.parse(JSON.stringify(data)));
         setIsEditing(false);
       } else {
-        const errorData = await res.json().catch(() => ({ detail: 'Не удалось сохранить изменения.' }));
-        setErrorModal({ open: true, title: 'Ошибка сохранения', message: errorData.detail });
+        const errorData = await res.json().catch(() => ({ detail: t('Failed to save changes.') }));
+        setErrorModal({ open: true, title: t('Save error'), message: errorData.detail });
       }
     } catch {
-      setErrorModal({ open: true, title: 'Ошибка сети', message: 'Проверьте подключение и попробуйте снова.' });
+      setErrorModal({ open: true, title: t('Network error'), message: t('Check your connection and try again.') });
     }
   };
 
@@ -183,7 +185,7 @@ export default function SurveyDetailPage({ id, onClose }) {
     }
   };
 
-  if (loading) return <div className="p-8 text-center">Загрузка...</div>;
+  if (loading) return <div className="p-8 text-center">{t('Loading...')}</div>;
   if (!survey) return null;
 
   const publicUrl = `${window.location.origin}/s/${survey.slug || survey.public_id}`;
@@ -205,25 +207,25 @@ export default function SurveyDetailPage({ id, onClose }) {
               <span className={`inline-flex items-center justify-center rounded-full p-2 bg-white shadow border ${typeStyles[q.type]?.split(' ')[2] || 'border-gray-200'}`}> 
                 <Icon className={`w-6 h-6 ${q.type === 'rating' ? 'text-yellow-400' : 'text-blue-500'}`} />
               </span>
-              <span className="uppercase text-xs font-bold tracking-wider text-gray-500">{QUESTION_TYPES.find(t => t.value === q.type)?.label || q.type}</span>
+              <span className="uppercase text-xs font-bold tracking-wider text-gray-500">{t(QUESTION_TYPES.find(tq => tq.value === q.type)?.label || q.type)}</span>
             </div>
             <input
               type="text"
               value={q.text}
               onChange={(e) => handleQuestionChange(qIndex, 'text', e.target.value)}
               className="w-full p-3 border border-gray-300 rounded-xl font-semibold text-lg mb-4 focus:ring-2 focus:ring-primary-400 transition"
-              placeholder="Текст вопроса"
+              placeholder={t('Question text')}
             />
             <Select
               value={q.type}
               onValueChange={value => handleQuestionChange(qIndex, 'type', value)}
-              options={QUESTION_TYPES}
-              placeholder="Тип вопроса"
+              options={QUESTION_TYPES.map(opt => ({ ...opt, label: t(opt.label) }))}
+              placeholder={t('Question type')}
               className="w-full mb-4"
             />
             {q.type === 'multiple_choice' && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Варианты ответа</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('Answer options')}</label>
                 <ul className="space-y-2">
                   {q.options.map((opt, oIndex) => (
                     <motion.li
@@ -238,7 +240,7 @@ export default function SurveyDetailPage({ id, onClose }) {
                         value={opt}
                         onChange={(e) => handleOptionChange(qIndex, oIndex, e.target.value)}
                         className="flex-grow bg-transparent border-none outline-none text-base"
-                        placeholder={`Вариант ${oIndex + 1}`}
+                        placeholder={`${t('Option')} ${oIndex + 1}`}
                       />
                       <button onClick={() => handleRemoveOption(qIndex, oIndex)} className="p-2 text-red-500 hover:text-red-700">
                         <Trash2 size={18} />
@@ -246,12 +248,12 @@ export default function SurveyDetailPage({ id, onClose }) {
                     </motion.li>
                   ))}
                 </ul>
-                <button onClick={() => handleAddOption(qIndex)} className="btn-secondary text-sm mt-2">Добавить вариант</button>
+                <button onClick={() => handleAddOption(qIndex)} className="btn-secondary text-sm mt-2">{t('Add option')}</button>
               </div>
             )}
             {q.type === 'rating' && (
               <div className="mt-2 flex items-center gap-2">
-                <label className="text-sm text-gray-700">Шкала:</label>
+                <label className="text-sm text-gray-700">{t('Scale')}:</label>
                 <input
                   type="number"
                   min="2"
@@ -260,7 +262,7 @@ export default function SurveyDetailPage({ id, onClose }) {
                   onChange={(e) => handleQuestionChange(qIndex, 'scale', parseInt(e.target.value))}
                   className="w-20 p-2 border border-yellow-200 rounded-xl text-yellow-700 font-semibold bg-yellow-50 focus:ring-2 focus:ring-yellow-300 transition"
                 />
-                <span className="text-xs text-yellow-600">(звёзды/сердечки)</span>
+                <span className="text-xs text-yellow-600">({t('stars/hearts')})</span>
               </div>
             )}
             <button onClick={() => handleRemoveQuestion(qIndex)} className="absolute top-2 right-2 p-2 text-gray-400 hover:text-red-600">
@@ -270,14 +272,14 @@ export default function SurveyDetailPage({ id, onClose }) {
         );
       })}
       <button onClick={handleAddQuestion} className="btn-primary w-full flex items-center justify-center gap-2">
-        <Plus/> Добавить вопрос
+        <Plus/> {t('Add question')}
       </button>
     </div>
   );
 
   const renderDisplayView = () => (
     <>
-      <h3 className="text-lg font-semibold mb-4">Вопросы:</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('Questions')}:</h3>
       <ul className="space-y-6">
         {survey.questions && survey.questions.map((q, idx) => {
           const Icon = typeIcons[q.type] || List;
@@ -293,7 +295,7 @@ export default function SurveyDetailPage({ id, onClose }) {
                 <span className={`inline-flex items-center justify-center rounded-full p-2 bg-white shadow border ${typeStyles[q.type]?.split(' ')[2] || 'border-gray-200'}`}> 
                   <Icon className={`w-6 h-6 ${q.type === 'rating' ? 'text-yellow-400' : 'text-blue-500'}`} />
                 </span>
-                <span className="uppercase text-xs font-bold tracking-wider text-gray-500">{QUESTION_TYPES.find(t => t.value === q.type)?.label || q.type}</span>
+                <span className="uppercase text-xs font-bold tracking-wider text-gray-500">{t(QUESTION_TYPES.find(tq => tq.value === q.type)?.label || q.type)}</span>
               </div>
               <div className="font-semibold text-lg mb-3 text-gray-800">{q.text || ''}</div>
               {q.type === "multiple_choice" && q.options && (
@@ -316,7 +318,7 @@ export default function SurveyDetailPage({ id, onClose }) {
                   {[...Array(q.scale || 5)].map((_, i) => (
                     <Star key={i} className="w-6 h-6 text-yellow-400" fill="currentColor" />
                   ))}
-                  <span className="ml-2 text-xs text-gray-500">Шкала: 1–{q.scale || 5}</span>
+                  <span className="ml-2 text-xs text-gray-500">{t('Scale')}: 1–{q.scale || 5}</span>
                 </div>
               )}
               {q.type === "ranking" && q.items && (
@@ -352,12 +354,12 @@ export default function SurveyDetailPage({ id, onClose }) {
               )}
               {q.type === "open_ended" && (
                 <div className="mt-2 px-4 py-2 rounded-xl bg-purple-50 border border-purple-100 text-purple-900 shadow-sm">
-                  Открытый вопрос
+                  {t('Open-ended question')}
                 </div>
               )}
               {q.type === "long_text" && (
                 <div className="mt-2 px-4 py-2 rounded-xl bg-gray-100 border border-gray-200 text-gray-700 shadow-sm">
-                  Ответ в свободной форме
+                  {t('Free form answer')}
                 </div>
               )}
             </motion.li>
@@ -369,13 +371,13 @@ export default function SurveyDetailPage({ id, onClose }) {
           className="btn-secondary w-full sm:w-auto flex items-center justify-center gap-2 text-base px-6 py-3 rounded-xl shadow hover:shadow-md transition"
           onClick={() => navigate("/dashboard")}
         >
-          <span role="img" aria-label="back">←</span> Назад к списку опросов
+          <span role="img" aria-label="back">←</span> {t('Back to survey list')}
         </button>
         <button
           className="bg-primary-600 text-white w-full sm:w-auto px-6 py-3 rounded-xl font-semibold shadow hover:bg-primary-700 hover:shadow-lg transition flex items-center justify-center gap-2"
           onClick={() => setShowShare(true)}
         >
-          <span role="img" aria-label="share">🔗</span> Поделиться
+          <span role="img" aria-label="share">🔗</span> {t('Share')}
         </button>
       </div>
     </>
@@ -397,13 +399,13 @@ export default function SurveyDetailPage({ id, onClose }) {
             onClick={() => setActiveTab('questions')}
             className={`px-4 py-2 flex items-center gap-2 border-b-2 border-blue-500 text-blue-600`}
           >
-            <Edit size={16} /> Вопросы
+            <Edit size={16} /> {t('Questions')}
           </button>
           <button
             onClick={() => setActiveTab('settings')}
             className={`px-4 py-2 flex items-center gap-2 ${activeTab === 'settings' ? 'border-b-2 border-blue-500 text-blue-600' : 'text-gray-500'}`}
           >
-            <User size={16} /> Личный кабинет
+            <User size={16} /> {t('Personal account')}
           </button>
         </div>
 
@@ -413,11 +415,11 @@ export default function SurveyDetailPage({ id, onClose }) {
             <div className="mt-6 flex gap-4">
               {isEditing ? (
                 <>
-                  <button onClick={handleSave} className="btn-primary">Сохранить</button>
-                  <button onClick={handleCancel} className="btn-secondary">Отмена</button>
+                  <button onClick={handleSave} className="btn-primary">{t('Save')}</button>
+                  <button onClick={handleCancel} className="btn-secondary">{t('Cancel')}</button>
                 </>
               ) : (
-                <button onClick={() => setIsEditing(true)} className="btn-primary">Редактировать</button>
+                <button onClick={() => setIsEditing(true)} className="btn-primary">{t('Edit')}</button>
               )}
             </div>
           </>
@@ -425,9 +427,9 @@ export default function SurveyDetailPage({ id, onClose }) {
 
         {activeTab === 'settings' && (
           <div>
-            <h2 className="text-xl font-bold">Настройки опроса</h2>
+            <h2 className="text-xl font-bold">{t('Survey settings')}</h2>
             {/* Settings content goes here */}
-            <p>Раздел настроек в разработке.</p>
+            <p>{t('Settings section in development.')}</p>
           </div>
         )}
 
@@ -437,27 +439,27 @@ export default function SurveyDetailPage({ id, onClose }) {
               <button
                 onClick={() => setShowShare(false)}
                 className="absolute top-3 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold"
-                aria-label="Закрыть"
+                aria-label={t('Close')}
               >×</button>
-              <div className="text-lg font-semibold mb-6 text-center">Поделиться опросом</div>
+              <div className="text-lg font-semibold mb-6 text-center">{t('Share survey')}</div>
               <div className="flex flex-col gap-4 w-full mb-8">
                 <button
                   className="bg-primary-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary-700 transition text-lg"
                   style={{ minWidth: 220 }}
-                  onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess('Публичная ссылка скопирована!'); setTimeout(()=>setCopySuccess(''), 1500);}}
+                  onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess(t('Public link copied!')); setTimeout(()=>setCopySuccess(''), 1500);}}
                 >
-                  Скопировать публичную ссылку
+                  {t('Copy public link')}
                 </button>
                 <button
                   className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition text-lg"
                   style={{ minWidth: 220 }}
-                  onClick={() => {navigator.clipboard.writeText(telegramUrl); setCopySuccess('Ссылка на Telegram скопирована!'); setTimeout(()=>setCopySuccess(''), 1500);}}
+                  onClick={() => {navigator.clipboard.writeText(telegramUrl); setCopySuccess(t('Telegram link copied!')); setTimeout(()=>setCopySuccess(''), 1500);}}
                 >
-                  Скопировать ссылку на Telegram
+                  {t('Copy Telegram link')}
                 </button>
               </div>
               {copySuccess && <span className="text-green-600 text-center w-full mb-4">{copySuccess}</span>}
-              <div className="mb-2 text-gray-500">QR-код для быстрого доступа:</div>
+              <div className="mb-2 text-gray-500">{t('QR code for quick access')}:</div>
               <div className="flex flex-col items-center gap-2">
                 <div ref={qrRef}>
                   <QRCode value={publicUrl} size={160} />

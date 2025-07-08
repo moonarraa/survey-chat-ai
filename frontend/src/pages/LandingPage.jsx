@@ -6,94 +6,95 @@ import surveyCreateImg from '../assets/survey-create.png';
 import aknurAvatar from '../assets/aknur-photo.png';
 import danaAvatar from '../assets/dana-photo.jpg';
 import { useState } from 'react';
-
-const features = [
-  {
-    icon: Brain,
-    title: 'AI генерирует вопросы',
-    description: 'Просто укажите тему — искусственный интеллект автоматически создаст релевантные и интересные вопросы для вашего опроса.'
-  },
-  {
-    icon: MessageSquare,
-    title: 'Диалоговый формат',
-    description: 'Опрос проходит в виде естественного диалога — участники чувствуют себя комфортно и дают более развернутые ответы.'
-  },
-  {
-    icon: BarChart3,
-    title: 'Умные уточнения',
-    description: 'AI анализирует ответы в реальном времени и задает дополнительные вопросы для получения более глубокой информации.'
-  },
-  {
-    icon: FileText,
-    title: 'Анализ и отчеты',
-    description: 'Получайте детальную аналитику с определением эмоций, ключевых тем и готовые отчеты для экспорта.'
-  }
-];
-
-const benefits = [
-  'Увеличение вовлеченности участников на 300%',
-  'Сокращение времени создания опроса в 10 раз',
-  'Получение более качественных и детальных ответов',
-  'Автоматический анализ тональности и эмоций',
-  'Экспорт в Excel, Google Sheets и другие форматы'
-];
-
-const testimonials = [
-  {
-    name: 'Акнур Сейдазым',
-    role: 'CEO, ShuShu AI',
-    content: 'Survey AI помог мне собрать данные о том, как люди воспринимают наш продукт. Теперь мы можем улучшать его на основе этих данных.',
-    rating: 5,
-    avatar: aknurAvatar
-  },
-  {
-    name: 'Дана Жаксылык',
-    role: 'CEO, LazyJumys',
-    content: 'Невероятно удобно! Раньше я создавала Google формы, а теперь - Survey AI помогает мне создавать опросы за 2 минуты. А качество данных выросло в разы.',
-    rating: 5,
-    avatar: danaAvatar
-  }
-];
+import { useTranslation } from 'react-i18next';
 
 function LandingPage() {
+  const { t } = useTranslation();
   const [openFaq, setOpenFaq] = useState(null);
   const [newSurveyTitle, setNewSurveyTitle] = useState('');
 
+  const features = [
+    {
+      icon: Brain,
+      title: t('AI generates questions'),
+      description: t('Just specify a topic — AI will automatically create relevant and interesting questions for your survey.')
+    },
+    {
+      icon: MessageSquare,
+      title: t('Dialog format'),
+      description: t('The survey is conducted as a natural conversation — participants feel comfortable and give more detailed answers.')
+    },
+    {
+      icon: BarChart3,
+      title: t('Smart clarifications'),
+      description: t('AI analyzes answers in real time and asks follow-up questions for deeper insights.')
+    },
+    {
+      icon: FileText,
+      title: t('Analysis and reports'),
+      description: t('Get detailed analytics with emotion detection, key topics, and ready-to-export reports.')
+    }
+  ];
+
+  const benefits = [
+    t('Increase participant engagement by 300%'),
+    t('Reduce survey creation time by 10x'),
+    t('Get higher quality and more detailed answers'),
+    t('Automatic sentiment and emotion analysis'),
+    t('Export to Excel, Google Sheets, and more')
+  ];
+
+  const testimonials = [
+    {
+      name: 'Акнур Сейдазым',
+      role: 'CEO, ShuShu AI',
+      content: t('Survey AI helped me collect data on how people perceive our product. Now we can improve it based on this data.'),
+      rating: 5,
+      avatar: aknurAvatar
+    },
+    {
+      name: 'Дана Жаксылык',
+      role: 'CEO, LazyJumys',
+      content: t('Incredibly convenient! I used to create Google Forms, but now Survey AI helps me create surveys in 2 minutes. And the data quality has increased dramatically.'),
+      rating: 5,
+      avatar: danaAvatar
+    }
+  ];
+
   const handleCreateSurvey = () => {
     if (!newSurveyTitle.trim()) return;
-    // Если пользователь не авторизован — редирект на регистрацию с темой
     window.location.href = `/register?topic=${encodeURIComponent(newSurveyTitle)}`;
-    // Если хочешь другой UX — можно показать модалку или что-то ещё
   };
 
   const faq = [
     {
-      q: 'Как быстро я получу аналитику по опросу?',
-      a: 'Аналитика формируется мгновенно после получения первых ответов. Вы видите результаты в реальном времени.'
+      q: t('How quickly will I get analytics for the survey?'),
+      a: t('Analytics is generated instantly after receiving the first responses. You see results in real time.')
     },
     {
-      q: 'Можно ли экспортировать результаты?',
-      a: 'Да, вы можете экспортировать все ответы и аналитику в Excel одним кликом.'
+      q: t('Can I export the results?'),
+      a: t('Yes, you can export all responses and analytics to Excel with one click.')
     },
     {
-      q: 'Нужно ли устанавливать приложение?',
-      a: 'Нет, Survey AI полностью работает в браузере — ничего скачивать не нужно.'
+      q: t('Do I need to install an app?'),
+      a: t('No, Survey AI works entirely in the browser — nothing to download.')
     },
     {
-      q: 'Могу ли я создать опрос бесплатно?',
-      a: 'Да, базовый функционал доступен бесплатно. Для расширенных возможностей выберите подходящий тариф.'
+      q: t('Can I create a survey for free?'),
+      a: t('Yes, basic functionality is free. For advanced features, choose a suitable plan.')
     }
   ];
+
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
       <section className="relative min-h-[70vh] flex flex-col items-center justify-center bg-white">
         <div className="w-full max-w-2xl flex flex-col items-center justify-center text-center px-4">
           <div className="mt-[120px]" />
-          <h1 className="text-5xl font-bold text-black mb-4">AI-опросы за 2 минуты</h1>
+          <h1 className="text-5xl font-bold text-black mb-4">{t('AI surveys in 2 minutes')}</h1>
           <div className="text-xl text-primary-600 font-semibold h-8 mb-2">
             <Typewriter
-              words={["Создайте опрос за 2 минуты...", "Получайте честные ответы...", "Всё просто, быстро, AI!"]}
+              words={[t('Create a survey in 2 minutes...'), t('Get honest answers...'), t('It\'s simple, fast, AI!')]}
               loop={0}
               cursor
               cursorStyle="|"
@@ -102,8 +103,8 @@ function LandingPage() {
               delaySpeed={1200}
             />
           </div>
-          <p className="text-xl text-gray-600 mb-4">Получайте честные ответы от клиентов и сотрудников.</p>
-          <p className="text-lg text-gray-600 mb-4">Наша платформа помогает создавать интерактивные опросы с помощью ИИ, которые действительно слушают и понимают участников. </p>
+          <p className="text-xl text-gray-600 mb-4">{t('Get honest answers from clients and employees.')}</p>
+          <p className="text-lg text-gray-600 mb-4">{t('Our platform helps you create interactive AI-powered surveys that truly listen and understand participants.')}</p>
           <div className="flex gap-4 justify-center my-6">
             <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0 }} viewport={{ once: true }}>
               <MessageSquare className="h-8 w-8 text-primary-500 animate-bounce" />
@@ -118,7 +119,7 @@ function LandingPage() {
               <FileText className="h-8 w-8 text-blue-400 animate-pulse" />
             </motion.div>
           </div>
-          <a href="/register" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg px-8 py-4 rounded-xl shadow mb-8 transition">Попробовать бесплатно</a>
+          <a href="/register" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg px-8 py-4 rounded-xl shadow mb-8 transition">{t('Try for free')}</a>
           <div className="mb-[80px]" />
           {/* Screenshot below headline */}
           <div className="w-full flex justify-center">
@@ -127,12 +128,12 @@ function LandingPage() {
                 <span className="inline-flex items-center justify-center rounded-full p-3 bg-blue-100">
                   <Plus className="w-7 h-7 text-blue-500" />
                 </span>
-                <span className="text-xl font-bold text-gray-900">Создать новый опрос</span>
+                <span className="text-xl font-bold text-gray-900">{t('Create new survey')}</span>
               </div>
               <input
                 type="text"
                 className="w-full px-5 py-4 bg-white/80 text-gray-900 placeholder:text-gray-400 border-none rounded-2xl focus:ring-2 focus:ring-blue-400 outline-none transition-all duration-200 text-lg shadow"
-                placeholder="Введите тему опроса..."
+                placeholder={t('Enter survey topic...')}
                 value={newSurveyTitle}
                 onChange={e => setNewSurveyTitle(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleCreateSurvey(); }}
@@ -142,7 +143,7 @@ function LandingPage() {
                 onClick={handleCreateSurvey}
                 disabled={!newSurveyTitle.trim()}
               >
-                Создать опрос
+                {t('Create survey')}
               </button>
             </div>
           </div>
@@ -154,10 +155,10 @@ function LandingPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Как это работает?
+              {t('How does it work?')}
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Всего 3 шага до качественной обратной связи
+              {t('All it takes is 3 steps for quality feedback')}
             </p>
           </div>
           <div className="flex flex-col gap-8">
@@ -172,8 +173,8 @@ function LandingPage() {
                 <Brain className="h-7 w-7 text-primary-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">1. Создайте опрос за 2 минуты</h3>
-                <p className="text-gray-600 leading-relaxed text-base">Укажите тему — AI сам предложит вопросы или выберите шаблон. Не нужно тратить время на ручную настройку.</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('1. Create a survey in 2 minutes')}</h3>
+                <p className="text-gray-600 leading-relaxed text-base">{t('Specify a topic — AI will propose questions or choose a template. No need to spend time on manual setup.')}</p>
               </div>
             </motion.div>
             <motion.div
@@ -187,8 +188,8 @@ function LandingPage() {
                 <MessageSquare className="h-7 w-7 text-primary-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">2. Отправьте ссылку или QR-код</h3>
-                <p className="text-gray-600 leading-relaxed text-base">Поделитесь опросом с клиентами или коллегами — они проходят его в удобном диалоговом формате на любом устройстве.</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('2. Share the link or QR code')}</h3>
+                <p className="text-gray-600 leading-relaxed text-base">{t('Share the survey with your clients or colleagues — they can complete it on any device in a natural conversational format.')}</p>
               </div>
             </motion.div>
             <motion.div
@@ -202,8 +203,8 @@ function LandingPage() {
                 <BarChart3 className="h-7 w-7 text-primary-600" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">3. Получите аналитику</h3>
-                <p className="text-gray-600 leading-relaxed text-base">Видите результаты в реальном времени: графики, ключевые темы, экспорт в Excel. Всё просто и наглядно.</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">{t('3. Get analytics')}</h3>
+                <p className="text-gray-600 leading-relaxed text-base">{t('See results in real time: graphs, key topics, export to Excel. Everything is simple and clear.')}</p>
               </div>
             </motion.div>
           </div>
@@ -216,24 +217,24 @@ function LandingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-                Ваша аналитика — наглядно
+                {t('Your analytics - visually clear')}
               </h2>
               <p className="text-xl text-gray-600 mb-8">
-                Получайте понятные отчёты и реальные инсайты сразу после прохождения опроса. Всё визуально, без Excel и сложных таблиц.
+                {t('Get clear reports and real insights immediately after the survey is completed. Everything is visual, no Excel or complex tables.')}
               </p>
               <ul className="space-y-4">
                 {[
                   {
                     icon: <BarChart3 className="h-6 w-6 text-primary-600 mr-3 mt-0.5 flex-shrink-0" />, 
-                    text: 'Графики по каждому вопросу'
+                    text: t('Charts for each question')
                   },
                   {
                     icon: <CheckCircle className="h-6 w-6 text-green-500 mr-3 mt-0.5 flex-shrink-0" />, 
-                    text: 'Ключевые темы и эмоции в ответах'
+                    text: t('Key themes and emotions in answers')
                   },
                   {
                     icon: <FileText className="h-6 w-6 text-primary-400 mr-3 mt-0.5 flex-shrink-0" />, 
-                    text: 'Экспорт в Excel одним кликом'
+                    text: t('Export to Excel with one click')
                   }
                 ].map((item, index) => (
                   <motion.li
@@ -254,15 +255,15 @@ function LandingPage() {
               <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
                 {/* Здесь можно вставить реальный скриншот аналитики, если появится */}
                 <div className="w-full h-56 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
-                  <span className="text-2xl text-primary-600 font-bold">Пример аналитики</span>
+                  <span className="text-2xl text-primary-600 font-bold">{t('Analytics example')}</span>
                 </div>
                 <div className="w-full">
-                  <p className="text-gray-700 text-sm mb-2">Опрос: "Удовлетворенность сервисом"</p>
+                  <p className="text-gray-700 text-sm mb-2">{t('Survey: "Satisfaction with the service"')}</p>
                   <ul className="text-gray-600 text-sm space-y-1">
-                    <li>Средняя оценка: <span className="font-semibold text-gray-900">4.7</span></li>
-                    <li>Топ-ответ: <span className="font-semibold text-gray-900">"Очень быстрое обслуживание!"</span></li>
-                    <li>Положительных эмоций: <span className="font-semibold text-green-600">87%</span></li>
-                    <li>Экспорт: <span className="font-semibold text-primary-600">Excel</span></li>
+                    <li>{t('Average rating:')} <span className="font-semibold text-gray-900">4.7</span></li>
+                    <li>{t('Top answer:')} <span className="font-semibold text-gray-900">"Very fast service!"</span></li>
+                    <li>{t('Positive emotions:')} <span className="font-semibold text-green-600">87%</span></li>
+                    <li>{t('Export:')} <span className="font-semibold text-primary-600">{t('Excel')}</span></li>
                   </ul>
                 </div>
               </div>
@@ -276,10 +277,10 @@ function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Что говорят наши клиенты
+              {t('What our clients say')}
             </h2>
             <p className="text-xl text-gray-600">
-              Реальные отзывы от компаний, которые уже используют Survey AI
+              {t('Real testimonials from companies that already use Survey AI')}
             </p>
           </div>
           
@@ -330,19 +331,18 @@ function LandingPage() {
             viewport={{ once: true }}
           >
             <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6">
-              Готовы революционизировать ваши опросы?
+              {t('Ready to revolutionize your surveys?')}
             </h2>
             <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
-              Присоединяйтесь к тысячам компаний, которые уже используют Survey AI 
-              для получения более качественных данных.
+              {t('Join thousands of companies that already use Survey AI for more qualitative data.')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register" className="bg-white text-primary-600 hover:bg-gray-50 font-semibold py-3 px-8 rounded-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 inline-flex items-center">
-                Начать бесплатно
+                {t('Start for free')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <button className="border-2 border-white text-white hover:bg-white hover:text-primary-600 font-semibold py-3 px-8 rounded-xl transition-all duration-200">
-                Связаться с нами
+                {t('Contact us')}
               </button>
             </div>
           </motion.div>
@@ -352,7 +352,7 @@ function LandingPage() {
       {/* FAQ Section */}
       <section className="py-20 bg-white">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-8 text-center">FAQ</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-8 text-center">{t('FAQ')}</h2>
           <div className="space-y-4">
             {faq.map((item, idx) => (
               <div key={idx} className="border border-gray-200 rounded-xl bg-gray-50">

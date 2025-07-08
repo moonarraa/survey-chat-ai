@@ -4,8 +4,10 @@ import { Eye, EyeOff, User, Mail, Building, Briefcase, Lock, CheckCircle } from 
 import { motion } from 'framer-motion';
 import OAuthButtons from '../components/OAuthButtons';
 import { BACKEND_URL, getApiUrl } from '../config';
+import { useTranslation } from 'react-i18next';
 
 function RegisterPage() {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,7 +26,6 @@ function RegisterPage() {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({
         ...prev,
@@ -35,29 +36,24 @@ function RegisterPage() {
 
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.name.trim()) {
-      newErrors.name = 'Имя обязательно для заполнения';
+      newErrors.name = t('Name is required');
     }
-    
     if (!formData.email.trim()) {
-      newErrors.email = 'Email обязателен для заполнения';
+      newErrors.email = t('Email is required');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Введите корректный email';
+      newErrors.email = t('Enter a valid email');
     }
-    
     if (!formData.password) {
-      newErrors.password = 'Пароль обязателен для заполнения';
+      newErrors.password = t('Password is required');
     } else if (formData.password.length < 8) {
-      newErrors.password = 'Пароль должен содержать минимум 8 символов';
+      newErrors.password = t('Password must be at least 8 characters');
     }
-    
     if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Повторите пароль';
+      newErrors.confirmPassword = t('Please confirm your password');
     } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Пароли не совпадают';
+      newErrors.confirmPassword = t('Passwords do not match');
     }
-    
     return newErrors;
   };
 
@@ -76,21 +72,16 @@ function RegisterPage() {
         body: JSON.stringify(formData)
       });
       const data = await res.json();
-      console.log("Register response:", data);
       if (res.ok && data.access_token) {
         localStorage.setItem('token', data.access_token);
-        console.log("Token saved to localStorage:", data.access_token);
         setTimeout(() => {
-          console.log("About to redirect to dashboard or reload page");
           navigate('/dashboard');
         }, 0);
       } else {
-        console.log("Registration failed or no access_token in response");
-        setErrors({ api: data.detail || 'Ошибка регистрации' });
+        setErrors({ api: data.detail || t('Registration error') });
       }
     } catch (error) {
-      setErrors({ api: 'Ошибка сети. Попробуйте позже.' });
-      console.error('Registration error:', error);
+      setErrors({ api: t('Network error. Please try again later.') });
     } finally {
       setIsSubmitting(false);
     }
@@ -111,8 +102,8 @@ function RegisterPage() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Создать аккаунт</h1>
-          <p className="text-gray-600">Зарегистрируйтесь в Survey AI</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('Create account')}</h1>
+          <p className="text-gray-600">{t('Register for Survey AI')}</p>
         </motion.div>
 
         {/* Registration Form */}
@@ -137,7 +128,7 @@ function RegisterPage() {
             {/* Name Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                Полное имя
+                {t('Full name')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -152,7 +143,7 @@ function RegisterPage() {
                   className={`block w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 ${
                     errors.name ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                   }`}
-                  placeholder="Введите ваше полное имя"
+                  placeholder={t('Enter your full name')}
                 />
               </div>
               {errors.name && (
@@ -169,7 +160,7 @@ function RegisterPage() {
             {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email адрес
+                {t('Email address')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -184,7 +175,7 @@ function RegisterPage() {
                   className={`block w-full pl-10 pr-3 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 ${
                     errors.email ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                   }`}
-                  placeholder="example@company.com"
+                  placeholder={t('example@company.com')}
                 />
               </div>
               {errors.email && (
@@ -201,7 +192,7 @@ function RegisterPage() {
             {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                Пароль
+                {t('Password')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -216,7 +207,7 @@ function RegisterPage() {
                   className={`block w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 ${
                     errors.password ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                   }`}
-                  placeholder="Минимум 8 символов"
+                  placeholder={t('At least 8 characters')}
                 />
                 <button
                   type="button"
@@ -244,7 +235,7 @@ function RegisterPage() {
             {/* Confirm Password Field */}
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                Повторите пароль
+                {t('Confirm password')}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -259,7 +250,7 @@ function RegisterPage() {
                   className={`block w-full pl-10 pr-10 py-3 border rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 ${
                     errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
                   }`}
-                  placeholder="Повторите пароль"
+                  placeholder={t('Repeat your password')}
                 />
                 <button
                   type="button"
@@ -295,12 +286,12 @@ function RegisterPage() {
               {isSubmitting ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                  Создание аккаунта...
+                  {t('Creating account...')}
                 </>
               ) : (
                 <>
                   <CheckCircle className="h-4 w-4 mr-2" />
-                  Создать аккаунт
+                  {t('Create account')}
                 </>
               )}
             </motion.button>
@@ -311,7 +302,7 @@ function RegisterPage() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">или</span>
+                <span className="px-2 bg-white text-gray-500">{t('or')}</span>
               </div>
             </div>
 
@@ -322,9 +313,9 @@ function RegisterPage() {
           {/* Login Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Уже есть аккаунт?{' '}
+              {t('Already have an account?')} {' '}
                <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500 transition-colors">
-                Войти
+                {t('Sign in')}
               </Link>
             </p>
           </div>
@@ -338,7 +329,7 @@ function RegisterPage() {
           className="text-center"
         >
           <p className="text-xs text-gray-500">
-            Создавая аккаунт, вы получаете доступ к революционной платформе для проведения опросов
+            {t('By creating an account, you get access to a revolutionary platform for conducting surveys')}
           </p>
         </motion.div>
       </motion.div>

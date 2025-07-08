@@ -34,8 +34,10 @@ import { BACKEND_URL, getApiUrl } from '../config';
 import { BarChart as RBarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, PieChart as RPieChart, Pie, Cell } from 'recharts';
 import { saveAs } from "file-saver";
 import LogoutButton from "./LogoutButton";
+import { useTranslation } from 'react-i18next';
 
 function DashboardPage() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('projects');
   const [searchQuery, setSearchQuery] = useState('');
   const [surveys, setSurveys] = useState([]);
@@ -88,38 +90,38 @@ function DashboardPage() {
   const companyData = {
     name: 'Survey AI',
     category: 'B2B SaaS',
-    summary: 'Survey AI - это революционная платформа для проведения опросов в формате живого диалога. Используя силу искусственного интеллекта, мы помогаем компаниям получать более качественные и детальные ответы от участников опросов.',
+    summary: t('Survey AI is a revolutionary platform for conducting surveys in a live dialogue format. Using the power of artificial intelligence, we help companies get higher quality and more detailed answers from survey participants.'),
     products: [
-      'AI-генерация вопросов',
-      'Диалоговые опросы',
-      'Анализ тональности',
-      'Экспорт данных'
+      t('AI-generated questions'),
+      t('Conversational surveys'),
+      t('Sentiment analysis'),
+      t('Data export')
     ],
     features: [
-      'Автоматическая настройка опросов',
-      'Встроенный сервер разработки',
-      'Поддержка современных JavaScript функций',
-      'Простая интеграция со сторонними библиотеками'
+      t('Automatic survey setup'),
+      t('Built-in development server'),
+      t('Support for modern JavaScript features'),
+      t('Easy integration with third-party libraries')
     ],
     benefits: [
-      'Экономия времени на настройку проектов',
-      'Упрощение рабочего процесса разработки',
-      'Обеспечение следования лучшим практикам',
-      'Облегчение развертывания'
+      t('Save time on project setup'),
+      t('Simplify the development workflow'),
+      t('Ensure best practices'),
+      t('Ease of deployment')
     ],
     uniquePoints: [
-      'Официально поддерживается командой React',
-      'Широко принят в сообществе React',
-      'Регулярные обновления и улучшения'
+      t('Officially supported by the React team'),
+      t('Widely adopted in the React community'),
+      t('Regular updates and improvements')
     ]
   };
 
   const sidebarItems = [
-    { id: 'projects', icon: FolderOpen, label: 'Мои опросы', active: activeTab === 'projects' },
-    { id: 'analytics', icon: Home, label: 'Аналитика', active: activeTab === 'analytics' },
-    { id: 'profile', icon: User, label: 'Личный кабинет', active: activeTab === 'profile' },
-    { id: 'help', icon: HelpCircle, label: 'Справка', active: false },
-    { id: 'settings', icon: Settings, label: 'Настройки', active: false }
+    { id: 'projects', icon: FolderOpen, label: t('My Surveys'), active: activeTab === 'projects' },
+    { id: 'analytics', icon: Home, label: t('Analytics'), active: activeTab === 'analytics' },
+    { id: 'profile', icon: User, label: t('Profile'), active: activeTab === 'profile' },
+    { id: 'help', icon: HelpCircle, label: t('Help'), active: false },
+    { id: 'settings', icon: Settings, label: t('Settings'), active: false }
   ];
 
   const getInitials = (name) => {
@@ -248,8 +250,8 @@ function DashboardPage() {
     } else {
       setErrorModal({
         open: true,
-        title: 'Ошибка архивации',
-        message: 'Не удалось архивировать опрос. Попробуйте позже.'
+        title: t('Error archiving'),
+        message: t('Failed to archive survey. Please try again later.')
       });
     }
   };
@@ -266,8 +268,8 @@ function DashboardPage() {
       const data = await res.json();
       setErrorModal({
         open: true,
-        title: 'Ошибка восстановления',
-        message: data.detail || 'Не удалось восстановить опрос. Попробуйте позже.'
+        title: t('Error restoring'),
+        message: data.detail || t('Failed to restore survey. Please try again later.')
       });
     }
   };
@@ -300,8 +302,8 @@ function DashboardPage() {
     if (isArchiveTab) {
       setErrorModal({
         open: true,
-        title: 'Действие недоступно',
-        message: 'Вы не можете создавать опросы, находясь на вкладке "Архив".'
+        title: t('Action unavailable'),
+        message: t('You cannot create surveys while on the "Archive" tab.')
       });
       return;
     }
@@ -309,8 +311,8 @@ function DashboardPage() {
     if (hasActiveSurvey) {
       setErrorModal({
         open: true,
-        title: 'У вас уже есть активный опрос',
-        message: 'Чтобы создать новый опрос, пожалуйста, сначала архивируйте текущий активный.'
+        title: t('You already have an active survey'),
+        message: t('Please archive your current active survey first to create a new one.')
       });
       return;
     }
@@ -321,7 +323,7 @@ function DashboardPage() {
   function handleExportCSV() {
     if (!analytics) return;
     const rows = [];
-    rows.push(["Вопрос", "Тип", "Ответ", "Количество"]);
+    rows.push([t('Question'), t('Type'), t('Answer'), t('Count')]);
     Object.entries(analytics.question_analytics).forEach(([question, data]) => {
       if (data.type === "multiple_choice" || data.type === "image_choice") {
         Object.entries(data.answers).forEach(([opt, count]) => {
@@ -331,7 +333,7 @@ function DashboardPage() {
         Object.entries(data.distribution).forEach(([score, count]) => {
           rows.push([question, data.type, score, count]);
         });
-        rows.push([question, data.type, "Среднее", data.average]);
+        rows.push([question, data.type, t('Average'), data.average]);
       } else if (data.type === "text") {
         data.answers.forEach((ans, idx) => {
           rows.push([question, data.type, ans, ""]);
@@ -429,7 +431,7 @@ function DashboardPage() {
               <span className="text-white text-sm font-semibold">{currentUser ? getInitials(currentUser.name) : ''}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">{currentUser ? currentUser.name : 'Загрузка...'}</p>
+              <p className="text-sm font-medium text-white truncate">{currentUser ? currentUser.name : t('Loading...')}</p>
               <p className="text-xs text-gray-400 truncate">{currentUser ? currentUser.email : ''}</p>
             </div>
           </div>
@@ -495,7 +497,7 @@ function DashboardPage() {
                     <span className="text-white text-sm font-semibold">{currentUser ? getInitials(currentUser.name) : ''}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{currentUser ? currentUser.name : 'Загрузка...'}</p>
+                    <p className="text-sm font-medium text-white truncate">{currentUser ? currentUser.name : t('Loading...')}</p>
                     <p className="text-xs text-gray-400 truncate">{currentUser ? currentUser.email : ''}</p>
                   </div>
                 </div>
@@ -532,13 +534,13 @@ function DashboardPage() {
                 {/* Фон секции аналитики */}
                 <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-50 via-white to-purple-100 opacity-90" />
                 <div className="flex items-center justify-between mb-10">
-                  <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight drop-shadow-sm">Аналитика по опросам</h1>
+                  <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight drop-shadow-sm">{t('Analytics by Surveys')}</h1>
                   {analytics && (
                     <button
                       className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all duration-200 text-lg"
                       onClick={handleExportCSV}
                     >
-                      <BarChart3 className="h-6 w-6" /> Экспорт CSV
+                      <BarChart3 className="h-6 w-6" /> {t('Export CSV')}
                     </button>
                   )}
                 </div>
@@ -556,7 +558,7 @@ function DashboardPage() {
                     </div>
                     <div>
                       <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.totalSurveys}</div>
-                      <div className="text-base text-gray-500 font-medium mt-1">Всего опросов</div>
+                      <div className="text-base text-gray-500 font-medium mt-1">{t('Total Surveys')}</div>
                     </div>
                   </motion.div>
                   <motion.div
@@ -571,7 +573,7 @@ function DashboardPage() {
                     </div>
                     <div>
                       <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.activeSurveys}</div>
-                      <div className="text-base text-gray-500 font-medium mt-1">Активных опросов</div>
+                      <div className="text-base text-gray-500 font-medium mt-1">{t('Active Surveys')}</div>
                     </div>
                   </motion.div>
                   <motion.div
@@ -588,7 +590,7 @@ function DashboardPage() {
                       <div className="flex items-baseline gap-2">
                         <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.totalResponses}</div>
                       </div>
-                      <div className="text-base text-gray-500 font-medium mt-1">Всего ответов</div>
+                      <div className="text-base text-gray-500 font-medium mt-1">{t('Total Responses')}</div>
                     </div>
                   </motion.div>
                   <motion.div
@@ -604,9 +606,8 @@ function DashboardPage() {
                     <div>
                       <div className="flex items-baseline gap-2">
                         <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.averageResponseRate}</div>
-                        <div className="text-lg font-medium text-gray-500">/ опрос</div>
+                        <div className="text-lg font-medium text-gray-500">{t('Average Responses per Survey')}</div>
                       </div>
-                      <div className="text-base text-gray-500 font-medium mt-1">Среднее кол-во ответов</div>
                     </div>
                   </motion.div>
                 </div>
@@ -618,20 +619,20 @@ function DashboardPage() {
                   className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-gray-200 mb-12"
                 >
                   <h2 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                    <BarChart3 className="h-7 w-7 text-primary-600" /> Аналитика по опросу
+                    <BarChart3 className="h-7 w-7 text-primary-600" /> {t('Analytics by Survey')}
                   </h2>
-                  {loadingAnalytics && <div className="p-4 text-center text-lg">Загрузка аналитики...</div>}
+                  {loadingAnalytics && <div className="p-4 text-center text-lg">{t('Loading analytics...')}</div>}
                   {!loadingAnalytics && analytics && (
                     <div className="space-y-10">
                       <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl flex flex-col sm:flex-row gap-6 items-center shadow-inner">
                         <div className="flex-1">
-                          <p className="text-xl font-semibold text-gray-800">Всего ответов: <span className="font-extrabold text-3xl text-blue-700">{analytics.total_responses}</span></p>
+                          <p className="text-xl font-semibold text-gray-800">{t('Total Responses')}: <span className="font-extrabold text-3xl text-blue-700">{analytics.total_responses}</span></p>
                         </div>
                         <div className="flex-1 flex flex-col gap-2 text-gray-600 text-base">
-                          <span>Первый ответ: <span className="font-medium text-gray-900">{analytics.first_response_date ? new Date(analytics.first_response_date).toLocaleString('ru-RU') : '-'}</span></span>
-                          <span>Последний ответ: <span className="font-medium text-gray-900">{analytics.last_response_date ? new Date(analytics.last_response_date).toLocaleString('ru-RU') : '-'}</span></span>
-                          <span>Уникальных респондентов: <span className="font-medium text-gray-900">{analytics.unique_respondents || '-'}</span></span>
-                          <span>Среднее время между ответами: <span className="font-medium text-gray-900">{analytics.avg_time_between_responses ? analytics.avg_time_between_responses + ' мин' : '-'}</span></span>
+                          <span>{t('First Response')}: <span className="font-medium text-gray-900">{analytics.first_response_date ? new Date(analytics.first_response_date).toLocaleString('ru-RU') : '-'}</span></span>
+                          <span>{t('Last Response')}: <span className="font-medium text-gray-900">{analytics.last_response_date ? new Date(analytics.last_response_date).toLocaleString('ru-RU') : '-'}</span></span>
+                          <span>{t('Unique Respondents')}: <span className="font-medium text-gray-900">{analytics.unique_respondents || '-'}</span></span>
+                          <span>{t('Average Time Between Responses')}: <span className="font-medium text-gray-900">{analytics.avg_time_between_responses ? analytics.avg_time_between_responses + ' ' + t('min') : '-'}</span></span>
                         </div>
                       </div>
                       {/* Остальная аналитика по вопросам */}
@@ -652,12 +653,12 @@ function DashboardPage() {
                               {data.type === 'rating' && (
                                 <div>
                                   <div className="flex gap-4 mb-2">
-                                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">Средняя: {data.average}</span>
-                                    <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">Медиана: {data.median}</span>
-                                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">Мода: {data.mode}</span>
+                                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">{t('Average')}: {data.average}</span>
+                                    <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">{t('Median')}: {data.median}</span>
+                                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">{t('Mode')}: {data.mode}</span>
                                   </div>
                                   <div className="mt-2">
-                                    <strong className="text-gray-700">Распределение:</strong>
+                                    <strong className="text-gray-700">{t('Distribution')}:</strong>
                                     <ul className="pl-4 mt-1 text-gray-600">
                                       {Object.entries(data.distribution).map(([score, count]) => (
                                         <li key={score}>{score}: <span className="font-bold text-gray-900">{count}</span></li>
@@ -668,7 +669,7 @@ function DashboardPage() {
                               )}
                               {data.type === 'ranking' && (
                                 <div>
-                                  <p className="mb-2 font-medium text-gray-700">Средний ранг по каждому элементу:</p>
+                                  <p className="mb-2 font-medium text-gray-700">{t('Average Rank for Each Item')}:</p>
                                   <ul className="pl-4">
                                     {data.items && Object.entries(data.average_ranks || {}).map(([item, avg]) => (
                                       <li key={item}><span className="font-semibold text-gray-900">{item}</span>: <span className="text-blue-700 font-bold">{avg ? avg : '—'}</span></li>
@@ -716,7 +717,7 @@ function DashboardPage() {
                               {/* Для текстовых и других типов — просто список ответов */}
                               {data.type === 'text' && !data.sentiment && data.answers && (
                                 <div className="mt-2">
-                                  <strong className="text-gray-700">Ответы:</strong>
+                                  <strong className="text-gray-700">{t('Answers')}:</strong>
                                   <ul className="pl-4 mt-1 text-gray-600 max-h-32 overflow-y-auto custom-scrollbar">
                                     {data.answers.map((ans, idx) => (
                                       <li key={idx} className="mb-1">{ans}</li>
@@ -726,7 +727,7 @@ function DashboardPage() {
                               )}
                               {data.type === 'ranking' && data.answers && (
                                 <div className="mt-2">
-                                  <strong className="text-gray-700">Ответы:</strong>
+                                  <strong className="text-gray-700">{t('Answers')}:</strong>
                                   <ul className="pl-4 mt-1 text-gray-600 max-h-32 overflow-y-auto custom-scrollbar">
                                     {data.answers.map((ans, idx) => (
                                       <li key={idx} className="mb-1">{JSON.stringify(ans)}</li>
@@ -759,7 +760,7 @@ function DashboardPage() {
                     {/* Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
                       <div className="flex items-center gap-4">
-                        <h1 className="text-3xl font-bold text-gray-900">Мои опросы</h1>
+                        <h1 className="text-3xl font-bold text-gray-900">{t('My Surveys')}</h1>
                       </div>
                       <div className="flex items-center space-x-2">
                         <motion.button
@@ -773,14 +774,14 @@ function DashboardPage() {
                           } text-white px-4 py-2 rounded-xl font-semibold shadow-lg transition-all duration-200 flex items-center gap-2`}
                           title={
                             isArchiveTab 
-                              ? 'Создание опросов недоступно в архиве' 
+                              ? t('Survey creation unavailable in archive') 
                               : hasActiveSurvey 
-                                ? 'У вас уже есть активный опрос' 
-                                : 'Создать новый опрос'
+                                ? t('You already have an active survey') 
+                                : t('Create new survey')
                           }
                         >
                           <Plus className="h-5 w-5" />
-                          Создать опрос
+                          {t('Create Survey')}
                         </motion.button>
                       </div>
                     </div>
@@ -791,7 +792,7 @@ function DashboardPage() {
                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                         <input
                           type="text"
-                          placeholder="Поиск опросов..."
+                          placeholder={t('Search surveys...')}
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200"
@@ -799,7 +800,7 @@ function DashboardPage() {
                       </div>
                       <button className="flex items-center gap-2 px-4 py-3 border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors">
                         <Filter className="h-5 w-5 text-gray-400" />
-                        Фильтры
+                        {t('Filters')}
                       </button>
                     </div>
 
@@ -809,13 +810,13 @@ function DashboardPage() {
                         className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'current' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-400 hover:text-primary-600'}`}
                         onClick={() => setSurveyTab('current')}
                       >
-                        Текущие
+                        {t('Current')}
                       </button>
                       <button
                         className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'archived' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-400 hover:text-primary-600'}`}
                         onClick={() => setSurveyTab('archived')}
                       >
-                        Архив
+                        {t('Archive')}
                       </button>
                     </div>
 
@@ -824,18 +825,18 @@ function DashboardPage() {
                       {loading ? (
                         <div className="text-center py-12">
                           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
-                          <p className="text-gray-500">Загрузка опросов...</p>
+                          <p className="text-gray-500">{t('Loading surveys...')}</p>
                         </div>
                       ) : filteredSurveys.length === 0 ? (
                         <div className="text-center py-16">
                           <div className="text-gray-400 text-6xl mb-4">📋</div>
                           <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                            {surveyTab === 'current' ? 'Нет активных опросов' : 'Архив пуст'}
+                            {surveyTab === 'current' ? t('No active surveys') : t('Archive is empty')}
                           </h3>
                           <p className="text-gray-600 mb-6">
                             {surveyTab === 'current' 
-                              ? 'Создайте свой первый опрос, чтобы начать собирать отзывы'
-                              : 'Здесь будут отображаться архивированные опросы'
+                              ? t('Create your first survey to start collecting feedback')
+                              : t('Archived surveys will be displayed here')
                             }
                           </p>
                           {surveyTab === 'current' && !hasActiveSurvey && !isArchiveTab && (
@@ -844,7 +845,7 @@ function DashboardPage() {
                               onClick={handleCreateSurveyClick}
                               className="btn-primary"
                             >
-                              Создать первый опрос
+                              {t('Create your first survey')}
                             </motion.button>
                           )}
                         </div>
@@ -870,22 +871,22 @@ function DashboardPage() {
                                     </h3>
                                     {surveyTab === 'archived' ? (
                                       <span className="flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
-                                        Архивирован
+                                        {t('Archived')}
                                       </span>
                                     ) : (
                                       <span className="flex-shrink-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                        Активный
+                                        {t('Active')}
                                       </span>
                                     )}
                                   </div>
                                   <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
                                     <div className="flex items-center gap-1.5">
                                       <BarChart3 className="h-4 w-4" />
-                                      <span>{survey.questions?.length || 0} вопросов</span>
+                                      <span>{survey.questions?.length || 0} {t('questions')}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                       <Users className="h-4 w-4" />
-                                      <span>{survey.answersCount || 0} ответов</span>
+                                      <span>{survey.answersCount || 0} {t('responses')}</span>
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                       <Clock className="h-4 w-4" />
@@ -900,9 +901,9 @@ function DashboardPage() {
                                         whileHover={{ scale: 1.05 }}
                                         onClick={() => handleRestore(survey.id)}
                                         className="p-2 text-primary-600 hover:text-white hover:bg-primary-600 rounded-lg transition-all duration-200 border border-primary-200 text-sm font-semibold px-3"
-                                        title="Вернуть из архива"
+                                        title={t('Restore from archive')}
                                       >
-                                        Вернуть
+                                        {t('Restore')}
                                       </motion.button>
                                     ) : (
                                       <>
@@ -910,7 +911,7 @@ function DashboardPage() {
                                           whileHover={{ scale: 1.05 }}
                                           onClick={() => handleView(survey.id)}
                                           className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
-                                          title="Просмотреть"
+                                          title={t('View')}
                                         >
                                           <Eye className="h-5 w-5" />
                                         </motion.button>
@@ -918,7 +919,7 @@ function DashboardPage() {
                                           whileHover={{ scale: 1.05 }}
                                           onClick={() => handleArchive(survey.id)}
                                           className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
-                                          title="Архивировать"
+                                          title={t('Archive')}
                                         >
                                           <Archive className="h-5 w-5" />
                                         </motion.button>
@@ -929,14 +930,14 @@ function DashboardPage() {
                                             handleDelete(survey.id);
                                           }}
                                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all duration-200"
-                                          title="Удалить"
+                                          title={t('Delete')}
                                         >
                                           <Trash2 className="h-5 w-5" />
                                         </motion.button>
                                         <motion.button
                                           whileHover={{ scale: 1.05 }}
                                           className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 hidden sm:block"
-                                          title="Дополнительно"
+                                          title={t('More')}
                                         >
                                           <MoreHorizontal className="h-5 w-5" />
                                         </motion.button>
@@ -964,7 +965,7 @@ function DashboardPage() {
                 transition={{ duration: 0.3 }}
                 className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8 border border-gray-200"
               >
-                <h2 className="text-2xl font-bold mb-4">Личный кабинет</h2>
+                <h2 className="text-2xl font-bold mb-4">{t('Profile')}</h2>
                 <ProfileSection currentUser={currentUser} surveys={surveys} />
               </motion.div>
             )}
@@ -978,8 +979,8 @@ function DashboardPage() {
                 transition={{ duration: 0.3 }}
                 className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8 border border-gray-200 text-center"
               >
-                <h2 className="text-2xl font-bold mb-4">Справка</h2>
-                <p className="text-gray-500 text-lg">Раздел в процессе разработки.</p>
+                <h2 className="text-2xl font-bold mb-4">{t('Help')}</h2>
+                <p className="text-gray-500 text-lg">{t('This section is under development.')}</p>
               </motion.div>
             )}
             {activeTab === 'settings' && (
@@ -991,8 +992,8 @@ function DashboardPage() {
                 transition={{ duration: 0.3 }}
                 className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8 border border-gray-200 text-center"
               >
-                <h2 className="text-2xl font-bold mb-4">Настройки</h2>
-                <p className="text-gray-500 text-lg">Раздел в процессе разработки.</p>
+                <h2 className="text-2xl font-bold mb-4">{t('Settings')}</h2>
+                <p className="text-gray-500 text-lg">{t('This section is under development.')}</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -1014,11 +1015,11 @@ function DashboardPage() {
         {showDeleteModal && (
           <Modal open={showDeleteModal} onClose={cancelDelete}>
             <div className="p-4 text-center">
-              <h2 className="text-xl font-bold mb-4">Удалить опрос?</h2>
-              <p className="mb-6 text-gray-600">Вы уверены, что хотите удалить этот опрос? Это действие необратимо.</p>
+              <h2 className="text-xl font-bold mb-4">{t('Delete Survey?')}</h2>
+              <p className="mb-6 text-gray-600">{t('Are you sure you want to delete this survey? This action is irreversible.')}</p>
               <div className="flex gap-4 justify-center">
-                <button className="btn-secondary px-6" onClick={cancelDelete}>Отмена</button>
-                <button className="btn-primary px-6" onClick={confirmDelete}>Удалить</button>
+                <button className="btn-secondary px-6" onClick={cancelDelete}>{t('Cancel')}</button>
+                <button className="btn-primary px-6" onClick={confirmDelete}>{t('Delete')}</button>
               </div>
             </div>
           </Modal>
@@ -1029,7 +1030,7 @@ function DashboardPage() {
               <h2 className="text-xl font-bold mb-4">{errorModal.title}</h2>
               <p className="mb-6 text-gray-600">{errorModal.message}</p>
               <div className="flex gap-4 justify-center">
-                <button className="btn-secondary px-6" onClick={() => setErrorModal(null)}>Закрыть</button>
+                <button className="btn-secondary px-6" onClick={() => setErrorModal(null)}>{t('Close')}</button>
               </div>
             </div>
           </Modal>
@@ -1040,10 +1041,11 @@ function DashboardPage() {
 }
 
 function ProfileSection({ currentUser, surveys }) {
+  const { t } = useTranslation();
   return (
     <div>
       <div className="mb-4">
-        <div className="font-semibold">Email:</div>
+        <div className="font-semibold">{t('Email')}:</div>
         <div>{currentUser?.email || "-"}</div>
       </div>
     </div>

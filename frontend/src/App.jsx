@@ -12,6 +12,8 @@ import CreateSurveyPage from './pages/CreateSurveyPage';
 import SurveyDetailPage from './pages/SurveyDetailPage';
 import SurveyPublicPage from './pages/SurveyPublicPage';
 import TemplateSurveyPage from './pages/TemplateSurveyPage';
+import './i18n';
+import LanguageSwitcher from './components/LanguageSwitcher';
 
 function AppLayout() {
   const location = useLocation();

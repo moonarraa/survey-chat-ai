@@ -1,77 +1,104 @@
 import { Link } from 'react-router-dom';
 import { Check, Star, Zap, Crown, X } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
-const plans = [
-  {
-    name: 'Стартер',
-    price: 'Бесплатно',
-    period: '',
-    description: 'Идеально для начинающих и небольших проектов',
-    icon: Star,
-    color: 'from-gray-400 to-gray-500',
-    features: [
-      'До 3 опросов в месяц',
-      'До 50 ответов на опрос',
-      'Базовая аналитика',
-      'AI генерация вопросов',
-      'Экспорт в CSV',
-      'Email поддержка'
-    ],
-    limitations: [
-      'Ограниченная кастомизация',
-      'Базовые типы вопросов'
-    ],
-    cta: 'Начать бесплатно',
-    popular: false
-  },
-  {
-    name: 'Профессионал',
-    price: '14,990тг',
-    period: '/месяц',
-    description: 'Для растущих команд и серьезных исследований',
-    icon: Zap,
-    color: 'from-primary-500 to-primary-600',
-    features: [
-      'Неограниченные опросы',
-      'До 1,000 ответов на опрос',
-      'Продвинутая аналитика',
-      'AI анализ тональности',
-      'Все типы вопросов',
-      'Кастомизация дизайна',
-      'Экспорт в Excel, Google Sheets',
-      'Приоритетная поддержка',
-      'Интеграции с CRM'
-    ],
-    limitations: [],
-    cta: 'Попробовать 14 дней бесплатно',
-    popular: true
-  },
-  {
-    name: 'Корпоративный',
-    price: 'По запросу',
-    period: '',
-    description: 'Для крупных организаций с особыми требованиями',
-    icon: Crown,
-    color: 'from-purple-500 to-purple-600',
-    features: [
-      'Все возможности Профессионал',
-      'Неограниченные ответы',
-      'Белый лейбл',
-      'API доступ',
-      'Персональный менеджер',
-      'SLA 99.9%',
-      'Корпоративная безопасность',
-      'Обучение команды',
-      'Кастомные интеграции'
-    ],
-    limitations: [],
-    cta: 'Связаться с нами',
-    popular: false
-  }
-];
+function getPlans(t) {
+  return [
+    {
+      name: t('Starter'),
+      price: t('Free'),
+      period: '',
+      description: t('Ideal for beginners and small projects'),
+      icon: Star,
+      color: 'from-gray-400 to-gray-500',
+      features: [
+        t('Up to 3 surveys per month'),
+        t('Up to 50 responses per survey'),
+        t('Basic analytics'),
+        t('AI question generation'),
+        t('Export to CSV'),
+        t('Email support')
+      ],
+      limitations: [
+        t('Limited customization'),
+        t('Basic question types')
+      ],
+      cta: t('Start for free'),
+      popular: false
+    },
+    {
+      name: t('Professional'),
+      price: '14,990тг',
+      period: t('/month'),
+      description: t('For growing teams and serious research'),
+      icon: Zap,
+      color: 'from-primary-500 to-primary-600',
+      features: [
+        t('Unlimited surveys'),
+        t('Up to 1,000 responses per survey'),
+        t('Advanced analytics'),
+        t('AI sentiment analysis'),
+        t('All question types'),
+        t('Design customization'),
+        t('Export to Excel, Google Sheets'),
+        t('Priority support'),
+        t('CRM integrations')
+      ],
+      limitations: [],
+      cta: t('Try 14 days free'),
+      popular: true
+    },
+    {
+      name: t('Enterprise'),
+      price: t('On request'),
+      period: '',
+      description: t('For large organizations with special requirements'),
+      icon: Crown,
+      color: 'from-purple-500 to-purple-600',
+      features: [
+        t('All Professional features'),
+        t('Unlimited responses'),
+        t('White label'),
+        t('API access'),
+        t('Personal manager'),
+        t('SLA 99.9%'),
+        t('Enterprise security'),
+        t('Team training'),
+        t('Custom integrations')
+      ],
+      limitations: [],
+      cta: t('Contact us'),
+      popular: false
+    }
+  ];
+}
+
+function getFAQs(t) {
+  return [
+    {
+      question: t('Can I change my plan at any time?'),
+      answer: t('Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.')
+    },
+    {
+      question: t('Are there discounts for non-profits?'),
+      answer: t('Yes, we offer up to 50% discounts for educational institutions and non-profits. Contact us for a special offer.')
+    },
+    {
+      question: t('What happens to my data if I cancel my subscription?'),
+      answer: t('Your data is retained for 90 days after cancellation. You can export all data at any time.')
+    },
+    {
+      question: t('Do you support integrations?'),
+      answer: t('Yes, we integrate with popular CRMs, Slack, Microsoft Teams, Zapier, and many other services.')
+    }
+  ];
+}
 
 function PricingPage() {
+  const { t } = useTranslation();
+  const plans = getPlans(t);
+  const faqs = getFAQs(t);
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Hero Section */}
@@ -83,12 +110,11 @@ function PricingPage() {
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Выберите свой
-              <span className="block text-primary-600">идеальный план</span>
+              {t('Choose your')}
+              <span className="block text-primary-600">{t('perfect plan')}</span>
             </h1>
             <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Начните бесплатно и масштабируйтесь по мере роста. 
-              Все планы включают AI-генерацию вопросов и диалоговые опросы.
+              {t('Start for free and scale as you grow. All plans include AI question generation and conversational surveys.')}
             </p>
           </motion.div>
         </div>
@@ -113,7 +139,7 @@ function PricingPage() {
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                     <div className="bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-2 rounded-full text-sm font-semibold shadow-lg">
-                      Популярный выбор
+                      {t('Popular choice')}
                     </div>
                   </div>
                 )}
@@ -152,7 +178,7 @@ function PricingPage() {
 
                   {/* CTA Button */}
                   <Link
-                    to={plan.name === 'Корпоративный' ? '/contact' : '/register'}
+                    to={plan.name === t('Enterprise') ? '/contact' : '/register'}
                     className={`w-full block text-center py-4 px-6 rounded-xl font-semibold transition-all duration-200 ${
                       plan.popular
                         ? 'bg-primary-600 text-white hover:bg-primary-700 shadow-lg hover:shadow-xl'
@@ -173,32 +199,15 @@ function PricingPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Часто задаваемые вопросы
+              {t('Frequently Asked Questions')}
             </h2>
             <p className="text-xl text-gray-600">
-              Ответы на самые популярные вопросы о наших тарифах
+              {t('Answers to the most popular questions about our pricing')}
             </p>
           </div>
 
           <div className="space-y-8">
-            {[
-              {
-                question: 'Можно ли изменить план в любое время?',
-                answer: 'Да, вы можете повысить или понизить тариф в любое время. Изменения вступают в силу немедленно.'
-              },
-              {
-                question: 'Есть ли скидки для некоммерческих организаций?',
-                answer: 'Да, мы предоставляем скидки до 50% для образовательных учреждений и НКО. Свяжитесь с нами для получения специального предложения.'
-              },
-              {
-                question: 'Что происходит с данными при отмене подписки?',
-                answer: 'Ваши данные сохраняются в течение 90 дней после отмены. Вы можете экспортировать все данные в любое время.'
-              },
-              {
-                question: 'Поддерживаете ли вы интеграции?',
-                answer: 'Да, мы интегрируемся с популярными CRM, Slack, Microsoft Teams, Zapier и многими другими сервисами.'
-              }
-            ].map((faq, index) => (
+            {faqs.map((faq, index) => (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
