@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
@@ -132,6 +132,17 @@ export default function CreateSurveyModal({ onSuccess }) {
   const navigate = useNavigate();
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   const [selectedSegment, setSelectedSegment] = useState(null);
+
+  // Pre-fill context from localStorage if available and context is empty
+  useEffect(() => {
+    if (!context) {
+      const savedTopic = localStorage.getItem('surveyTopic');
+      if (savedTopic) {
+        setContext(savedTopic);
+        localStorage.removeItem('surveyTopic');
+      }
+    }
+  }, [context]);
 
   async function handleSubmit(e) {
     e.preventDefault();

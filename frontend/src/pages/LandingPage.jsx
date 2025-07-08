@@ -5,13 +5,23 @@ import { Typewriter } from 'react-simple-typewriter';
 import surveyCreateImg from '../assets/survey-create.png';
 import aknurAvatar from '../assets/aknur-photo.png';
 import danaAvatar from '../assets/dana-photo.jpg';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
 function LandingPage() {
   const { t } = useTranslation();
   const [openFaq, setOpenFaq] = useState(null);
   const [newSurveyTitle, setNewSurveyTitle] = useState('');
+
+  // Persist survey topic in localStorage
+  useEffect(() => {
+    const savedTopic = localStorage.getItem('surveyTopic');
+    if (savedTopic) setNewSurveyTitle(savedTopic);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('surveyTopic', newSurveyTitle);
+  }, [newSurveyTitle]);
 
   const features = [
     {
@@ -63,6 +73,7 @@ function LandingPage() {
 
   const handleCreateSurvey = () => {
     if (!newSurveyTitle.trim()) return;
+    localStorage.removeItem('surveyTopic');
     window.location.href = `/register?topic=${encodeURIComponent(newSurveyTitle)}`;
   };
 

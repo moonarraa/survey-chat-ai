@@ -1,5 +1,5 @@
 from aiogram import Router, F, types
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandObject
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 import api
@@ -12,12 +12,38 @@ class SurveyStates(StatesGroup):
     answering = State()
 
 @router.message(Command("start"))
-async def cmd_start(message: types.Message, state: FSMContext):
+async def cmd_start(message: types.Message, command: CommandObject, state: FSMContext):
+    payload = command.args
+    if payload and payload.startswith("s_"):
+        public_id = payload[2:]
+        try:
+            survey = await api.get_survey_by_public_id(public_id)
+        except Exception:
+            await message.answer("Опрос не найден или недоступен.")
+            return
+        await state.update_data(
+            public_id=public_id,
+            questions=survey["questions"],
+            topic=survey.get("topic", "Опрос"),
+            answers=[],
+            current=0
+        )
+        await message.answer(f"Опрос: {survey.get('topic', '')}\n\n{survey['questions'][0]['text']}")
+        await state.set_state(SurveyStates.answering)
+        return
     await message.answer(
         "👋 Привет! Я бот для прохождения опросов.\n\n" \
         "Чтобы пройти опрос, отправьте мне ссылку на опрос или его код (например: s/abc123)."
     )
     await state.clear()
+
+@router.message(Command("help"))
+async def cmd_help(message: types.Message):
+    await message.answer("Отправьте ссылку на опрос или его код (например: s/abc123), чтобы пройти опрос.")
+
+@router.message(Command("about"))
+async def cmd_about(message: types.Message):
+    await message.answer("Этот бот создан для прохождения опросов, созданных на Survey AI.")
 
 @router.message(lambda message: message.text and (message.text.startswith("http") or message.text.startswith("s/")))
 async def handle_survey_link_or_code(message: types.Message, state: FSMContext):
