@@ -161,9 +161,9 @@ export default function SurveyPublicPage() {
         {loading ? (
           <motion.div
             key="loading"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto bg-white/80 rounded-3xl shadow-2xl p-8 min-h-[420px]"
           >
             <div className="animate-spin rounded-full h-14 w-14 border-b-2 border-primary-600 mb-6"></div>
@@ -172,9 +172,9 @@ export default function SurveyPublicPage() {
         ) : submitted ? (
           <motion.div
             key="submitted"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
             className="flex flex-col items-center justify-center w-full max-w-2xl mx-auto bg-gradient-to-br from-green-50 via-emerald-50 to-teal-100 rounded-3xl shadow-2xl p-10 min-h-[420px]"
           >
@@ -194,9 +194,9 @@ export default function SurveyPublicPage() {
         ) : (
           <motion.div
             key="main"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="w-full max-w-2xl mx-auto bg-white/90 rounded-3xl shadow-2xl p-0 sm:p-0 flex flex-col h-screen max-h-screen"
             style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)' }}
           >
