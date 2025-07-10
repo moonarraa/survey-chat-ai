@@ -18,6 +18,7 @@ from src.database import get_async_db
 from src.config import settings
 from src.tasks.crud import UserDAO
 from src.auth.utils import create_access_token
+from src.tasks.schema import User as DBUser
 
 router = APIRouter()
 
@@ -132,11 +133,12 @@ async def auth_via_google(request: Request, db: AsyncSession = Depends(get_async
         )
         # Предполагается, что AuthService.register_user вернет токен, но нам здесь нужен пользователь
         # Лучше использовать UserDAO напрямую для создания
-        user = await UserDAO.create_user(
+        new_user = DBUser(
             email=email,
             hashed_password="", # Пароль не нужен для OAuth юзеров
             name=new_user_data.name
         )
+        user = await UserDAO.create_user(new_user, db)
         await db.commit()
         await db.refresh(user)
 
