@@ -102,3 +102,15 @@ async def process_survey_answer(message: types.Message, state: FSMContext):
         except Exception as e:
             await message.answer(f"Ошибка при сохранении ответа: {e}")
         await state.clear() 
+
+@router.message()
+async def catch_all(message: types.Message):
+    print(f"Received message: {message.text}")
+    await message.answer("Received your message.")
+
+@router.message(Command("survey"))
+async def cmd_survey(message: types.Message, command: CommandObject, state: FSMContext):
+    payload = command.args
+    if payload:
+        public_id = payload.replace("s_", "").replace("s/", "")
+        # ... fetch and start survey ... 

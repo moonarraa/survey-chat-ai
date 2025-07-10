@@ -599,16 +599,6 @@ export default function SurveyEditPage({ id: propId, onClose }) {
                 </span>
               )}
             </button>
-            <a
-              href={`https://t.me/survey_chat_ai_bot?start=s_${survey.public_id}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg transition"
-              style={{ textDecoration: 'none' }}
-            >
-              <FaTelegramPlane className="w-6 h-6" />
-              {t('Start in Telegram')}
-            </a>
             <div className="mt-6 flex flex-col items-center">
               <div className="mb-2 text-gray-500">{t('QR code for quick access')}:</div>
               <QRCode ref={qrRef} value={publicUrl} size={160} />
