@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Check, Star, Zap, Crown, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 function getPlans(t) {
   return [
@@ -101,6 +102,7 @@ function PricingPage() {
   const faqs = getFAQs(t);
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <AnimatedBackground />
       {/* Hero Section */}
       <section className="py-20 lg:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

@@ -1,10 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
-import LandingPage from './pages/LandingPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import PricingPage from './pages/PricingPage';
-import Header from './components/Header';
-import Footer from './components/Footer';
 import AuthCallback from './pages/AuthCallback';
 import LoginPage from './pages/LoginPage';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -14,19 +11,21 @@ import SurveyPublicPage from './pages/SurveyPublicPage';
 import TemplateSurveyPage from './pages/TemplateSurveyPage';
 import './i18n';
 import LanguageSwitcher from './components/LanguageSwitcher';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
 
 function AppLayout() {
   const location = useLocation();
-  // Hide header/footer on public survey page and dashboard
+  // Hide navbar/footer on public survey page and dashboard
   const isPublicSurvey = /^\/s\//.test(location.pathname);
   const isDashboard = location.pathname.startsWith('/dashboard');
   
   return (
     <div className="min-h-screen flex flex-col">
-      {!isPublicSurvey && !isDashboard && <Header />}
+      {!isPublicSurvey && !isDashboard && <Navbar />}
       <main className="flex-1">
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={<Hero />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -40,7 +39,6 @@ function AppLayout() {
           <Route path="/s/:public_id" element={<SurveyPublicPage />} />
         </Routes>
       </main>
-      {!isPublicSurvey && !isDashboard && <Footer />}
     </div>
   );
 }

@@ -206,6 +206,15 @@ export default function CreateSurveyModal({ onSuccess }) {
     }
   }
 
+  // In the component, before rendering, map TEMPLATES to translatedTemplates:
+  const translatedTemplates = TEMPLATES.map(seg => ({
+    segment: t(seg.segment),
+    templates: seg.templates.map(tpl => ({
+      name: t(tpl.name),
+      context: t(tpl.context)
+    }))
+  }));
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -213,7 +222,7 @@ export default function CreateSurveyModal({ onSuccess }) {
       className="space-y-6"
     >
       <div className="text-center">
-        <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-3 rounded-2xl w-fit mx-auto mb-4">
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-3 rounded-2xl w-fit mx-auto mb-4">
           <Sparkles className="h-8 w-8 text-white" />
         </div>
         <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('Create new survey')}</h2>
@@ -228,7 +237,7 @@ export default function CreateSurveyModal({ onSuccess }) {
           <textarea
             value={context}
             onChange={e => setContext(e.target.value)}
-            className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition-all duration-200 hover:border-gray-400 min-h-[120px] resize-none"
+            className="w-full border border-gray-300 rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all duration-200 hover:border-gray-400 min-h-[120px] resize-none"
             placeholder={t('For example: Student satisfaction assessment, customer needs research, team performance analysis...')}
             rows={4}
             disabled={isSubmitting}
@@ -253,7 +262,7 @@ export default function CreateSurveyModal({ onSuccess }) {
           disabled={isSubmitting || !context.trim()}
           whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
           whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-          className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white py-4 rounded-xl font-semibold transition-all duration-200 hover:from-primary-700 hover:to-primary-800 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+          className="w-full bg-gradient-to-r from-purple-600 to-purple-700 text-white py-4 rounded-xl font-semibold transition-all duration-200 hover:from-purple-700 hover:to-purple-800 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>
@@ -308,17 +317,17 @@ export default function CreateSurveyModal({ onSuccess }) {
               <p className="text-gray-500 text-lg">
                 {selectedSegment === null
                   ? t('AI will help you get started quickly with ready-made scenarios')
-                  : TEMPLATES[selectedSegment].segment}
+                  : translatedTemplates[selectedSegment].segment}
               </p>
             </div>
             {/* Content */}
             <div className="flex-1 flex flex-col items-center justify-center px-4 pb-8 overflow-y-auto">
               {selectedSegment === null ? (
                 <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mt-6">
-                  {TEMPLATES.map((seg, idx) => (
+                  {translatedTemplates.map((seg, idx) => (
                     <button
                       key={seg.segment}
-                      className="w-full px-6 py-5 rounded-3xl bg-white text-primary-900 text-base font-semibold shadow-sm border border-gray-200 hover:bg-primary-50 hover:border-primary-200 hover:shadow-lg transition focus:ring-2 focus:ring-primary-100 focus:outline-none"
+                      className="w-full px-6 py-5 rounded-3xl bg-white text-primary-900 text-base font-semibold shadow-sm border border-gray-200 hover:bg-purple-50 hover:border-purple-200 hover:shadow-lg transition focus:ring-2 focus:ring-purple-100 focus:outline-none"
                       onClick={() => setSelectedSegment(idx)}
                       type="button"
                     >
@@ -328,7 +337,7 @@ export default function CreateSurveyModal({ onSuccess }) {
                 </div>
               ) : (
                 <div className="w-full max-w-2xl flex flex-col gap-4 mt-6">
-                  {TEMPLATES[selectedSegment].templates.map((tpl) => (
+                  {translatedTemplates[selectedSegment].templates.map((tpl) => (
                     <div
                       key={tpl.name}
                       className="w-full flex flex-col items-start border rounded-2xl p-4 bg-gray-50 shadow-md transition hover:shadow-xl border-gray-200"
@@ -336,7 +345,7 @@ export default function CreateSurveyModal({ onSuccess }) {
                       <div className="font-semibold text-gray-900 text-base mb-1">{tpl.name}</div>
                       <div className="text-gray-600 text-sm mb-3">{tpl.context}</div>
                       <button
-                        className="w-full px-6 py-2 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 transition shadow-lg text-sm"
+                        className="w-full px-6 py-2 bg-purple-600 text-white rounded-xl font-bold hover:bg-purple-700 transition shadow-lg text-sm"
                         onClick={() => {
                           setContext(tpl.context);
                           setShowTemplateModal(false);
@@ -356,7 +365,7 @@ export default function CreateSurveyModal({ onSuccess }) {
 
       <button
         type="button"
-        className="px-4 py-2 bg-primary-100 text-primary-700 rounded-xl font-medium hover:bg-primary-200 transition mx-auto flex justify-center"
+        className="px-4 py-2 bg-purple-100 text-purple-700 rounded-xl font-medium hover:bg-purple-200 transition mx-auto flex justify-center"
         onClick={() => setShowTemplateModal(true)}
         tabIndex={-1}
       >

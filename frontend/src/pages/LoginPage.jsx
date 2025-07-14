@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { User, Eye, EyeOff, Mail, Lock } from "lucide-react";
 import { BACKEND_URL, getApiUrl } from '../config';
 import { useTranslation } from 'react-i18next';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -51,7 +52,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center py-8 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center py-8 px-4 pt-32">
+      <AnimatedBackground />
       <div className="w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

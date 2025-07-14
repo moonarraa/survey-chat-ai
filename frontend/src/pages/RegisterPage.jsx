@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import OAuthButtons from '../components/OAuthButtons';
 import { BACKEND_URL, getApiUrl } from '../config';
 import { useTranslation } from 'react-i18next';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 function RegisterPage() {
   const { t } = useTranslation();
@@ -88,7 +89,8 @@ function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 pt-32">
+      <AnimatedBackground />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

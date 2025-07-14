@@ -7,6 +7,7 @@ import aknurAvatar from '../assets/aknur-photo.png';
 import danaAvatar from '../assets/dana-photo.jpg';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import AnimatedBackground from '../components/AnimatedBackground';
 
 function LandingPage() {
   const { t } = useTranslation();
@@ -98,6 +99,7 @@ function LandingPage() {
 
   return (
     <div className="overflow-hidden">
+      <AnimatedBackground />
       {/* Hero Section */}
       <section className="relative min-h-[70vh] flex flex-col items-center justify-center bg-white">
         <div className="w-full max-w-2xl flex flex-col items-center justify-center text-center px-4">

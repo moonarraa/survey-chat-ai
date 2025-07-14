@@ -30,7 +30,12 @@ export default {
             700: '#374151',
             800: '#1f2937',
             900: '#111827',
-          }
+          },
+          'convrt-purple': '#6936F5',
+          'convrt-purple-hover': '#5a2edc',
+          'convrt-purple-light': '#a18aff', // optional, for gradients
+          'convrt-dark-blue': '#232946',    // optional, for text
+          'convrt-light-gray': '#f3f4f6',   // optional, for backgrounds
         },
         fontFamily: {
           sans: ['Inter', 'system-ui', 'sans-serif'],

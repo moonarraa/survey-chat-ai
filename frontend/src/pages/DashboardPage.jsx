@@ -35,6 +35,7 @@ import { BarChart as RBarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveCo
 import { saveAs } from "file-saver";
 import LogoutButton from "./LogoutButton";
 import { useTranslation } from 'react-i18next';
+import modernLogo from '../assets/modern-logo.png';
 
 function DashboardPage() {
   const { t } = useTranslation();
@@ -395,10 +396,7 @@ function DashboardPage() {
         {/* Logo */}
         <div className="p-6 border-b border-gray-800">
           <Link to="/" className="flex items-center space-x-3">
-            <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-2.5 rounded-xl">
-              <span className="text-white font-bold text-sm">SC</span>
-            </div>
-            <span className="text-xl font-bold">Survey AI</span>
+            <img src={modernLogo} alt="Survey AI Logo" className="h-8 w-auto" />
           </Link>
         </div>
 
@@ -412,7 +410,7 @@ function DashboardPage() {
                   onClick={() => setActiveTab(item.id)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                     item.active 
-                      ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg' 
+                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg' 
                       : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                   }`}
                 >
@@ -427,7 +425,7 @@ function DashboardPage() {
         {/* User Profile */}
         <div className="p-4 border-t border-gray-800">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="text-white text-sm font-semibold">{currentUser ? getInitials(currentUser.name) : ''}</span>
             </div>
             <div className="flex-1 min-w-0">
@@ -459,9 +457,7 @@ function DashboardPage() {
               {/* Logo */}
               <div className="p-6 border-b border-gray-800">
                 <Link to="/" className="flex items-center space-x-3">
-                  <div className="bg-gradient-to-br from-primary-500 to-primary-600 p-2.5 rounded-xl">
-                    <span className="text-white font-bold text-sm">SC</span>
-                  </div>
+                  <img src={modernLogo} alt="Survey AI Logo" className="h-8 w-auto" />
                   <span className="text-xl font-bold">Survey AI</span>
                 </Link>
               </div>
@@ -478,7 +474,7 @@ function DashboardPage() {
                         }}
                         className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
                           item.active 
-                            ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white shadow-lg' 
+                            ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg' 
                             : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                         }`}
                       >
@@ -493,7 +489,7 @@ function DashboardPage() {
               {/* User Profile */}
               <div className="p-4 border-t border-gray-800">
                 <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center">
+                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-full flex items-center justify-center">
                     <span className="text-white text-sm font-semibold">{currentUser ? getInitials(currentUser.name) : ''}</span>
                   </div>
                   <div className="flex-1 min-w-0">
@@ -513,7 +509,7 @@ function DashboardPage() {
         <div className="flex items-center justify-between px-8 py-4 bg-white shadow-sm border-b">
           <div className="flex items-center gap-4">
             {/* Place for logo or title */}
-            <span className="text-xl font-bold text-primary-700">Survey AI</span>
+            <span className="text-xl font-bold text-purple-700">Survey AI</span>
           </div>
           <div>
             <LogoutButton />
@@ -532,12 +528,12 @@ function DashboardPage() {
                 className="relative px-0 sm:px-0"
               >
                 {/* Фон секции аналитики */}
-                <div className="absolute inset-0 -z-10 bg-gradient-to-br from-blue-50 via-white to-purple-100 opacity-90" />
+                <div className="absolute inset-0 -z-10 bg-gradient-to-br from-purple-50 via-white to-purple-100 opacity-90" />
                 <div className="flex items-center justify-between mb-10">
                   <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight drop-shadow-sm">{t('Analytics by Surveys')}</h1>
                   {analytics && (
                     <button
-                      className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all duration-200 text-lg"
+                      className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold px-6 py-3 rounded-2xl shadow-lg transition-all duration-200 text-lg"
                       onClick={handleExportCSV}
                     >
                       <BarChart3 className="h-6 w-6" /> {t('Export CSV')}
@@ -550,11 +546,11 @@ function DashboardPage() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
-                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-blue-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
+                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-purple-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
                   >
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-t-3xl" />
-                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-purple-100 shadow-inner">
-                      <ChartBar className="w-8 h-8 text-blue-600" />
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-t-3xl" />
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 shadow-inner">
+                      <ChartBar className="w-8 h-8 text-purple-600" />
                     </div>
                     <div>
                       <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.totalSurveys}</div>
@@ -565,11 +561,11 @@ function DashboardPage() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-green-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
+                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-pink-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
                   >
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-blue-400 rounded-t-3xl" />
-                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-green-100 to-blue-100 shadow-inner">
-                      <Activity className="w-8 h-8 text-green-600" />
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-t-3xl" />
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-pink-100 to-purple-100 shadow-inner">
+                      <Activity className="w-8 h-8 text-pink-600" />
                     </div>
                     <div>
                       <div className="text-4xl font-extrabold text-gray-900 drop-shadow-sm">{summaryStats.activeSurveys}</div>
@@ -580,11 +576,11 @@ function DashboardPage() {
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-blue-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
+                    className="relative bg-white/70 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-purple-100 flex items-center gap-6 overflow-hidden group hover:scale-[1.03] transition-transform"
                   >
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-400 to-green-400 rounded-t-3xl" />
-                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-blue-100 to-green-100 shadow-inner">
-                      <MessageCircle className="w-8 h-8 text-blue-600" />
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-t-3xl" />
+                    <div className="flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 shadow-inner">
+                      <MessageCircle className="w-8 h-8 text-purple-600" />
                     </div>
                     <div>
                       <div className="flex items-baseline gap-2">
@@ -619,14 +615,14 @@ function DashboardPage() {
                   className="bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-xl border border-gray-200 mb-12"
                 >
                   <h2 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                    <BarChart3 className="h-7 w-7 text-primary-600" /> {t('Analytics by Survey')}
+                    <BarChart3 className="h-7 w-7 text-purple-600" /> {t('Analytics by Survey')}
                   </h2>
                   {loadingAnalytics && <div className="p-4 text-center text-lg">{t('Loading analytics...')}</div>}
                   {!loadingAnalytics && analytics && (
                     <div className="space-y-10">
-                      <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl flex flex-col sm:flex-row gap-6 items-center shadow-inner">
+                      <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl flex flex-col sm:flex-row gap-6 items-center shadow-inner">
                         <div className="flex-1">
-                          <p className="text-xl font-semibold text-gray-800">{t('Total Responses')}: <span className="font-extrabold text-3xl text-blue-700">{analytics.total_responses}</span></p>
+                          <p className="text-xl font-semibold text-gray-800">{t('Total Responses')}: <span className="font-extrabold text-3xl text-purple-700">{analytics.total_responses}</span></p>
                         </div>
                         <div className="flex-1 flex flex-col gap-2 text-gray-600 text-base">
                           <span>{t('First Response')}: <span className="font-medium text-gray-900">{analytics.first_response_date ? new Date(analytics.first_response_date).toLocaleString('ru-RU') : '-'}</span></span>
@@ -638,7 +634,7 @@ function DashboardPage() {
                       {/* Остальная аналитика по вопросам */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {Object.entries(analytics.question_analytics).map(([question, data], idx) => {
-                          const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF19AF'];
+                          const COLORS = ['#a18aff', '#c084fc', '#9333ea', '#7e22ce', '#e879f9', '#f472b6'];
                           return (
                             <motion.div
                               key={question}
@@ -648,14 +644,14 @@ function DashboardPage() {
                               className="border border-gray-100 rounded-2xl p-6 bg-white/90 shadow-lg flex flex-col gap-4"
                             >
                               <h3 className="text-lg font-bold mb-2 text-gray-900 flex items-center gap-2">
-                                <PieChart className="h-5 w-5 text-primary-500" /> {question}
+                                <PieChart className="h-5 w-5 text-purple-500" /> {question}
                               </h3>
                               {data.type === 'rating' && (
                                 <div>
                                   <div className="flex gap-4 mb-2">
-                                    <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-semibold">{t('Average')}: {data.average}</span>
+                                    <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">{t('Average')}: {data.average}</span>
                                     <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">{t('Median')}: {data.median}</span>
-                                    <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-semibold">{t('Mode')}: {data.mode}</span>
+                                    <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-semibold">{t('Mode')}: {data.mode}</span>
                                   </div>
                                   <div className="mt-2">
                                     <strong className="text-gray-700">{t('Distribution')}:</strong>
@@ -672,7 +668,7 @@ function DashboardPage() {
                                   <p className="mb-2 font-medium text-gray-700">{t('Average Rank for Each Item')}:</p>
                                   <ul className="pl-4">
                                     {data.items && Object.entries(data.average_ranks || {}).map(([item, avg]) => (
-                                      <li key={item}><span className="font-semibold text-gray-900">{item}</span>: <span className="text-blue-700 font-bold">{avg ? avg : '—'}</span></li>
+                                      <li key={item}><span className="font-semibold text-gray-900">{item}</span>: <span className="text-purple-700 font-bold">{avg ? avg : '—'}</span></li>
                                     ))}
                                   </ul>
                                 </div>
@@ -770,7 +766,7 @@ function DashboardPage() {
                           className={`${
                             hasActiveSurvey || isArchiveTab
                               ? 'bg-gray-400 cursor-not-allowed' 
-                              : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-xl'
+                              : 'bg-gradient-to-r from-purple-600 to-purple-700 hover:shadow-xl'
                           } text-white px-4 py-2 rounded-xl font-semibold shadow-lg transition-all duration-200 flex items-center gap-2`}
                           title={
                             isArchiveTab 
@@ -807,13 +803,13 @@ function DashboardPage() {
                     {/* Tabs */}
                     <div className="flex items-center gap-8 border-b border-gray-200 mb-6 px-2">
                       <button
-                        className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'current' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-400 hover:text-primary-600'}`}
+                        className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'current' ? 'border-b-2 border-purple-600 text-purple-700' : 'text-gray-400 hover:text-purple-600'}`}
                         onClick={() => setSurveyTab('current')}
                       >
                         {t('Current')}
                       </button>
                       <button
-                        className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'archived' ? 'border-b-2 border-primary-600 text-primary-700' : 'text-gray-400 hover:text-primary-600'}`}
+                        className={`pb-2 font-semibold text-lg transition-colors duration-200 ${surveyTab === 'archived' ? 'border-b-2 border-purple-600 text-purple-700' : 'text-gray-400 hover:text-purple-600'}`}
                         onClick={() => setSurveyTab('archived')}
                       >
                         {t('Archive')}
@@ -824,7 +820,7 @@ function DashboardPage() {
                     <div className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
                       {loading ? (
                         <div className="text-center py-12">
-                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto mb-4"></div>
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
                           <p className="text-gray-500">{t('Loading surveys...')}</p>
                         </div>
                       ) : filteredSurveys.length === 0 ? (
@@ -866,7 +862,7 @@ function DashboardPage() {
                               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div className="flex-1 min-w-0">
                                   <div className="flex items-start gap-3 mb-2">
-                                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors break-words">
+                                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-purple-600 transition-colors break-words">
                                       {survey.topic}
                                     </h3>
                                     {surveyTab === 'archived' ? (
@@ -900,7 +896,7 @@ function DashboardPage() {
                                       <motion.button
                                         whileHover={{ scale: 1.05 }}
                                         onClick={() => handleRestore(survey.id)}
-                                        className="p-2 text-primary-600 hover:text-white hover:bg-primary-600 rounded-lg transition-all duration-200 border border-primary-200 text-sm font-semibold px-3"
+                                        className="p-2 text-purple-600 hover:text-white hover:bg-purple-600 rounded-lg transition-all duration-200 border border-purple-200 text-sm font-semibold px-3"
                                         title={t('Restore from archive')}
                                       >
                                         {t('Restore')}
@@ -910,7 +906,7 @@ function DashboardPage() {
                                         <motion.button
                                           whileHover={{ scale: 1.05 }}
                                           onClick={() => handleView(survey.id)}
-                                          className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all duration-200"
+                                          className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-all duration-200"
                                           title={t('View')}
                                         >
                                           <Eye className="h-5 w-5" />
