@@ -76,7 +76,7 @@ const Hero: React.FC = () => {
               </motion.div>
               <motion.h1 
                 variants={itemVariants}
-                className="font-inter font-bold text-3xl md:text-5xl lg:text-7xl tracking-tight max-w-4xl mx-auto mb-6 text-convrt-dark-blue leading-[1.1]"
+                className="font-inter font-bold text-4xl md:text-5xl lg:text-7xl tracking-tight max-w-4xl mx-auto mb-6 text-convrt-dark-blue leading-[1.1]"
               >
                 {t('Create')} <span className="text-[#EA384C] font-extrabold">{t('Smart Surveys')}</span> {t('with')} <span className="text-[#6936F5] font-extrabold">{t('AI Power')}</span>
               </motion.h1>
