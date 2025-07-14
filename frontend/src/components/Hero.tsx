@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import aknurAvatar from '../assets/aknur-photo.png';
 import danaAvatar from '../assets/dana-photo.jpg';
 import Footer from './Footer';
+import screenshot from '../assets/Screenshot 2025-07-14 104507.png';
 
 // Testimonials data (copied from LandingPage.jsx)
 const testimonials = [
@@ -202,8 +203,8 @@ const Hero: React.FC = () => {
                 <div className="relative">
                   <div className="bg-white rounded-2xl shadow-xl p-8 flex flex-col items-center">
                     {/* Здесь можно вставить реальный скриншот аналитики, если появится */}
-                    <div className="w-full h-56 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center mb-4">
-                      <span className="text-2xl text-primary-600 font-bold">{t('Analytics example')}</span>
+                    <div className="w-full mb-4">
+                      <img src={screenshot} alt="Analytics Example" className="rounded-xl shadow-lg w-full object-cover" />
                     </div>
                     <div className="w-full">
                       <p className="text-gray-700 text-sm mb-2">{t('Survey: "Satisfaction with the service"')}</p>

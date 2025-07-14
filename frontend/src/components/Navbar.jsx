@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Menu, X } from 'lucide-react';
 import LanguageSwitcher from './LanguageSwitcher';
+import modernLogo from '../assets/modern-logo.png';
 
 function cn(...classes) {
   return classes.filter(Boolean).join(' ');
@@ -33,7 +34,7 @@ const Navbar = () => {
         <div className="flex items-center">
           <a href="/" className="flex items-center ml-6">
             <img 
-              src="/src/assets/modern-logo.png" 
+              src={modernLogo} 
               alt="SurveyAI Logo" 
               className="h-9 md:h-12"
             />
