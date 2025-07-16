@@ -132,7 +132,7 @@ function LandingPage() {
               <FileText className="h-8 w-8 text-blue-400 animate-pulse" />
             </motion.div>
           </div>
-          <a href="/register" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg px-8 py-4 rounded-xl shadow mb-8 transition">{t('Try for free')}</a>
+          <a href="/register" className="bg-blue-600 hover:bg-blue-700 text-white font-semibold text-lg px-8 py-4 rounded-xl shadow mb-8 transition">{t('Create a survey in 1 minute')}</a>
           <div className="mb-[80px]" />
           {/* Screenshot below headline */}
           <div className="w-full flex justify-center">

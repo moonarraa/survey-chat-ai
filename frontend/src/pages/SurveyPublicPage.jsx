@@ -96,9 +96,18 @@ export default function SurveyPublicPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answers: finalChat.map(c => c.answer) })
       });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.ok === false && data.message) {
+        // Show clarifying question instead of advancing
+        setCurrentQuestion(data.message);
+        setInput("");
+        setSubmitting(false);
+        setIsTyping(false);
+        return;
+      }
+      if (res.ok && (data.ok === true || data.ok === undefined)) {
         setSubmitted(true);
-      } else {
+      } else if (!res.ok) {
         setErrorModal({ open: true, title: t('Send error'), message: t('Failed to send answers. Please try again later.') });
       }
     } catch {
@@ -192,11 +201,7 @@ export default function SurveyPublicPage() {
             </p>
           </motion.div>
         ) : (
-          <motion.div
-            key="main"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+          <div
             className="w-full max-w-2xl mx-auto bg-white/90 rounded-3xl shadow-2xl p-0 sm:p-0 flex flex-col h-screen max-h-screen"
             style={{ boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)' }}
           >
@@ -359,7 +364,7 @@ export default function SurveyPublicPage() {
                 )}
               </motion.div>
             )}
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
       <ErrorModal open={errorModal.open} title={errorModal.title} message={errorModal.message} onClose={() => setErrorModal({ open: false, title: '', message: '' })} />

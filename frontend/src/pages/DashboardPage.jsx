@@ -121,8 +121,6 @@ function DashboardPage() {
     { id: 'projects', icon: FolderOpen, label: t('My Surveys'), active: activeTab === 'projects' },
     { id: 'analytics', icon: Home, label: t('Analytics'), active: activeTab === 'analytics' },
     { id: 'profile', icon: User, label: t('Profile'), active: activeTab === 'profile' },
-    { id: 'help', icon: HelpCircle, label: t('Help'), active: false },
-    { id: 'settings', icon: Settings, label: t('Settings'), active: false }
   ];
 
   const getInitials = (name) => {
@@ -509,6 +507,12 @@ function DashboardPage() {
         <div className="flex items-center justify-between px-8 py-4 bg-white shadow-sm border-b">
           <div className="flex items-center gap-4">
             {/* Place for logo or title */}
+            <button
+              className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu className="h-7 w-7 text-purple-700" />
+            </button>
             <span className="text-xl font-bold text-purple-700">Survey AI</span>
           </div>
           <div>
@@ -963,33 +967,6 @@ function DashboardPage() {
               >
                 <h2 className="text-2xl font-bold mb-4">{t('Profile')}</h2>
                 <ProfileSection currentUser={currentUser} surveys={surveys} />
-              </motion.div>
-            )}
-
-            {activeTab === 'help' && (
-              <motion.div
-                key="help"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8 border border-gray-200 text-center"
-              >
-                <h2 className="text-2xl font-bold mb-4">{t('Help')}</h2>
-                <p className="text-gray-500 text-lg">{t('This section is under development.')}</p>
-              </motion.div>
-            )}
-            {activeTab === 'settings' && (
-              <motion.div
-                key="settings"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="max-w-xl mx-auto bg-white rounded-2xl shadow-lg p-8 border border-gray-200 text-center"
-              >
-                <h2 className="text-2xl font-bold mb-4">{t('Settings')}</h2>
-                <p className="text-gray-500 text-lg">{t('This section is under development.')}</p>
               </motion.div>
             )}
           </AnimatePresence>
