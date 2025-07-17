@@ -65,6 +65,9 @@ export default function SurveyDetailPage({ id, onClose }) {
   const [errorModal, setErrorModal] = useState({ open: false, title: '', message: '' });
   const [activeTab, setActiveTab] = useState('questions'); // 'questions', 'analytics', 'settings'
   const qrRef = useRef(null);
+  const [showAddQuestion, setShowAddQuestion] = useState(false);
+  const [newQuestionText, setNewQuestionText] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     async function fetchSurvey() {
@@ -160,10 +163,34 @@ export default function SurveyDetailPage({ id, onClose }) {
     setSurvey(newSurvey);
   };
   
-  const handleAddQuestion = () => {
+  const handleAddQuestionManual = () => {
+    if (!newQuestionText.trim()) return;
     const newSurvey = { ...survey };
-    newSurvey.questions.push(getDefaultQuestion());
+    newSurvey.questions.push({ type: "open_ended", text: newQuestionText });
     setSurvey(newSurvey);
+    setShowAddQuestion(false);
+    setNewQuestionText("");
+  };
+
+  const handleAddQuestionAI = async () => {
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/surveys/generate-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ topic: survey.topic })
+      });
+      const data = await res.json();
+      if (data && data.question) {
+        const newSurvey = { ...survey };
+        newSurvey.questions.push({ type: "open_ended", text: data.question });
+        setSurvey(newSurvey);
+        setShowAddQuestion(false);
+        setNewQuestionText("");
+      }
+    } finally {
+      setAiLoading(false);
+    }
   };
   
   const handleRemoveQuestion = (qIndex) => {
@@ -271,7 +298,44 @@ export default function SurveyDetailPage({ id, onClose }) {
           </motion.div>
         );
       })}
-      <button onClick={handleAddQuestion} className="btn-primary w-full flex items-center justify-center gap-2">
+      {/* Add Question Section */}
+      {showAddQuestion ? (
+        <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4 mb-4 flex flex-col gap-2">
+          <input
+            type="text"
+            value={newQuestionText}
+            onChange={e => setNewQuestionText(e.target.value)}
+            className="w-full p-3 border border-gray-300 rounded-xl font-semibold text-lg mb-2 focus:ring-2 focus:ring-primary-400 transition"
+            placeholder={t('Enter your question manually')}
+          />
+          <div className="flex gap-2">
+            <button
+              onClick={handleAddQuestionManual}
+              className="btn-primary flex-1"
+              disabled={!newQuestionText.trim()}
+            >
+              {t('Add manually')}
+            </button>
+            <button
+              onClick={handleAddQuestionAI}
+              className="btn-secondary flex-1"
+              disabled={aiLoading}
+            >
+              {aiLoading ? t('Generating...') : t('Generate with AI')}
+            </button>
+            <button
+              onClick={() => { setShowAddQuestion(false); setNewQuestionText(""); }}
+              className="btn-secondary"
+            >
+              {t('Cancel')}
+            </button>
+          </div>
+        </div>
+      ) : null}
+      <button
+        onClick={() => setShowAddQuestion(true)}
+        className="btn-primary w-full flex items-center justify-center gap-2 mt-2"
+      >
         <Plus/> {t('Add question')}
       </button>
     </div>

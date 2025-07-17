@@ -6,6 +6,7 @@ from src.tasks.models import SurveyCreate, SurveyOut, User
 from src.tasks.crud import SurveyDAO
 from src.tasks.schema import Survey, SurveyAnswer
 from src.assistant.openai_assistant import (
+    ai_generate_first_question, 
     ai_generate_followup_question, 
     ai_generate_questions_for_topic, 
     ai_is_meaningful_answer, 
@@ -19,6 +20,7 @@ from sqlalchemy import select, func, and_
 from collections import Counter
 from src.leaderboard.api import broadcast_leaderboard_update
 import os
+from src.assistant.followup_subagent import followup_subagent
 
 router = APIRouter(tags=["surveys"])
 
@@ -34,12 +36,11 @@ class PublicSurveyAnswerOut(BaseModel):
     ok: bool
     message: str
 
-class GenerateQuestionsIn(BaseModel):
+class GenerateQuestionIn(BaseModel):
     topic: str
-    n: int = 5
 
-class GenerateQuestionsOut(BaseModel):
-    questions: list[str]
+class GenerateQuestionOut(BaseModel):
+    question: str
 
 class GenerateQuestionsAdvancedIn(BaseModel):
     context: str
@@ -198,20 +199,20 @@ async def submit_public_survey_answer(
     survey = survey._mapping
     
     # Check if this IP has already answered
-    if request and request.client:
-        existing_answer = await db.execute(
-            select(SurveyAnswer).where(
-                and_(
-                    SurveyAnswer.survey_id == survey["id"],
-                    SurveyAnswer.ip == request.client.host
-                )
-            )
-        )
-        if existing_answer.first():
-            raise HTTPException(
-                status_code=403,
-                detail="You have already submitted a response for this survey from this IP address."
-            )
+    # if request and request.client:
+    #     existing_answer = await db.execute(
+    #         select(SurveyAnswer).where(
+    #             and_(
+    #                 SurveyAnswer.survey_id == survey["id"],
+    #                 SurveyAnswer.ip == request.client.host
+    #             )
+    #         )
+    #     )
+    #     if existing_answer.first():
+    #         raise HTTPException(
+    #             status_code=403,
+    #             detail="You have already submitted a response for this survey from this IP address."
+    #         )
 
     # Проверяем, не архивирован ли опрос
     if survey["archived"]:
@@ -230,6 +231,42 @@ async def submit_public_survey_answer(
     )
     db.add(db_answer)
     await db.commit()
+
+    # --- FOLLOWUP SUBAGENT INTEGRATION ---
+    # Try to get session dict from request.state, fallback to in-memory (demo only)
+    session = getattr(request.state, 'session', None)
+    if session is None:
+        session = {}
+        setattr(request.state, 'session', session)
+    # Prepare context for followup_subagent
+    # Load survey questions
+    questions = json.loads(survey["questions"])
+    # Find the last answered question (assume answers are in order)
+    if questions and data.answers:
+        last_q_idx = len(data.answers) - 1
+        if last_q_idx < len(questions):
+            last_question = questions[last_q_idx]
+            last_answer = data.answers[-1]
+            # Build history (all previous Q&A)
+            history = []
+            for i in range(last_q_idx):
+                if i < len(questions) and i < len(data.answers):
+                    history.append({
+                        'question': questions[i]['text'] if isinstance(questions[i], dict) else str(questions[i]),
+                        'answer': data.answers[i]
+                    })
+            # Call followup_subagent
+            result = followup_subagent(
+                topic=survey["topic"],
+                question=last_question,
+                answer=last_answer,
+                history=history,
+                session=session,
+                followup_limit=2
+            )
+            if result['action'] == 'followup':
+                return PublicSurveyAnswerOut(ok=False, message=result['message'])
+    # --- END FOLLOWUP SUBAGENT INTEGRATION ---
 
     # If it's a template survey, broadcast the leaderboard update
     if survey["is_template_survey"]:
@@ -262,10 +299,10 @@ async def get_next_ai_question(
     question = ai_generate_followup_question(topic, history, last_answer)
     return {"question": question}
 
-@router.post("/generate-questions", response_model=GenerateQuestionsOut)
-async def generate_questions(data: GenerateQuestionsIn = Body(...)):
-    questions = ai_generate_questions_for_topic(data.topic, n=min(max(data.n, 3), 5))
-    return GenerateQuestionsOut(questions=questions)
+@router.post("/generate-questions", response_model=GenerateQuestionOut)
+async def generate_question(data: GenerateQuestionIn = Body(...)):
+    question = ai_generate_first_question(data.topic)
+    return GenerateQuestionOut(question=question)
 
 @router.post("/generate-questions-advanced", response_model=GenerateQuestionsAdvancedOut)
 async def generate_questions_advanced(data: GenerateQuestionsAdvancedIn = Body(...)):
