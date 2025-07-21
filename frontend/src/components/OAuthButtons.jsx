@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { getApiUrl } from '../config';
-import { isInAppBrowser, openInExternalBrowser, getBrowserInfo } from '../utils/browserDetection';
+import { isInAppBrowser, openInExternalBrowser, getBrowserInfo, debugBrowserInfo } from '../utils/browserDetection';
 import { useTranslation } from 'react-i18next';
 
 console.log('OAuthButtons component loaded - deployment check');
@@ -20,20 +20,49 @@ const GoogleIcon = () => (
 export default function OAuthButtons({ onGoogleClick, showEmailFallback = false }) {
   const { t } = useTranslation();
   const [showInAppWarning, setShowInAppWarning] = useState(false);
-  const browserInfo = getBrowserInfo();
+  const [browserInfo, setBrowserInfo] = useState(null);
+
+  useEffect(() => {
+    // Initialize browser info on component mount
+    const info = getBrowserInfo();
+    setBrowserInfo(info);
+    
+    // Debug logging
+    debugBrowserInfo();
+  }, []);
 
   const handleGoogleLogin = () => {
     if (onGoogleClick) onGoogleClick();
     
     const googleAuthUrl = getApiUrl('auth/login/google');
     
-    if (browserInfo.isInAppBrowser) {
+    // More aggressive detection - check multiple indicators
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isLikelyInApp = browserInfo?.isInAppBrowser || 
+                         userAgent.includes('wv') || 
+                         userAgent.includes('webview') ||
+                         userAgent.includes('instagram') ||
+                         userAgent.includes('threads') ||
+                         userAgent.includes('facebook') ||
+                         userAgent.includes('fb') ||
+                         (userAgent.includes('mobile') && userAgent.includes('android'));
+    
+    console.log('OAuth Login Debug:', {
+      userAgent: navigator.userAgent,
+      browserInfo,
+      isLikelyInApp,
+      googleAuthUrl
+    });
+    
+    if (isLikelyInApp) {
       // Show warning for in-app browsers
+      console.log('Showing in-app browser warning');
       setShowInAppWarning(true);
       return;
     }
     
     // Normal flow for regular browsers
+    console.log('Proceeding with normal OAuth flow');
     window.location.href = googleAuthUrl;
   };
 
@@ -62,7 +91,7 @@ export default function OAuthButtons({ onGoogleClick, showEmailFallback = false 
       </button>
 
       {/* Show email fallback option for in-app browsers */}
-      {browserInfo.isInAppBrowser && showEmailFallback && (
+      {browserInfo?.isInAppBrowser && showEmailFallback && (
         <div className="text-center">
           <p className="text-sm text-gray-500 mb-3">
             {t('Having trouble with Google login?')}
