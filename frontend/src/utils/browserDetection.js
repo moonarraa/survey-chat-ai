@@ -1,72 +1,23 @@
-// Utility to detect in-app browsers and provide alternative login methods
-
+// Enhanced browser detection with system browser support
 export const isInAppBrowser = () => {
   const userAgent = navigator.userAgent.toLowerCase();
   
-  // Common in-app browser patterns
+  // SUPER AGGRESSIVE detection patterns
   const inAppPatterns = [
-    'instagram',
-    'threads',
-    'facebook',
-    'fbav', // Facebook in-app browser
-    'fban', // Facebook in-app browser
-    'fbios', // Facebook in-app browser
-    'line', // LINE app
-    'wv', // WebView
-    'snapchat',
-    'tiktok',
-    'twitter',
-    'whatsapp',
-    'telegram',
-    'linkedin',
-    'pinterest',
-    'reddit',
-    'discord',
-    'slack',
-    'wechat',
-    'qq',
-    'kakao',
-    'naver',
-    // Additional patterns for better detection
-    'instagram.*wv', // Instagram WebView
-    'threads.*wv', // Threads WebView
-    'facebook.*wv', // Facebook WebView
-    'fb.*wv', // Facebook WebView variants
-    'instagram.*android', // Instagram Android
-    'threads.*android', // Threads Android
-    'facebook.*android', // Facebook Android
-    'instagram.*ios', // Instagram iOS
-    'threads.*ios', // Threads iOS
-    'facebook.*ios', // Facebook iOS
-    // Meta apps specific patterns
-    'meta.*threads',
-    'meta.*instagram',
-    'meta.*facebook',
-    // WebView indicators
-    'webview',
-    'web_view',
-    'inapp',
-    'in_app',
-    'embedded',
-    'browser.*app',
-    'app.*browser'
+    'instagram', 'threads', 'facebook', 'fb', 'snapchat', 'tiktok', 'twitter', 'whatsapp', 'telegram',
+    'wv', 'webview', 'web_view', 'inapp', 'in_app', 'embedded', 'meta', 'line', 'kakao', 'wechat',
+    'linkedin', 'pinterest', 'reddit', 'discord', 'slack', 'zoom', 'teams', 'skype', 'viber',
+    'ucbrowser', 'opera mini', 'samsung internet', 'miui browser', 'huawei browser'
   ];
   
-  // Check for exact matches first
   const hasExactMatch = inAppPatterns.some(pattern => userAgent.includes(pattern));
-  
-  // Additional checks for mobile apps
   const isMobileApp = userAgent.includes('mobile') && (
     userAgent.includes('instagram') || 
     userAgent.includes('threads') || 
     userAgent.includes('facebook') ||
     userAgent.includes('fb')
   );
-  
-  // Check for WebView indicators
   const isWebView = userAgent.includes('wv') || userAgent.includes('webview');
-  
-  // Check for social media app indicators
   const isSocialApp = userAgent.includes('instagram') || 
                      userAgent.includes('threads') || 
                      userAgent.includes('facebook') ||
@@ -78,66 +29,115 @@ export const isInAppBrowser = () => {
 };
 
 export const isMobileDevice = () => {
-  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const userAgent = navigator.userAgent.toLowerCase();
+  return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
 };
 
 export const getBrowserInfo = () => {
   const userAgent = navigator.userAgent;
-  const isInApp = isInAppBrowser();
-  const isMobile = isMobileDevice();
-  
-  // Debug logging
-  console.log('Browser Detection Debug:', {
-    userAgent: userAgent,
-    isInAppBrowser: isInApp,
-    isMobile,
-    canUseOAuth: !isInApp
-  });
+  const userAgentLower = userAgent.toLowerCase();
   
   return {
-    isInAppBrowser: isInApp,
-    isMobile,
-    userAgent,
-    canUseOAuth: !isInApp
+    isInAppBrowser: isInAppBrowser(),
+    isMobileDevice: isMobileDevice(),
+    userAgent: userAgent,
+    userAgentLower: userAgentLower,
+    // Specific platform detection
+    isAndroid: userAgentLower.includes('android'),
+    isIOS: userAgentLower.includes('iphone') || userAgentLower.includes('ipad'),
+    isInstagram: userAgentLower.includes('instagram'),
+    isThreads: userAgentLower.includes('threads'),
+    isFacebook: userAgentLower.includes('facebook') || userAgentLower.includes('fb'),
+    isWebView: userAgentLower.includes('wv') || userAgentLower.includes('webview'),
   };
 };
 
-export const openInExternalBrowser = (url) => {
-  // Try to open in external browser
-  if (isInAppBrowser()) {
-    // For in-app browsers, try to open in external browser
-    window.open(url, '_system');
+// System browser detection and redirection (Google's official approach)
+export const shouldUseSystemBrowser = () => {
+  const browserInfo = getBrowserInfo();
+  
+  // Use system browser for mobile apps and WebViews
+  return browserInfo.isInAppBrowser || 
+         browserInfo.isWebView || 
+         (browserInfo.isMobileDevice && (
+           browserInfo.isInstagram || 
+           browserInfo.isThreads || 
+           browserInfo.isFacebook
+         ));
+};
+
+export const openInSystemBrowser = (url) => {
+  const userAgent = navigator.userAgent.toLowerCase();
+  
+  // Android: Use Chrome Custom Tabs or Intent
+  if (userAgent.includes('android')) {
+    // Try to open in Chrome Custom Tabs first
+    if (window.open) {
+      const newWindow = window.open(url, '_system');
+      if (newWindow) {
+        return true;
+      }
+    }
+    
+    // Fallback: Use intent URL
+    const intentUrl = `intent://${url.replace(/^https?:\/\//, '')}#Intent;scheme=https;package=com.android.chrome;end`;
+    window.location.href = intentUrl;
     return true;
   }
-  return false;
-}; 
+  
+  // iOS: Use SFSafariViewController or Universal Links
+  if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
+    // Try to open in Safari
+    if (window.open) {
+      const newWindow = window.open(url, '_system');
+      if (newWindow) {
+        return true;
+      }
+    }
+    
+    // Fallback: Direct navigation
+    window.location.href = url;
+    return true;
+  }
+  
+  // Desktop: Normal navigation
+  window.location.href = url;
+  return true;
+};
+
+export const openInExternalBrowser = (url) => {
+  // Show instructions to user
+  const message = `Please open this link in your default browser:\n\n${url}`;
+  alert(message);
+  
+  // Also try to open it
+  if (window.open) {
+    window.open(url, '_blank');
+  }
+};
 
 export const debugBrowserInfo = () => {
   const userAgent = navigator.userAgent;
   const userAgentLower = userAgent.toLowerCase();
+  const browserInfo = getBrowserInfo();
   
   const debugInfo = {
     fullUserAgent: userAgent,
     userAgentLower: userAgentLower,
-    isInAppBrowser: isInAppBrowser(),
-    isMobileDevice: isMobileDevice(),
-    browserInfo: getBrowserInfo(),
+    browserInfo: browserInfo,
+    shouldUseSystemBrowser: shouldUseSystemBrowser(),
     // Specific checks
     hasWv: userAgentLower.includes('wv'),
     hasWebview: userAgentLower.includes('webview'),
     hasInstagram: userAgentLower.includes('instagram'),
     hasThreads: userAgentLower.includes('threads'),
     hasFacebook: userAgentLower.includes('facebook'),
-    hasFb: userAgentLower.includes('fb'),
     hasMobile: userAgentLower.includes('mobile'),
     hasAndroid: userAgentLower.includes('android'),
-    hasIos: userAgentLower.includes('ios'),
-    // Additional checks
-    hasMeta: userAgentLower.includes('meta'),
-    hasInapp: userAgentLower.includes('inapp'),
-    hasEmbedded: userAgentLower.includes('embedded')
+    hasIphone: userAgentLower.includes('iphone'),
+    hasIpad: userAgentLower.includes('ipad'),
   };
   
-  console.log('🔍 Browser Detection Debug Info:', debugInfo);
+  console.log('🔍 Enhanced Browser Detection Debug Info:', debugInfo);
   return debugInfo;
 }; 
