@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getApiUrl } from '../utils/api';
+import { getApiUrl } from '../config';
 import { 
   isInAppBrowser, 
   shouldUseSystemBrowser, 

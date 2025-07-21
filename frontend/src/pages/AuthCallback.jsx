@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getApiUrl } from '../utils/api';
+import { getApiUrl } from '../config';
 
 const AuthCallback = () => {
   const [searchParams] = useSearchParams();
