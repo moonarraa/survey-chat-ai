@@ -103,6 +103,12 @@ async def get_users_count(
 
 @router.get('/login/google')
 async def login_via_google(request: Request):
+    """
+    Google OAuth login endpoint.
+    
+    Note: In-app browsers (Instagram, Threads, Facebook, etc.) may block OAuth flows.
+    The frontend now detects these browsers and shows appropriate warnings/alternatives.
+    """
     redirect_uri = settings.google_redirect_url
     return await oauth.google.authorize_redirect(request, redirect_uri)
 

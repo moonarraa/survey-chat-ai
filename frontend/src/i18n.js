@@ -390,8 +390,15 @@ const resources = {
       'event_evaluation_by_participants': 'Event Evaluation by Participants',
       'event_evaluation_by_participants_context': 'Survey participants to assess the organization and content of the event.',
       'speaker_evaluation': 'Speaker Evaluation',
-      'speaker_evaluation_context': 'Collect feedback on the speakers\' presentations at the event.',
-      'Please fill in the survey goal/context.': 'Please fill in the survey goal/context.',
+      'speaker_evaluation_context': 'Собрать обратную связь о выступлениях спикеров на мероприятии.',
+      'Please fill in the survey goal/context.': 'Пожалуйста, заполните цель или тему опроса.',
+      'Sign in with Google': 'Войти через Google',
+      'In-App Browser Detected': 'Обнаружен встроенный браузер',
+      'Google login may not work properly in this browser. We recommend opening this page in your default browser.': 'Вход через Google может не работать в этом браузере. Рекомендуем открыть страницу в стандартном браузере.',
+      'Open in Browser': 'Открыть в браузере',
+      'Continue Anyway': 'Продолжить',
+      'Having trouble with Google login?': 'Проблемы с входом через Google?',
+      'Try using email and password instead': 'Попробуйте использовать email и пароль',
     }
   },
   ru: {
@@ -784,6 +791,13 @@ const resources = {
       'speaker_evaluation': 'Оценка спикеров',
       'speaker_evaluation_context': 'Собрать обратную связь о выступлениях спикеров на мероприятии.',
       'Please fill in the survey goal/context.': 'Пожалуйста, заполните цель или тему опроса.',
+      'Sign in with Google': 'Войти через Google',
+      'In-App Browser Detected': 'Обнаружен встроенный браузер',
+      'Google login may not work properly in this browser. We recommend opening this page in your default browser.': 'Вход через Google может не работать в этом браузере. Рекомендуем открыть страницу в стандартном браузере.',
+      'Open in Browser': 'Открыть в браузере',
+      'Continue Anyway': 'Продолжить',
+      'Having trouble with Google login?': 'Проблемы с входом через Google?',
+      'Try using email and password instead': 'Попробуйте использовать email и пароль',
     }
   }
 };

@@ -163,7 +163,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <OAuthButtons />
+            <OAuthButtons showEmailFallback={true} />
           </form>
 
           <div className="mt-6 text-center">

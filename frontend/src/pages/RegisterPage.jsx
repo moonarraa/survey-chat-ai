@@ -309,7 +309,7 @@ function RegisterPage() {
             </div>
 
             {/* Google OAuth Button */}
-            <OAuthButtons />
+            <OAuthButtons showEmailFallback={true} />
           </form>
 
           {/* Login Link */}
