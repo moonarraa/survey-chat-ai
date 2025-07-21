@@ -306,7 +306,7 @@ const resources = {
       'Оценка курса студентами': 'Course Evaluation by Students',
       'Провести опрос среди студентов для оценки качества учебного курса и преподавания.': 'Survey students to assess the quality of the course and teaching.',
       'Оценка преподавателя': 'Teacher Evaluation',
-      'Собрать обратную связь о работе преподавателя по итогам семестра.': 'Collect feedback on the teacher’s work at the end of the semester.',
+      'Собрать обратную связь о работе преподавателя по итогам семестра.': 'Collect feedback on the teacher\'s work at the end of the semester.',
       'Оценка учебных материалов': 'Educational Materials Evaluation',
       'Провести опрос для оценки полезности и доступности учебных материалов.': 'Survey to assess the usefulness and accessibility of educational materials.',
       'Продажи / Опрос клиентов': 'Sales / Customer Survey',
@@ -333,17 +333,18 @@ const resources = {
       'Оценка мероприятия участниками': 'Event Evaluation by Participants',
       'Провести опрос среди участников для оценки организации и содержания мероприятия.': 'Survey participants to assess the organization and content of the event.',
       'Оценка спикеров': 'Speaker Evaluation',
-      'Собрать обратную связь о выступлениях спикеров на мероприятии.': 'Collect feedback on the speakers’ presentations at the event.',
-      'AI will automatically generate questions based on your goal': 'ИИ автоматически сгенерирует вопросы на основе вашей цели',
-      'Survey goal/context': 'Цель или тема опроса',
-      'For example: Student satisfaction assessment, customer needs research, team performance analysis...': 'Например: оценка удовлетворенности студентов, исследование потребностей клиентов, анализ эффективности команды...',
-      'The more detailed the goal, the better the questions will be': 'Чем подробнее цель, тем лучше будут вопросы',
-      'Create survey with AI': 'Создать опрос с помощью ИИ',
-      'Choose a template': 'Выбрать шаблон',
-      'AI is creating questions...': 'ИИ создает вопросы...',
-      'Use this template': 'Использовать этот шаблон',
-      'Choose a segment': 'Выберите сегмент',
-      'AI will help you get started quickly with ready-made scenarios': 'ИИ поможет быстро начать с готовыми сценариями',
+      'Собрать обратную связь о выступлениях спикеров на мероприятии.': 'Collect feedback on the speakers\' presentations at the event.',
+      'AI will automatically generate questions based on your goal': 'AI will automatically generate questions based on your goal',
+      'Survey goal or topic': 'Survey goal or topic',
+      'Survey goal/context': 'Survey goal/context',
+      'For example: Student satisfaction assessment, customer needs research, team performance analysis...': 'For example: Student satisfaction assessment, customer needs research, team performance analysis...',
+      'The more detailed the goal, the better the questions will be': 'The more detailed the goal, the better the questions will be',
+      'Create survey with AI': 'Create survey with AI',
+      'Choose a template': 'Choose a template',
+      'AI is creating questions...': 'AI is creating questions...',
+      'Use this template': 'Use this template',
+      'Choose a segment': 'Choose a segment',
+      'AI will help you get started quickly with ready-made scenarios': 'AI will help you get started quickly with ready-made scenarios',
       'Logout': 'Logout',
       'product_feedback': 'Product Feedback',
       'product_feedback_context': 'Collect user feedback on a new mobile app to identify strengths and weaknesses.',
@@ -362,7 +363,7 @@ const resources = {
       'course_evaluation_by_students': 'Course Evaluation by Students',
       'course_evaluation_by_students_context': 'Survey students to assess the quality of the course and teaching.',
       'teacher_evaluation': 'Teacher Evaluation',
-      'teacher_evaluation_context': 'Collect feedback on the teacher’s work at the end of the semester.',
+      'teacher_evaluation_context': 'Collect feedback on the teacher\'s work at the end of the semester.',
       'educational_materials_evaluation': 'Educational Materials Evaluation',
       'educational_materials_evaluation_context': 'Survey to assess the usefulness and accessibility of educational materials.',
       'sales_customer_survey': 'Sales / Customer Survey',
@@ -389,7 +390,8 @@ const resources = {
       'event_evaluation_by_participants': 'Event Evaluation by Participants',
       'event_evaluation_by_participants_context': 'Survey participants to assess the organization and content of the event.',
       'speaker_evaluation': 'Speaker Evaluation',
-      'speaker_evaluation_context': 'Collect feedback on the speakers’ presentations at the event.',
+      'speaker_evaluation_context': 'Collect feedback on the speakers\' presentations at the event.',
+      'Please fill in the survey goal/context.': 'Please fill in the survey goal/context.',
     }
   },
   ru: {
@@ -444,7 +446,7 @@ const resources = {
       'Automatic sentiment and emotion analysis': 'Автоматический анализ тональности и эмоций',
       'Export to Excel, Google Sheets, and more': 'Экспорт в Excel, Google Sheets и другие форматы',
       'Survey AI helped me collect data on how people perceive our product. Now we can improve it based on this data.': 'Survey AI помог мне собрать данные о том, как люди воспринимают наш продукт. Теперь мы можем улучшать его на основе этих данных.',
-      'Incredibly convenient! I used to create Google Forms, but now Survey AI helps me create surveys in 2 minutes. And the data quality has increased dramatically.': 'Невероятно удобно! Раньше я создавала Google формы, а теперь - Survey AI помогает мне создавать опросы за 2 минуты. А качество данных выросло в разы.',
+      'Incredibly convenient! I used to create Google Forms, but now Survey AI helps me create surveys in 2 минуты. And the data quality has increased dramatically.': 'Невероятно удобно! Раньше я создавала Google формы, а теперь - Survey AI помогает мне создавать опросы за 2 минуты. А качество данных выросло в разы.',
       'How quickly will I get analytics for the survey?': 'Как быстро я получу аналитику по опросу?',
       'Analytics is generated instantly after receiving the first responses. You see results in real time.': 'Аналитика формируется мгновенно после получения первых ответов. Вы видите результаты в реальном времени.',
       'Can I export the results?': 'Можно ли экспортировать результаты?',
@@ -725,6 +727,7 @@ const resources = {
       'Оценка спикеров': 'Оценка спикеров',
       'Собрать обратную связь о выступлениях спикеров на мероприятии.': 'Собрать обратную связь о выступлениях спикеров на мероприятии.',
       'AI will automatically generate questions based on your goal': 'ИИ автоматически сгенерирует вопросы на основе вашей цели',
+      'Survey goal or topic': 'Цель или тема опроса',
       'Survey goal/context': 'Цель или тема опроса',
       'For example: Student satisfaction assessment, customer needs research, team performance analysis...': 'Например: оценка удовлетворенности студентов, исследование потребностей клиентов, анализ эффективности команды...',
       'The more detailed the goal, the better the questions will be': 'Чем подробнее цель, тем лучше будут вопросы',
@@ -780,6 +783,7 @@ const resources = {
       'event_evaluation_by_participants_context': 'Провести опрос среди участников для оценки организации и содержания мероприятия.',
       'speaker_evaluation': 'Оценка спикеров',
       'speaker_evaluation_context': 'Собрать обратную связь о выступлениях спикеров на мероприятии.',
+      'Please fill in the survey goal/context.': 'Пожалуйста, заполните цель или тему опроса.',
     }
   }
 };
@@ -788,8 +792,8 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: localStorage.getItem('lang') || 'ru', // Always default to Russian unless user has chosen
-    fallbackLng: 'ru', // Fallback to Russian as well
+    lng: localStorage.getItem('lang') || 'en', // Default to English unless user has chosen
+    fallbackLng: 'en', // Fallback to English as well
     interpolation: {
       escapeValue: false,
     },

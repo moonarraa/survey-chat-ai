@@ -7,118 +7,118 @@ import { useTranslation } from 'react-i18next';
 
 const TEMPLATES = [
   {
-    segment: 'Обратная связь по продукту',
+    segment: 'product_feedback',
     templates: [
       {
-        name: 'Обратная связь по продукту',
-        context: 'Сбор отзывов пользователей о новом мобильном приложении для выявления сильных и слабых сторон продукта.'
+        name: 'product_feedback',
+        context: 'product_feedback_context'
       },
       {
-        name: 'Оценка качества поддержки',
-        context: 'Оценка удовлетворенности клиентов качеством технической поддержки.'
+        name: 'support_quality_assessment',
+        context: 'support_quality_assessment_context'
       },
       {
-        name: 'Оценка интерфейса',
-        context: 'Собрать мнения пользователей о простоте и удобстве интерфейса продукта.'
+        name: 'interface_evaluation',
+        context: 'interface_evaluation_context'
       }
     ]
   },
   {
-    segment: 'HR / Оценка сотрудников',
+    segment: 'hr_employee_evaluation',
     templates: [
       {
-        name: 'Оценка вовлеченности сотрудников',
-        context: 'Провести опрос для оценки вовлеченности сотрудников компании и выявления зон для улучшения корпоративной культуры.'
+        name: 'employee_engagement_assessment',
+        context: 'employee_engagement_assessment_context'
       },
       {
-        name: 'Оценка адаптации новых сотрудников',
-        context: 'Собрать обратную связь от новых сотрудников о процессе адаптации в компании.'
+        name: 'new_employee_adaptation_assessment',
+        context: 'new_employee_adaptation_assessment_context'
       },
       {
-        name: 'Оценка удовлетворенности условиями труда',
-        context: 'Провести опрос среди сотрудников для оценки условий труда и выявления потребностей.'
+        name: 'work_conditions_satisfaction_assessment',
+        context: 'work_conditions_satisfaction_assessment_context'
       }
     ]
   },
   {
-    segment: 'Образование / Оценка курса',
+    segment: 'education_course_evaluation',
     templates: [
       {
-        name: 'Оценка курса студентами',
-        context: 'Провести опрос среди студентов для оценки качества учебного курса и преподавания.'
+        name: 'course_evaluation_by_students',
+        context: 'course_evaluation_by_students_context'
       },
       {
-        name: 'Оценка преподавателя',
-        context: 'Собрать обратную связь о работе преподавателя по итогам семестра.'
+        name: 'teacher_evaluation',
+        context: 'teacher_evaluation_context'
       },
       {
-        name: 'Оценка учебных материалов',
-        context: 'Провести опрос для оценки полезности и доступности учебных материалов.'
+        name: 'educational_materials_evaluation',
+        context: 'educational_materials_evaluation_context'
       }
     ]
   },
   {
-    segment: 'Продажи / Опрос клиентов',
+    segment: 'sales_customer_survey',
     templates: [
       {
-        name: 'Оценка удовлетворенности клиентов',
-        context: 'Провести опрос среди клиентов для оценки их удовлетворенности сервисом и выявления потребностей.'
+        name: 'customer_satisfaction_assessment',
+        context: 'customer_satisfaction_assessment_context'
       },
       {
-        name: 'Исследование причин отказа от покупки',
-        context: 'Собрать мнения клиентов, которые не совершили покупку, чтобы понять причины отказа.'
+        name: 'purchase_refusal_reasons_research',
+        context: 'purchase_refusal_reasons_research_context'
       }
     ]
   },
   {
-    segment: 'Медицина / Опрос пациентов',
+    segment: 'medicine_patient_survey',
     templates: [
       {
-        name: 'Оценка качества медицинских услуг',
-        context: 'Собрать обратную связь от пациентов о качестве оказанных медицинских услуг.'
+        name: 'medical_services_quality_assessment',
+        context: 'medical_services_quality_assessment_context'
       },
       {
-        name: 'Оценка работы персонала',
-        context: 'Провести опрос среди пациентов для оценки работы медицинского персонала.'
+        name: 'staff_performance_assessment',
+        context: 'staff_performance_assessment_context'
       }
     ]
   },
   {
-    segment: 'IT / Оценка процессов',
+    segment: 'it_process_evaluation',
     templates: [
       {
-        name: 'Оценка эффективности процессов разработки',
-        context: 'Провести опрос среди команды разработки для выявления узких мест и улучшения процессов.'
+        name: 'development_process_efficiency_assessment',
+        context: 'development_process_efficiency_assessment_context'
       },
       {
-        name: 'Оценка удовлетворенности инструментами',
-        context: 'Собрать мнения сотрудников о качестве и удобстве используемых IT-инструментов.'
+        name: 'tool_satisfaction_assessment',
+        context: 'tool_satisfaction_assessment_context'
       }
     ]
   },
   {
-    segment: 'Маркетинг / Исследование рынка',
+    segment: 'marketing_market_research',
     templates: [
       {
-        name: 'Анализ узнаваемости бренда',
-        context: 'Провести опрос для оценки узнаваемости бренда среди целевой аудитории.'
+        name: 'brand_awareness_analysis',
+        context: 'brand_awareness_analysis_context'
       },
       {
-        name: 'Оценка эффективности рекламной кампании',
-        context: 'Собрать мнения клиентов о новой рекламной кампании.'
+        name: 'advertising_campaign_effectiveness_assessment',
+        context: 'advertising_campaign_effectiveness_assessment_context'
       }
     ]
   },
   {
-    segment: 'Event / Оценка мероприятия',
+    segment: 'event_event_evaluation',
     templates: [
       {
-        name: 'Оценка мероприятия участниками',
-        context: 'Провести опрос среди участников для оценки организации и содержания мероприятия.'
+        name: 'event_evaluation_by_participants',
+        context: 'event_evaluation_by_participants_context'
       },
       {
-        name: 'Оценка спикеров',
-        context: 'Собрать обратную связь о выступлениях спикеров на мероприятии.'
+        name: 'speaker_evaluation',
+        context: 'speaker_evaluation_context'
       }
     ]
   }
@@ -186,7 +186,7 @@ export default function CreateSurveyModal({ onSuccess }) {
       });
       if (!res.ok) {
         const data = await res.json();
-        if (data.detail && data.detail.includes("уже есть активный опрос")) {
+        if (data.detail && data.detail.includes("active survey")) {
           setError(t('You already have an active survey. Please archive it in the "Current" section before creating a new one.'));
         } else {
           setError(data.detail || t('Error creating survey'));
