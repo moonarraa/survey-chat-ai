@@ -7,6 +7,7 @@ import { Plus, Trash2, BarChart2, Edit, Settings, Star, List, Image as ImageIcon
 import Select from '../components/Select';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { FaTelegramPlane } from 'react-icons/fa';
 
 const QUESTION_TYPES = [
   { value: "multiple_choice", label: "Multiple Choice" },
@@ -515,11 +516,20 @@ export default function SurveyDetailPage({ id, onClose }) {
                   {t('Copy public link')}
                 </button>
                 <button
-                  className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition text-lg"
+                  className="bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-600 transition text-lg flex items-center justify-center gap-2"
                   style={{ minWidth: 220 }}
                   onClick={() => {navigator.clipboard.writeText(telegramUrl); setCopySuccess(t('Telegram link copied!')); setTimeout(()=>setCopySuccess(''), 1500);}}
                 >
+                  <FaTelegramPlane className="w-5 h-5" />
                   {t('Copy Telegram link')}
+                </button>
+                <button
+                  className="bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition text-lg flex items-center justify-center gap-2"
+                  style={{ minWidth: 220 }}
+                  onClick={() => window.open(telegramUrl, '_blank')}
+                >
+                  <FaTelegramPlane className="w-5 h-5" />
+                  {t('Open in Telegram')}
                 </button>
               </div>
               {copySuccess && <span className="text-green-600 text-center w-full mb-4">{copySuccess}</span>}

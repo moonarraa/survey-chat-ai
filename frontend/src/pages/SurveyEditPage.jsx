@@ -586,19 +586,34 @@ export default function SurveyEditPage({ id: propId, onClose }) {
         {activeTab === 'share' && !survey?.archived && (
           <div className="flex flex-col items-center gap-8 py-12">
             <div className="text-lg font-semibold text-center mb-2">{t('Public survey link')}</div>
-            <button
-              className="relative bg-primary-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-primary-700 transition flex items-center gap-3 focus:outline-none focus:ring-4 focus:ring-primary-300"
-              onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess(t('Link copied!')); setTimeout(()=>setCopySuccess(''), 1500);}}
-              style={{minWidth: 260}}
-            >
-              <Copy className="w-6 h-6" />
-              {t('Copy link')}
+            <div className="flex flex-col gap-4 w-full max-w-sm">
+              <button
+                className="relative bg-primary-600 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-primary-700 transition flex items-center justify-center gap-3 focus:outline-none focus:ring-4 focus:ring-primary-300"
+                onClick={() => {navigator.clipboard.writeText(publicUrl); setCopySuccess(t('Link copied!')); setTimeout(()=>setCopySuccess(''), 1500);}}
+              >
+                <Copy className="w-6 h-6" />
+                {t('Copy link')}
+              </button>
+              <button
+                className="bg-blue-500 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-blue-600 transition flex items-center justify-center gap-3 focus:outline-none focus:ring-4 focus:ring-blue-300"
+                onClick={() => {navigator.clipboard.writeText(`https://t.me/survey_chat_ai_bot?start=${survey.public_id}`); setCopySuccess(t('Telegram link copied!')); setTimeout(()=>setCopySuccess(''), 1500);}}
+              >
+                <FaTelegramPlane className="w-6 h-6" />
+                {t('Copy Telegram link')}
+              </button>
+              <button
+                className="bg-green-500 text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-green-600 transition flex items-center justify-center gap-3 focus:outline-none focus:ring-4 focus:ring-green-300"
+                onClick={() => window.open(`https://t.me/survey_chat_ai_bot?start=${survey.public_id}`, '_blank')}
+              >
+                <FaTelegramPlane className="w-6 h-6" />
+                {t('Open in Telegram')}
+              </button>
               {copySuccess && (
-                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-green-500 text-white px-4 py-1 rounded-xl shadow text-base animate-fade-in">
+                <span className="text-center bg-green-500 text-white px-4 py-2 rounded-xl shadow text-base animate-fade-in">
                   {copySuccess}
                 </span>
               )}
-            </button>
+            </div>
             <div className="mt-6 flex flex-col items-center">
               <div className="mb-2 text-gray-500">{t('QR code for quick access')}:</div>
               <QRCode ref={qrRef} value={publicUrl} size={160} />
