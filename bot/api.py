@@ -1,6 +1,9 @@
 import httpx
 from config import BACKEND_URL
-from fastapi import HTTPException
+
+class SurveyNotFoundError(Exception):
+    """Custom exception for survey not found"""
+    pass
 
 async def get_survey_by_public_id(public_id: str):
     print(f"🔍 Attempting to get survey with public_id: {public_id}")
@@ -17,7 +20,7 @@ async def get_survey_by_public_id(public_id: str):
             
             if res.status_code == 404:
                 print("❌ Survey not found (404)")
-                raise HTTPException(status_code=404, detail="Survey not found")
+                raise SurveyNotFoundError("Survey not found")
             
             res.raise_for_status()
             data = res.json()
