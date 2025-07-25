@@ -44,18 +44,18 @@ async def cmd_start(message: types.Message, command: CommandObject, state: FSMCo
         first_q = survey["questions"][0]
         if first_q["type"] == "multiple_choice":
             keyboard = get_multiple_choice_keyboard(first_q["options"])
-            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
+            await message.answer(safe_tg_message(first_q['text']), reply_markup=keyboard)
         elif first_q["type"] == "rating":
             keyboard = get_rating_keyboard(first_q.get("scale", 5))
-            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
+            await message.answer(safe_tg_message(first_q['text']), reply_markup=keyboard)
         elif first_q["type"] == "ranking":
             keyboard = get_ranking_keyboard(first_q["items"])
-            await message.answer(f"{first_q['text']}\n\nВыберите один элемент:", reply_markup=keyboard)
+            await message.answer(safe_tg_message(f"{first_q['text']}\n\nВыберите один элемент:"), reply_markup=keyboard)
         elif first_q["type"] == "image_choice":
             keyboard = get_image_choice_keyboard(first_q["images"])
-            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
+            await message.answer(safe_tg_message(first_q['text']), reply_markup=keyboard)
         else:
-            await message.answer(f"{first_q['text']}")
+            await message.answer(safe_tg_message(first_q['text']))
         await state.set_state(SurveyStates.answering)
         return
     # Only show the welcome message if no valid payload
@@ -143,22 +143,29 @@ async def handle_survey_link_or_code(message: types.Message, state: FSMContext):
     first_q = survey["questions"][0]
     if first_q["type"] == "multiple_choice":
         keyboard = get_multiple_choice_keyboard(first_q["options"])
-        await message.answer(f"{first_q['text']}", reply_markup=keyboard)
+        await message.answer(safe_tg_message(first_q['text']), reply_markup=keyboard)
     elif first_q["type"] == "rating":
         keyboard = get_rating_keyboard(first_q.get("scale", 5))
-        await message.answer(f"{first_q['text']}", reply_markup=keyboard)
+        await message.answer(safe_tg_message(first_q['text']), reply_markup=keyboard)
     elif first_q["type"] == "ranking":
         keyboard = get_ranking_keyboard(first_q["items"])
-        await message.answer(f"{first_q['text']}\n\nВыберите один элемент:", reply_markup=keyboard)
+        await message.answer(safe_tg_message(f"{first_q['text']}\n\nВыберите один элемент:"), reply_markup=keyboard)
     elif first_q["type"] == "image_choice":
         keyboard = get_image_choice_keyboard(first_q["images"])
-        await message.answer(f"{first_q['text']}", reply_markup=keyboard)
+        await message.answer(safe_tg_message(first_q['text']), reply_markup=keyboard)
     else:
-        await message.answer(f"{first_q['text']}")
+        await message.answer(safe_tg_message(first_q['text']))
     await state.set_state(SurveyStates.answering)
 
 @router.callback_query(F.data.startswith("answer:"))
 async def handle_answer_callback(callback_query: types.CallbackQuery, state: FSMContext):
+    # Проверяем, есть ли данные в состоянии
+    data = await state.get_data()
+    if not data or "questions" not in data:
+        await callback_query.answer("Сессия опроса истекла. Начните опрос заново.")
+        await callback_query.message.answer("Пожалуйста, начните опрос заново с помощью команды /start <код_опроса>")
+        return
+    
     # Передаем callback_query как message-like объект
     await process_survey_answer(callback_query, state)
     await callback_query.answer()
@@ -172,6 +179,13 @@ async def process_survey_answer(message: types.Message, state: FSMContext):
         chat_message = message
 
     data = await state.get_data()
+    
+    # Проверяем наличие необходимых данных
+    if not data or "questions" not in data or "current" not in data:
+        await chat_message.answer("Сессия опроса истекла. Начните опрос заново с помощью команды /start <код_опроса>")
+        await state.clear()
+        return
+    
     answers = data.get("answers", [])
     questions = data["questions"]
     current = data["current"]
@@ -210,18 +224,18 @@ async def process_survey_answer(message: types.Message, state: FSMContext):
         await state.update_data(answers=answers, current=current)
         if next_q["type"] == "multiple_choice":
             keyboard = get_multiple_choice_keyboard(next_q["options"])
-            await chat_message.answer(f"📝 {next_q['text']}", reply_markup=keyboard)
+            await chat_message.answer(safe_tg_message(f"📝 {next_q['text']}"), reply_markup=keyboard)
         elif next_q["type"] == "rating":
             keyboard = get_rating_keyboard(next_q.get("scale", 5))
-            await chat_message.answer(f"⭐ {next_q['text']}", reply_markup=keyboard)
+            await chat_message.answer(safe_tg_message(f"⭐ {next_q['text']}"), reply_markup=keyboard)
         elif next_q["type"] == "ranking":
             keyboard = get_ranking_keyboard(next_q["items"])
-            await chat_message.answer(f"📊 {next_q['text']}", reply_markup=keyboard)
+            await chat_message.answer(safe_tg_message(f"📊 {next_q['text']}"), reply_markup=keyboard)
         elif next_q["type"] == "image_choice":
             keyboard = get_image_choice_keyboard(next_q["images"])
-            await chat_message.answer(f"🖼️ {next_q['text']}", reply_markup=keyboard)
+            await chat_message.answer(safe_tg_message(f"🖼️ {next_q['text']}"), reply_markup=keyboard)
         else:
-            await chat_message.answer(f"💭 {next_q['text']}")
+            await chat_message.answer(safe_tg_message(f"💭 {next_q['text']}"))
     else:
         # Отправить ответы на backend
         try:
@@ -248,12 +262,16 @@ async def process_survey_answer(message: types.Message, state: FSMContext):
             print(f"Error submitting survey answers: {e}")
             if hasattr(e, 'response') and e.response is not None:
                 try:
-                    detail = e.response.json().get('detail')
-                    await message.answer(f"Ошибка: {detail}")
+                    # Проверяем, что ответ не пустой
+                    if e.response.content:
+                        detail = e.response.json().get('detail')
+                        await message.answer(safe_tg_message(f"Ошибка: {detail}"))
+                    else:
+                        await message.answer("Ошибка при сохранении ответа: пустой ответ от сервера")
                 except Exception:
-                    await message.answer(f"Ошибка при сохранении ответа: {e}")
+                    await message.answer(safe_tg_message(f"Ошибка при сохранении ответа: {str(e)[:100]}"))
             else:
-                await message.answer(f"Ошибка при сохранении ответа: {e}")
+                await message.answer(safe_tg_message(f"Ошибка при сохранении ответа: {str(e)[:100]}"))
         finally:
             await state.clear()
 
@@ -288,18 +306,18 @@ async def cmd_survey(message: types.Message, command: CommandObject, state: FSMC
         first_q = survey["questions"][0]
         if first_q["type"] == "multiple_choice":
             keyboard = get_multiple_choice_keyboard(first_q["options"])
-            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
+            await message.answer(safe_tg_message(first_q['text']), reply_markup=keyboard)
         elif first_q["type"] == "rating":
             keyboard = get_rating_keyboard(first_q.get("scale", 5))
-            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
+            await message.answer(safe_tg_message(first_q['text']), reply_markup=keyboard)
         elif first_q["type"] == "ranking":
             keyboard = get_ranking_keyboard(first_q["items"])
-            await message.answer(f"{first_q['text']}\n\nВыберите один элемент:", reply_markup=keyboard)
+            await message.answer(safe_tg_message(f"{first_q['text']}\n\nВыберите один элемент:"), reply_markup=keyboard)
         elif first_q["type"] == "image_choice":
             keyboard = get_image_choice_keyboard(first_q["images"])
-            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
+            await message.answer(safe_tg_message(first_q['text']), reply_markup=keyboard)
         else:
-            await message.answer(f"{first_q['text']}")
+            await message.answer(safe_tg_message(first_q['text']))
         await state.set_state(SurveyStates.answering)
     else:
         await message.answer("Использование: /survey <код_опроса>")

@@ -58,10 +58,40 @@ async def get_survey_by_public_id(public_id: str):
             raise
 
 async def submit_survey_answer(public_id: str, answers: list, respondent_id: str = None):
+    print(f"📤 Submitting answers for survey: {public_id}")
+    print(f"📋 Answers: {answers}")
+    print(f"👤 Respondent ID: {respondent_id}")
+    
+    url = f"{BACKEND_URL}/api/surveys/s/{public_id}/answer"
+    print(f"📡 Making POST request to: {url}")
+    
     async with httpx.AsyncClient() as client:
         payload = {"answers": answers}
         if respondent_id:
             payload["respondent_id"] = respondent_id
-        res = await client.post(f"{BACKEND_URL}/api/surveys/s/{public_id}/answer", json=payload)
-        res.raise_for_status()
-        return res.json() 
+        
+        print(f"📦 Payload: {payload}")
+        
+        try:
+            res = await client.post(url, json=payload)
+            print(f"📊 Response status: {res.status_code}")
+            print(f"📄 Response headers: {res.headers}")
+            print(f"📄 Response content: {res.text[:500]}")
+            
+            res.raise_for_status()
+            
+            if res.content:
+                data = res.json()
+                print(f"✅ Answer submitted successfully: {data}")
+                return data
+            else:
+                print("⚠️ Empty response from server")
+                return {"ok": True, "message": "Answer submitted"}
+                
+        except httpx.HTTPStatusError as e:
+            print(f"❌ HTTP error: {e}")
+            print(f"❌ Response content: {e.response.text[:500]}")
+            raise
+        except Exception as e:
+            print(f"❌ Unexpected error: {e}")
+            raise 
