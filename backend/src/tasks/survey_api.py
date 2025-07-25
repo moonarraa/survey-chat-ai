@@ -268,10 +268,6 @@ async def submit_public_survey_answer(
                 return PublicSurveyAnswerOut(ok=False, message=result['message'])
     # --- END FOLLOWUP SUBAGENT INTEGRATION ---
 
-    # If it's a template survey, broadcast the leaderboard update
-    if survey["is_template_survey"]:
-        await broadcast_leaderboard_update(db)
-
     return PublicSurveyAnswerOut(ok=True, message="Ответ успешно сохранён!")
 
 @router.post("/s/{public_id}/next-question")
