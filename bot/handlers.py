@@ -14,7 +14,7 @@ class SurveyStates(StatesGroup):
 
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, command: CommandObject, state: FSMContext):
-    print(f"Received /start with payload: {command.args}")
+    print(f"🚀 Received /start with payload: {command.args}")
     payload = command.args
     if payload:
         # Поддерживаем s_префикс + обычный ввод public_id
@@ -23,9 +23,15 @@ async def cmd_start(message: types.Message, command: CommandObject, state: FSMCo
         else:
             public_id = payload
             
+        print(f"🔍 Extracted public_id: {public_id}")
+        
         try:
+            print(f"📡 Calling API to get survey...")
             survey = await api.get_survey_by_public_id(public_id)
-        except Exception:
+            print(f"✅ Survey retrieved successfully: {survey}")
+        except Exception as e:
+            print(f"❌ Error getting survey: {e}")
+            print(f"❌ Error type: {type(e)}")
             await message.answer("Опрос не найден или недоступен.")
             return
         await state.update_data(
