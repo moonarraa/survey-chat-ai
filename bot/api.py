@@ -17,15 +17,39 @@ async def get_survey_by_public_id(public_id: str):
             res = await client.get(url)
             print(f"📊 Response status: {res.status_code}")
             print(f"📄 Response headers: {res.headers}")
+            print(f"📄 Content-Type: {res.headers.get('content-type', 'Not set')}")
+            
+            # Логируем первые 200 символов ответа для отладки
+            content_preview = res.text[:200]
+            print(f"📄 Content preview: {content_preview}")
             
             if res.status_code == 404:
                 print("❌ Survey not found (404)")
                 raise SurveyNotFoundError("Survey not found")
             
             res.raise_for_status()
-            data = res.json()
-            print(f"✅ Survey data received: {data}")
-            return data
+            
+            # Попробуем разные способы декодирования
+            try:
+                data = res.json()
+                print(f"✅ Survey data received: {data}")
+                return data
+            except Exception as json_error:
+                print(f"❌ JSON parsing error: {json_error}")
+                print(f"❌ Raw content: {res.text[:500]}")
+                
+                # Попробуем декодировать как UTF-8
+                try:
+                    decoded_content = res.content.decode('utf-8')
+                    print(f"🔧 UTF-8 decoded content: {decoded_content[:200]}")
+                    import json
+                    data = json.loads(decoded_content)
+                    print(f"✅ Survey data decoded successfully: {data}")
+                    return data
+                except Exception as decode_error:
+                    print(f"❌ UTF-8 decode error: {decode_error}")
+                    raise SurveyNotFoundError(f"Failed to parse survey data: {json_error}")
+                    
         except httpx.HTTPStatusError as e:
             print(f"❌ HTTP error: {e}")
             raise
