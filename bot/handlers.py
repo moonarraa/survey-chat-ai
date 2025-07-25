@@ -44,18 +44,18 @@ async def cmd_start(message: types.Message, command: CommandObject, state: FSMCo
         first_q = survey["questions"][0]
         if first_q["type"] == "multiple_choice":
             keyboard = get_multiple_choice_keyboard(first_q["options"])
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}", reply_markup=keyboard)
+            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
         elif first_q["type"] == "rating":
             keyboard = get_rating_keyboard(first_q.get("scale", 5))
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}", reply_markup=keyboard)
+            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
         elif first_q["type"] == "ranking":
             keyboard = get_ranking_keyboard(first_q["items"])
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}\n\nВыберите один элемент:", reply_markup=keyboard)
+            await message.answer(f"{first_q['text']}\n\nВыберите один элемент:", reply_markup=keyboard)
         elif first_q["type"] == "image_choice":
             keyboard = get_image_choice_keyboard(first_q["images"])
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}", reply_markup=keyboard)
+            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
         else:
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}")
+            await message.answer(f"{first_q['text']}")
         await state.set_state(SurveyStates.answering)
         return
     # Only show the welcome message if no valid payload
@@ -143,18 +143,18 @@ async def handle_survey_link_or_code(message: types.Message, state: FSMContext):
     first_q = survey["questions"][0]
     if first_q["type"] == "multiple_choice":
         keyboard = get_multiple_choice_keyboard(first_q["options"])
-        await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}", reply_markup=keyboard)
+        await message.answer(f"{first_q['text']}", reply_markup=keyboard)
     elif first_q["type"] == "rating":
         keyboard = get_rating_keyboard(first_q.get("scale", 5))
-        await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}", reply_markup=keyboard)
+        await message.answer(f"{first_q['text']}", reply_markup=keyboard)
     elif first_q["type"] == "ranking":
         keyboard = get_ranking_keyboard(first_q["items"])
-        await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}\n\nВыберите один элемент:", reply_markup=keyboard)
+        await message.answer(f"{first_q['text']}\n\nВыберите один элемент:", reply_markup=keyboard)
     elif first_q["type"] == "image_choice":
         keyboard = get_image_choice_keyboard(first_q["images"])
-        await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}", reply_markup=keyboard)
+        await message.answer(f"{first_q['text']}", reply_markup=keyboard)
     else:
-        await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}")
+        await message.answer(f"{first_q['text']}")
     await state.set_state(SurveyStates.answering)
 
 @router.callback_query(F.data.startswith("answer:"))
@@ -288,18 +288,18 @@ async def cmd_survey(message: types.Message, command: CommandObject, state: FSMC
         first_q = survey["questions"][0]
         if first_q["type"] == "multiple_choice":
             keyboard = get_multiple_choice_keyboard(first_q["options"])
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}", reply_markup=keyboard)
+            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
         elif first_q["type"] == "rating":
             keyboard = get_rating_keyboard(first_q.get("scale", 5))
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}", reply_markup=keyboard)
+            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
         elif first_q["type"] == "ranking":
             keyboard = get_ranking_keyboard(first_q["items"])
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}\n\nВыберите один элемент:", reply_markup=keyboard)
+            await message.answer(f"{first_q['text']}\n\nВыберите один элемент:", reply_markup=keyboard)
         elif first_q["type"] == "image_choice":
             keyboard = get_image_choice_keyboard(first_q["images"])
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}", reply_markup=keyboard)
+            await message.answer(f"{first_q['text']}", reply_markup=keyboard)
         else:
-            await message.answer(f"📋 Опрос: {survey.get('topic', '')}\n\n{first_q['text']}")
+            await message.answer(f"{first_q['text']}")
         await state.set_state(SurveyStates.answering)
     else:
         await message.answer("Использование: /survey <код_опроса>")
