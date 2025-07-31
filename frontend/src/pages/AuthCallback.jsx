@@ -38,9 +38,24 @@ const AuthCallback = () => {
         // Handle Google OAuth callback with token (from our backend)
         if (token) {
           console.log('✅ Received token from Google OAuth callback');
-          localStorage.setItem('access_token', token);
+          console.log('🔗 Token length:', token.length);
+          localStorage.setItem('token', token); // Fixed: use 'token' instead of 'access_token'
+          console.log('💾 Token stored in localStorage with key "token"');
           setStatus('success');
-          setTimeout(() => navigate('/dashboard'), 1000);
+          console.log('🔄 Setting status to success, will redirect in 1 second...');
+          
+          // Immediate redirect as fallback
+          setTimeout(() => {
+            console.log('🚀 Attempting redirect to /dashboard...');
+            navigate('/dashboard');
+          }, 1000);
+          
+          // Additional fallback redirect after 3 seconds
+          setTimeout(() => {
+            console.log('🔄 Fallback redirect attempt...');
+            window.location.href = '/dashboard';
+          }, 3000);
+          
           return;
         }
 
@@ -127,7 +142,7 @@ const AuthCallback = () => {
       const backendData = await backendResponse.json();
 
       if (backendData.access_token) {
-        localStorage.setItem('access_token', backendData.access_token);
+        localStorage.setItem('token', backendData.access_token); // Fixed: use 'token' instead of 'access_token'
         setStatus('success');
         setTimeout(() => navigate('/dashboard'), 1000);
       } else {
@@ -155,7 +170,7 @@ const AuthCallback = () => {
       const data = await response.json();
 
       if (data.access_token) {
-        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('token', data.access_token); // Fixed: use 'token' instead of 'access_token'
         setStatus('success');
         setTimeout(() => navigate('/dashboard'), 1000);
       } else {
@@ -189,7 +204,7 @@ const AuthCallback = () => {
       const data = await response.json();
 
       if (data.access_token) {
-        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('token', data.access_token); // Fixed: use 'token' instead of 'access_token'
         setStatus('success');
         setTimeout(() => navigate('/dashboard'), 1000);
       } else {
