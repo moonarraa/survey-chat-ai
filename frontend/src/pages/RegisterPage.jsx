@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, User, Mail, Building, Briefcase, Lock, CheckCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -6,6 +6,7 @@ import OAuthButtons from '../components/OAuthButtons';
 import { BACKEND_URL, getApiUrl } from '../config';
 import { useTranslation } from 'react-i18next';
 import AnimatedBackground from '../components/AnimatedBackground';
+import { isMobileDevice } from '../utils/browserDetection';
 
 function RegisterPage() {
   const { t } = useTranslation();
@@ -19,7 +20,12 @@ function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsMobile(isMobileDevice());
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -298,18 +304,23 @@ function RegisterPage() {
               )}
             </motion.button>
 
-            {/* Divider */}
-            <div className="mt-6 relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">{t('or')}</span>
-              </div>
-            </div>
+            {/* OAuth Section - Hidden on Mobile */}
+            {!isMobile && (
+              <>
+                {/* Divider */}
+                <div className="mt-6 relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-gray-500">{t('or')}</span>
+                  </div>
+                </div>
 
-            {/* Google OAuth Button */}
-            <OAuthButtons showEmailFallback={true} />
+                {/* Google OAuth Button */}
+                <OAuthButtons showEmailFallback={true} />
+              </>
+            )}
           </form>
 
           {/* Login Link */}
