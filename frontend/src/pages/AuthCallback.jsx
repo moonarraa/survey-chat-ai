@@ -14,8 +14,19 @@ const AuthCallback = () => {
     const handleCallback = async () => {
       try {
         const code = searchParams.get('code');
+        const token = searchParams.get('token');
         const error = searchParams.get('error');
         const state = searchParams.get('state');
+
+        // Debug logging
+        console.log('🔍 AuthCallback Debug Info:');
+        console.log('URL:', window.location.href);
+        console.log('Pathname:', window.location.pathname);
+        console.log('Search params:', Object.fromEntries(searchParams.entries()));
+        console.log('Code:', code);
+        console.log('Token:', token);
+        console.log('Error:', error);
+        console.log('State:', state);
 
         if (error) {
           console.error('OAuth error:', error);
@@ -24,36 +35,43 @@ const AuthCallback = () => {
           return;
         }
 
-        if (!code) {
-          console.error('No authorization code received');
-          setError('No authorization code received');
-          setStatus('error');
+        // Handle Google OAuth callback with token (from our backend)
+        if (token) {
+          console.log('✅ Received token from Google OAuth callback');
+          localStorage.setItem('access_token', token);
+          setStatus('success');
+          setTimeout(() => navigate('/dashboard'), 1000);
           return;
         }
 
         // Handle Auth0 callback
-        if (window.location.pathname.includes('/auth/callback')) {
+        if (window.location.pathname.includes('/auth/callback') && code) {
+          console.log('🔄 Handling Auth0 callback with code');
           await handleAuth0Callback(code);
           return;
         }
 
-        // Handle Google OAuth callback
-        if (window.location.pathname.includes('/auth/google/callback')) {
+        // Handle Google OAuth callback with code (legacy flow)
+        if (window.location.pathname.includes('/auth/google/callback') && code) {
+          console.log('🔄 Handling Google callback with code');
           await handleGoogleCallback(code);
           return;
         }
 
         // Handle magic link callback
         if (window.location.pathname.includes('/auth/magic-link')) {
+          console.log('🔄 Handling magic link callback');
           await handleMagicLinkCallback();
           return;
         }
 
-        setError('Unknown callback type');
+        console.error('❌ No authorization code or token received');
+        console.error('Available search params:', Object.fromEntries(searchParams.entries()));
+        setError('No authorization code or token received');
         setStatus('error');
 
       } catch (err) {
-        console.error('Callback handling error:', err);
+        console.error('❌ Callback handling error:', err);
         setError(err.message);
         setStatus('error');
       }
@@ -185,71 +203,54 @@ const AuthCallback = () => {
     }
   };
 
+  // Render loading state
   if (status === 'processing') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-              {t('Processing Authentication')}
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              {t('Please wait while we complete your sign-in...')}
-            </p>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Processing authentication...</h2>
+          <p className="text-gray-600">Please wait while we complete your sign-in.</p>
         </div>
       </div>
     );
   }
 
+  // Render error state
   if (status === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
-              <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-              {t('Authentication Failed')}
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              {error || t('An error occurred during authentication')}
-            </p>
-            <div className="mt-6">
-              <button
-                onClick={() => navigate('/login')}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-              >
-                {t('Back to Login')}
-              </button>
-            </div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <div className="bg-red-100 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authentication Failed</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <button
+            onClick={() => navigate('/login')}
+            className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg hover:bg-primary-700 transition-colors"
+          >
+            Back to Login
+          </button>
         </div>
       </div>
     );
   }
 
+  // Render success state
   if (status === 'success') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="max-w-md w-full space-y-8">
-          <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-              <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-              {t('Authentication Successful')}
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              {t('Redirecting to dashboard...')}
-            </p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="bg-green-100 rounded-full p-3 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
           </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Authentication Successful!</h2>
+          <p className="text-gray-600">Redirecting to dashboard...</p>
         </div>
       </div>
     );
